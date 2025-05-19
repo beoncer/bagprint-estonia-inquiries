@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Sample product data - this would come from the backend in the real implementation
 const products = [
@@ -39,6 +41,17 @@ const products = [
         { quantity: 200, price: 2.50 },
         { quantity: 500, price: 2.30 },
         { quantity: 1000, price: 2.10 }
+      ],
+      colorSurcharge: [
+        { colors: 0, surcharge: 0 },
+        { colors: 1, surcharge: 0.3 },
+        { colors: 2, surcharge: 0.5 },
+        { colors: 3, surcharge: 0.7 },
+        { colors: 4, surcharge: 0.9 },
+        { colors: 5, surcharge: 1.1 },
+        { colors: 6, surcharge: 1.3 },
+        { colors: 7, surcharge: 1.5 },
+        { colors: 8, surcharge: 1.7 }
       ]
     }
   },
@@ -73,6 +86,17 @@ const products = [
         { quantity: 200, price: 1.80 },
         { quantity: 500, price: 1.60 },
         { quantity: 1000, price: 1.40 }
+      ],
+      colorSurcharge: [
+        { colors: 0, surcharge: 0 },
+        { colors: 1, surcharge: 0.3 },
+        { colors: 2, surcharge: 0.5 },
+        { colors: 3, surcharge: 0.7 },
+        { colors: 4, surcharge: 0.9 },
+        { colors: 5, surcharge: 1.1 },
+        { colors: 6, surcharge: 1.3 },
+        { colors: 7, surcharge: 1.5 },
+        { colors: 8, surcharge: 1.7 }
       ]
     }
   }
@@ -83,6 +107,12 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
+  
+  // Calculator state
+  const [quantity, setQuantity] = useState<number>(100);
+  const [printColors, setPrintColors] = useState<number>(0);
+  const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
+  const [pricePerItem, setPricePerItem] = useState<number>(0);
   
   useEffect(() => {
     // Simulate API call to get product details
@@ -101,6 +131,40 @@ const ProductDetail = () => {
     
     fetchProduct();
   }, [id]);
+  
+  useEffect(() => {
+    if (product) {
+      calculatePrice(quantity, printColors);
+    }
+  }, [quantity, printColors, product]);
+  
+  const calculatePrice = (qty: number, colors: number) => {
+    if (!product) return;
+    
+    let basePrice = 0;
+    let pricingList = printColors > 0 ? product.pricing.withPrint : product.pricing.withoutPrint;
+    
+    // Find the appropriate price bracket based on quantity
+    for (let i = 0; i < pricingList.length; i++) {
+      if (qty <= pricingList[i].quantity || i === pricingList.length - 1) {
+        basePrice = pricingList[i].price;
+        break;
+      }
+    }
+    
+    // Add color surcharge if applicable
+    let colorPrice = 0;
+    if (colors > 0 && product.pricing.colorSurcharge) {
+      const colorSurcharge = product.pricing.colorSurcharge.find(c => c.colors === colors);
+      if (colorSurcharge) {
+        colorPrice = colorSurcharge.surcharge;
+      }
+    }
+    
+    const totalPricePerItem = basePrice + colorPrice;
+    setPricePerItem(totalPricePerItem);
+    setCalculatedPrice(totalPricePerItem * qty);
+  };
   
   if (loading) {
     return (
@@ -179,27 +243,68 @@ const ProductDetail = () => {
             </div>
           </div>
           
-          {/* Product Info */}
+          {/* Product Info and Calculator */}
           <div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
             <p className="text-gray-700 mb-6">{product.description}</p>
             
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-2">Alates</h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-primary">
-                  {product.pricing.withoutPrint[product.pricing.withoutPrint.length - 1].price.toFixed(2)} €
-                </span>
-                <span className="text-gray-500">/ tk (ilma trükita)</span>
+            {/* Price Calculator */}
+            <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
+              <h3 className="text-xl font-semibold mb-4">Arvuta hind</h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="quantity" className="mb-2 block">Kogus</Label>
+                  <Input 
+                    id="quantity" 
+                    type="number" 
+                    min="50" 
+                    value={quantity} 
+                    onChange={(e) => setQuantity(Number(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="print-colors" className="mb-2 block">Trüki värvid</Label>
+                  <Select 
+                    value={printColors.toString()} 
+                    onValueChange={(value) => setPrintColors(Number(value))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Vali värvide arv" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Ilma trükita</SelectItem>
+                      <SelectItem value="1">1 värv</SelectItem>
+                      <SelectItem value="2">2 värvi</SelectItem>
+                      <SelectItem value="3">3 värvi</SelectItem>
+                      <SelectItem value="4">4 värvi</SelectItem>
+                      <SelectItem value="5">5 värvi</SelectItem>
+                      <SelectItem value="6">6 värvi</SelectItem>
+                      <SelectItem value="7">7 värvi</SelectItem>
+                      <SelectItem value="8">8 värvi</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span>Hind/tk:</span>
+                    <span className="font-medium">{pricePerItem.toFixed(2)} €</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Kokku:</span>
+                    <span className="text-xl font-bold text-primary">{calculatedPrice.toFixed(2)} €</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">* Hinnad on indikatiivsed ja ei sisalda käibemaksu</p>
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mt-1">
-                * Hind sõltub kogusest ja trüki valikutest
-              </p>
             </div>
             
             <div className="space-y-6">
               <Button size="lg" className="w-full md:w-auto" asChild>
-                <Link to={`/inquiry?product=${product.id}`}>
+                <Link to={`/inquiry?product=${product.id}&quantity=${quantity}&colors=${printColors}`}>
                   Küsi pakkumist
                 </Link>
               </Button>
@@ -207,130 +312,39 @@ const ProductDetail = () => {
           </div>
         </div>
         
-        {/* Product Details Tabs */}
+        {/* Product Specifications */}
         <div className="mt-16">
-          <Tabs defaultValue="info">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="info">Toote info</TabsTrigger>
-              <TabsTrigger value="pricing">Hinnad</TabsTrigger>
-              <TabsTrigger value="printing">Trüki info</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="info" className="pt-4">
-              <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <table className="w-full">
-                    <tbody>
-                      {Object.entries(product.specifications).map(([key, value]) => {
-                        if (key !== 'colors') {
-                          return (
-                            <tr key={key} className="border-b">
-                              <td className="py-3 font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                              <td className="py-3">{value as string}</td>
-                            </tr>
-                          );
-                        }
-                        return null;
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Saadaval värvid:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {product.specifications.colors.map((color: string) => (
-                      <span key={color} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                        {color}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="pricing" className="pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Hinnad ilma trükita</h3>
-                  <table className="price-table">
-                    <thead>
-                      <tr>
-                        <th>Kogus</th>
-                        <th>Hind / tk (€)</th>
-                        <th>Kokku (€)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {product.pricing.withoutPrint.map((item: any) => (
-                        <tr key={item.quantity}>
-                          <td>{item.quantity} tk</td>
-                          <td>{item.price.toFixed(2)} €</td>
-                          <td>{(item.quantity * item.price).toFixed(2)} €</td>
+          <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <table className="w-full">
+                <tbody>
+                  {Object.entries(product.specifications).map(([key, value]) => {
+                    if (key !== 'colors') {
+                      return (
+                        <tr key={key} className="border-b">
+                          <td className="py-3 font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                          <td className="py-3">{value as string}</td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Hinnad koos trükiga</h3>
-                  <table className="price-table">
-                    <thead>
-                      <tr>
-                        <th>Kogus</th>
-                        <th>Hind / tk (€)</th>
-                        <th>Kokku (€)</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {product.pricing.withPrint.map((item: any) => (
-                        <tr key={item.quantity}>
-                          <td>{item.quantity} tk</td>
-                          <td>{item.price.toFixed(2)} €</td>
-                          <td>{(item.quantity * item.price).toFixed(2)} €</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <p className="mt-6 text-sm text-gray-500">
-                * Hinnad on indikatiivsed ja võivad varieeruda sõltuvalt trüki värvilisusest, suurusest ja muudest teguritest. Täpse pakkumise saamiseks palun kasutage pakkumise küsimise vormi.
-              </p>
-            </TabsContent>
+                      );
+                    }
+                    return null;
+                  })}
+                </tbody>
+              </table>
+            </div>
             
-            <TabsContent value="printing" className="pt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Trükkimisvõimalused</h3>
-                  <p className="mb-4">
-                    Pakume mitmeid erinevaid trükkimisvõimalusi, et täita teie ettevõtte vajadused:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Siiditrükk - ideaalne suuremate koguste jaoks</li>
-                    <li>Transfertrükk - sobib detailsete kujunduste jaoks</li>
-                    <li>Flock-trükk - annab tekstuurse, veidi reljeefsena tunduva tulemuse</li>
-                    <li>Flex-trükk - vastupidav ja elastne</li>
-                    <li>Digitrükk - väiksemate koguste ja värviliste kujunduste jaoks</li>
-                  </ul>
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Trüki ettevalmistus</h3>
-                  <p className="mb-4">
-                    Trükkimiseks vajame teie logo või kujunduse vektor-formaadis failina (.ai, .eps, .pdf või .svg).
-                  </p>
-                  <p className="mb-4">
-                    Kui teil pole vektor-formaati, võime aidata teie olemasoleva logo konvertimisega.
-                  </p>
-                  <p>
-                    Trüki värvid saame kohandada vastavalt teie ettevõtte stiilile (Pantone või CMYK).
-                  </p>
-                </div>
+            <div>
+              <h4 className="font-medium mb-2">Saadaval värvid:</h4>
+              <div className="flex flex-wrap gap-2">
+                {product.specifications.colors.map((color: string) => (
+                  <span key={color} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                    {color}
+                  </span>
+                ))}
               </div>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>

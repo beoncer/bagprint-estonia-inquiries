@@ -12,7 +12,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-sm">
+    <nav className="bg-transparent absolute w-full z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-primary">
@@ -50,30 +50,30 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden pt-4 pb-2 animate-fade-in">
+          <div className="md:hidden pt-4 pb-2 animate-fade-in bg-white rounded-lg shadow-lg mt-2">
             <div className="flex flex-col space-y-3">
               <Link 
                 to="/" 
-                className="py-2 hover:text-primary transition-colors"
+                className="py-2 hover:text-primary transition-colors px-4"
                 onClick={() => setIsOpen(false)}
               >
                 Avaleht
               </Link>
               <Link 
                 to="/products" 
-                className="py-2 hover:text-primary transition-colors"
+                className="py-2 hover:text-primary transition-colors px-4"
                 onClick={() => setIsOpen(false)}
               >
                 Tooted
               </Link>
               <Link 
                 to="/contact" 
-                className="py-2 hover:text-primary transition-colors"
+                className="py-2 hover:text-primary transition-colors px-4"
                 onClick={() => setIsOpen(false)}
               >
                 Kontakt
               </Link>
-              <Button asChild className="w-full mt-2">
+              <Button asChild className="w-full mt-2 mx-4">
                 <Link 
                   to="/inquiry" 
                   onClick={() => setIsOpen(false)}
