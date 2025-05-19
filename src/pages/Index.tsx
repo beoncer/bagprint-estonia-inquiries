@@ -44,7 +44,7 @@ const Index = () => {
                 Kvaliteetsed kotid ja pakendid teie brändile
               </h1>
               <p className="text-lg text-gray-600 mb-8">
-                bagprint.ee pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
+                Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                 e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
               </p>
               <div className="flex flex-wrap gap-4">
