@@ -35,9 +35,17 @@ const featuredProducts = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="bg-gray-50">
-        <div className="container mx-auto px-4 py-20">
+      {/* Hero Section with new background image */}
+      <section 
+        className="relative bg-cover bg-center bg-no-repeat" 
+        style={{ 
+          backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center"
+        }}
+      >
+        <div className="absolute inset-0 bg-white/75"></div>
+        <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
