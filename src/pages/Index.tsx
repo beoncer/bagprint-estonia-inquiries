@@ -29,13 +29,21 @@ const featuredProducts = [
     image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
     category: "drawstring",
     startingPrice: 1.20
+  },
+  {
+    id: "bag1",
+    name: "Sussikott",
+    description: "Kvaliteetsed ja vastupidavad sussikotid.",
+    image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=800&auto=format&fit=crop",
+    category: "shoebag",
+    startingPrice: 1.40
   }
 ];
 
 const Index = () => {
   return (
     <Layout>
-      {/* Hero Section with new background image */}
+      {/* Hero Section with enhanced background */}
       <section 
         className="relative bg-cover bg-center bg-no-repeat" 
         style={{ 
@@ -44,7 +52,7 @@ const Index = () => {
           backgroundPosition: "center"
         }}
       >
-        <div className="absolute inset-0 bg-white/75"></div>
+        <div className="absolute inset-0 bg-white/60"></div>
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="flex flex-col md:flex-row items-center">
             <div className="md:w-1/2 mb-10 md:mb-0">
@@ -64,96 +72,80 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <div className="md:w-1/2 md:pl-10">
-              <img 
-                src="https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop" 
-                alt="Cotton bags with print"
-                className="rounded-lg shadow-lg"
-              />
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Updated Categories Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Meie tootekategooriad</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">Meie tooted</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full p-6 mb-4 mx-auto w-28 h-28 flex items-center justify-center">
+              <div className="h-60 mb-4 overflow-hidden rounded-lg">
                 <img 
-                  src="https://images.unsplash.com/photo-1607166452147-3a432d381111?w=200&auto=format&fit=crop"
-                  alt="Puuvillakotid"
-                  className="w-16 h-16 object-cover rounded-full"
+                  src="https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop"
+                  alt="Riidest kotid"
+                  className="w-full h-full object-cover transition-all hover:scale-105"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Puuvillakotid</h3>
-              <p className="text-gray-600 mb-4">Keskkonnasõbralikud ja vastupidavad</p>
+              <h3 className="text-xl font-semibold mb-2">Riidest kotid</h3>
               <Button variant="link" asChild>
                 <Link to="/products?category=cotton">Vaata tooteid</Link>
               </Button>
             </div>
             
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full p-6 mb-4 mx-auto w-28 h-28 flex items-center justify-center">
+              <div className="h-60 mb-4 overflow-hidden rounded-lg">
                 <img 
-                  src="https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=200&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop" 
                   alt="Paberkotid"
-                  className="w-16 h-16 object-cover rounded-full"
+                  className="w-full h-full object-cover transition-all hover:scale-105"
                 />
               </div>
               <h3 className="text-xl font-semibold mb-2">Paberkotid</h3>
-              <p className="text-gray-600 mb-4">Elegantsed ja ökoloogilised</p>
               <Button variant="link" asChild>
                 <Link to="/products?category=paper">Vaata tooteid</Link>
               </Button>
             </div>
             
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full p-6 mb-4 mx-auto w-28 h-28 flex items-center justify-center">
+              <div className="h-60 mb-4 overflow-hidden rounded-lg">
                 <img 
-                  src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=200&auto=format&fit=crop" 
-                  alt="Paelaga kotid"
-                  className="w-16 h-16 object-cover rounded-full"
+                  src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop" 
+                  alt="Nööriga kotid"
+                  className="w-full h-full object-cover transition-all hover:scale-105"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Paelaga kotid</h3>
-              <p className="text-gray-600 mb-4">Praktilised ja mitmekülgsed</p>
+              <h3 className="text-xl font-semibold mb-2">Nööriga kotid</h3>
               <Button variant="link" asChild>
                 <Link to="/products?category=drawstring">Vaata tooteid</Link>
               </Button>
             </div>
             
             <div className="text-center">
-              <div className="bg-gray-100 rounded-full p-6 mb-4 mx-auto w-28 h-28 flex items-center justify-center">
+              <div className="h-60 mb-4 overflow-hidden rounded-lg">
                 <img 
-                  src="https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=200&auto=format&fit=crop" 
-                  alt="E-poe pakendid"
-                  className="w-16 h-16 object-cover rounded-full"
+                  src="https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop" 
+                  alt="Sussikotid"
+                  className="w-full h-full object-cover transition-all hover:scale-105"
                 />
               </div>
-              <h3 className="text-xl font-semibold mb-2">E-poe pakendid</h3>
-              <p className="text-gray-600 mb-4">Funktsionaalsed ja bränditud</p>
+              <h3 className="text-xl font-semibold mb-2">Sussikotid</h3>
               <Button variant="link" asChild>
-                <Link to="/products?category=packaging">Vaata tooteid</Link>
+                <Link to="/products?category=shoebag">Vaata tooteid</Link>
               </Button>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products Section */}
+      {/* Featured Products Section - Now with 4 products and no "View all" button */}
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Populaarsed tooted</h2>
           <ProductGrid products={featuredProducts} />
-          <div className="text-center mt-10">
-            <Button asChild>
-              <Link to="/products">Vaata kõiki tooteid</Link>
-            </Button>
-          </div>
         </div>
       </section>
 
