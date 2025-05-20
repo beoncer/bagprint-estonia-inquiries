@@ -43,7 +43,7 @@ const featuredProducts = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero Section with enhanced background */}
+      {/* Hero Section with reduced height and more transparent background */}
       <section 
         className="relative bg-cover bg-center bg-no-repeat" 
         style={{ 
@@ -52,14 +52,14 @@ const Index = () => {
           backgroundPosition: "center"
         }}
       >
-        <div className="absolute inset-0 bg-white/60"></div>
-        <div className="container mx-auto px-4 py-20 relative z-10">
+        <div className="absolute inset-0 bg-white/45"></div> {/* Adjusted transparency for more vivid background */}
+        <div className="container mx-auto px-4 py-12 relative z-10"> {/* Reduced padding from py-20 to py-12 */}
           <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-10 md:mb-0">
+            <div className="md:w-1/2 mb-8 md:mb-0"> {/* Reduced margin-bottom */}
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Kvaliteetsed kotid ja pakendid teie brändile
               </h1>
-              <p className="text-lg text-gray-600 mb-8">
+              <p className="text-lg text-gray-600 mb-6"> {/* Reduced margin-bottom */}
                 Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                 e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
               </p>

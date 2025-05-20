@@ -21,13 +21,13 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8 items-center">
-            <Link to="/" className="hover:text-primary transition-colors">
+            <Link to="/" className="text-gray-800 font-medium hover:text-primary transition-colors">
               Avaleht
             </Link>
-            <Link to="/products" className="hover:text-primary transition-colors">
+            <Link to="/products" className="text-gray-800 font-medium hover:text-primary transition-colors">
               Tooted
             </Link>
-            <Link to="/contact" className="hover:text-primary transition-colors">
+            <Link to="/contact" className="text-gray-800 font-medium hover:text-primary transition-colors">
               Kontakt
             </Link>
             <Button asChild>
@@ -41,7 +41,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button 
               onClick={toggleMenu}
-              className="text-gray-500 hover:text-primary"
+              className="text-gray-800 hover:text-primary"
             >
               <Menu size={24} />
             </button>
