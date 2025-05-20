@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 348 86% 93%;
+    --background: 348 5% 95%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -91,7 +91,7 @@
   }
 
   body {
-    @apply bg-[#fcdee4] text-foreground font-fixel;
+    @apply bg-[#f7f2f3] text-foreground font-fixel;
   }
 }
 
