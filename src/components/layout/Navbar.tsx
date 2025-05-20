@@ -15,7 +15,7 @@ const Navbar = () => {
     <nav className="bg-transparent absolute w-full z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-primary">
+          <Link to="/" className="text-3xl font-bold text-primary">
             Leatex
           </Link>
 

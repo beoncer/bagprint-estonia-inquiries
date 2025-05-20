@@ -52,18 +52,18 @@ const Index = () => {
           backgroundPosition: "center"
         }}
       >
-        <div className="absolute inset-0 bg-white/45"></div> {/* Adjusted transparency for more vivid background */}
-        <div className="container mx-auto px-4 py-12 relative z-10"> {/* Reduced padding from py-20 to py-12 */}
-          <div className="flex flex-col md:flex-row items-center">
-            <div className="md:w-1/2 mb-8 md:mb-0"> {/* Reduced margin-bottom */}
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className="absolute inset-0 bg-white/45"></div>
+        <div className="container mx-auto px-4 py-12 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="md:w-1/2 mb-8 md:mb-0">
+              <h1 className="text-3xl md:text-4xl font-bold mb-3">
                 Kvaliteetsed kotid ja pakendid teie brändile
               </h1>
-              <p className="text-lg text-gray-600 mb-6"> {/* Reduced margin-bottom */}
+              <p className="text-base text-gray-600 mb-8">
                 Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                 e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap gap-4 mt-auto">
                 <Button size="lg" asChild>
                   <Link to="/products">Vaata tooteid</Link>
                 </Button>
