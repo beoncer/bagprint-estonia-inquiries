@@ -42,29 +42,30 @@ const featuredProducts = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero Section with reduced height and more transparent background */}
+      {/* Hero Section with increased height */}
       <section 
         className="relative bg-cover bg-center bg-no-repeat" 
         style={{ 
           backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
           backgroundSize: "cover",
-          backgroundPosition: "center"
+          backgroundPosition: "center",
+          height: "600px" // Increased height
         }}
       >
         <div className="absolute inset-0 bg-white/45"></div>
-        <div className="container mx-auto px-4 py-10 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col h-full">
-              <div className="mt-8 mb-4">
-                <h1 className="text-3xl md:text-4xl font-bold mb-3">
+        <div className="container mx-auto px-4 py-20 relative z-10 h-full">
+          <div className="flex flex-col md:flex-row items-center justify-between h-full">
+            <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-10">
+              <div className="mt-16"> {/* Added more spacing from the top */}
+                <h1 className="text-3xl md:text-3xl font-bold mb-4">
                   Kvaliteetsed kotid ja pakendid teie brändile
                 </h1>
-                <p className="text-base text-gray-600 mb-6">
+                <p className="text-base text-gray-600 mb-8">
                   Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                   e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
                 </p>
               </div>
-              <div className="flex flex-wrap gap-4 mt-auto pb-4">
+              <div className="flex flex-wrap gap-4 mb-10">
                 <Button size="lg" asChild>
                   <Link to="/products">Vaata tooteid</Link>
                 </Button>
@@ -77,10 +78,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Updated Categories Section - reduced top padding */}
-      <section className="py-8">
+      {/* Updated Categories Section - moved down due to larger hero section */}
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Meie tooted</h2>
+          <h2 className="text-3xl font-bold text-center mb-10">Meie tooted</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
