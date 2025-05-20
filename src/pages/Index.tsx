@@ -57,21 +57,22 @@ const Index = () => {
           <div className="absolute inset-0 bg-white/45"></div>
           <div className="container mx-auto px-4 relative z-10 h-full">
             <div className="flex flex-col md:flex-row items-center justify-between h-full">
-              <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-10">
-                <div className="mt-16"> {/* Added more spacing from the top */}
-                  <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-6 md:py-10">
+                <div className="mt-6 md:mt-16"> {/* Adjusted top spacing for better responsiveness */}
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
                     Kvaliteetsed kotid ja pakendid teie brändile
                   </h1>
-                  <p className="text-xl text-gray-600 mb-8">
+                  <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
                     Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                     e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-4 mb-10">
-                  <Button size="lg" className="text-xl py-7 px-10" asChild>
+                {/* Ensure buttons are always visible by moving them higher in the container */}
+                <div className="flex flex-wrap gap-3 md:gap-4 mb-6 md:mb-10">
+                  <Button size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10" asChild>
                     <Link to="/products">Vaata tooteid</Link>
                   </Button>
-                  <Button variant="outline" size="lg" className="text-xl py-7 px-10 bg-white" asChild>
+                  <Button variant="outline" size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10 bg-white" asChild>
                     <Link to="/inquiry">Küsi pakkumist</Link>
                   </Button>
                 </div>
