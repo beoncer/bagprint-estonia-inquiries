@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
@@ -57,19 +58,19 @@ const Index = () => {
           <div className="flex flex-col md:flex-row items-center justify-between h-full">
             <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-10">
               <div className="mt-16"> {/* Added more spacing from the top */}
-                <h1 className="text-3xl md:text-3xl font-bold mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold mb-4">
                   Kvaliteetsed kotid ja pakendid teie brändile
                 </h1>
-                <p className="text-base text-gray-600 mb-8">
+                <p className="text-lg text-gray-600 mb-8">
                   Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                   e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 mb-10">
-                <Button size="lg" asChild>
+                <Button size="lg" className="text-lg py-6 px-8" asChild>
                   <Link to="/products">Vaata tooteid</Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
+                <Button variant="outline" size="lg" className="text-lg py-6 px-8" asChild>
                   <Link to="/inquiry">Küsi pakkumist</Link>
                 </Button>
               </div>
