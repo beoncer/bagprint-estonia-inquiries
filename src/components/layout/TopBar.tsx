@@ -3,7 +3,7 @@ import { Phone, Mail } from "lucide-react";
 
 const TopBar = () => {
   return (
-    <div className="bg-white text-black w-full py-2 border-b">
+    <div className="bg-[#fcdee4] text-black w-full py-2 border-b">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center text-sm">
           <div className="flex items-center space-x-4">

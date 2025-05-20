@@ -43,34 +43,34 @@ const featuredProducts = [
 const Index = () => {
   return (
     <Layout>
-      {/* Hero Section with increased height */}
+      {/* Hero Section with full width but container content */}
       <section 
-        className="relative bg-cover bg-center bg-no-repeat" 
+        className="relative bg-cover bg-center bg-no-repeat py-0" 
         style={{ 
           backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
           backgroundSize: "cover",
           backgroundPosition: "center",
-          height: "600px" // Increased height
+          height: "650px" // Adjusted height to match reference
         }}
       >
         <div className="absolute inset-0 bg-white/45"></div>
-        <div className="container mx-auto px-4 py-20 relative z-10 h-full">
+        <div className="container mx-auto px-4 relative z-10 h-full">
           <div className="flex flex-col md:flex-row items-center justify-between h-full">
             <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-10">
               <div className="mt-16"> {/* Added more spacing from the top */}
-                <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                <h1 className="text-5xl md:text-6xl font-bold mb-6">
                   Kvaliteetsed kotid ja pakendid teie brändile
                 </h1>
-                <p className="text-lg text-gray-600 mb-8">
+                <p className="text-xl text-gray-600 mb-8">
                   Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                   e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
                 </p>
               </div>
               <div className="flex flex-wrap gap-4 mb-10">
-                <Button size="lg" className="text-lg py-6 px-8" asChild>
+                <Button size="lg" className="text-xl py-7 px-10" asChild>
                   <Link to="/products">Vaata tooteid</Link>
                 </Button>
-                <Button variant="outline" size="lg" className="text-lg py-6 px-8" asChild>
+                <Button variant="outline" size="lg" className="text-xl py-7 px-10" asChild>
                   <Link to="/inquiry">Küsi pakkumist</Link>
                 </Button>
               </div>
