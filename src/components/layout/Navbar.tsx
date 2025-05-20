@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, Briefcase, Book } from "lucide-react";
+import { Menu } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,13 +27,11 @@ const Navbar = () => {
             <Link to="/products" className="text-gray-800 font-medium hover:text-primary transition-colors">
               Tooted
             </Link>
-            <Link to="/our-work" className="text-gray-800 font-medium hover:text-primary transition-colors flex items-center gap-1">
-              <Briefcase size={16} />
-              <span>Meie tööd</span>
+            <Link to="/our-work" className="text-gray-800 font-medium hover:text-primary transition-colors">
+              Meie tööd
             </Link>
-            <Link to="/blog" className="text-gray-800 font-medium hover:text-primary transition-colors flex items-center gap-1">
-              <Book size={16} />
-              <span>Blogi</span>
+            <Link to="/blog" className="text-gray-800 font-medium hover:text-primary transition-colors">
+              Blogi
             </Link>
             <Link to="/contact" className="text-gray-800 font-medium hover:text-primary transition-colors">
               Kontakt
@@ -76,19 +74,17 @@ const Navbar = () => {
               </Link>
               <Link 
                 to="/our-work" 
-                className="py-2 hover:text-primary transition-colors px-4 flex items-center gap-1"
+                className="py-2 hover:text-primary transition-colors px-4"
                 onClick={() => setIsOpen(false)}
               >
-                <Briefcase size={16} />
-                <span>Meie tööd</span>
+                Meie tööd
               </Link>
               <Link 
                 to="/blog" 
-                className="py-2 hover:text-primary transition-colors px-4 flex items-center gap-1"
+                className="py-2 hover:text-primary transition-colors px-4"
                 onClick={() => setIsOpen(false)}
               >
-                <Book size={16} />
-                <span>Blogi</span>
+                Blogi
               </Link>
               <Link 
                 to="/contact" 
