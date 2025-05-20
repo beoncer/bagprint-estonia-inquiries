@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
@@ -53,7 +52,7 @@ const Index = () => {
         }}
       >
         <div className="absolute inset-0 bg-white/45"></div>
-        <div className="container mx-auto px-4 py-12 relative z-10">
+        <div className="container mx-auto px-4 py-10 relative z-10">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col h-full">
               <div className="mt-8 mb-4">
@@ -78,10 +77,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Updated Categories Section */}
-      <section className="py-16">
+      {/* Updated Categories Section - reduced top padding */}
+      <section className="py-8">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Meie tooted</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">Meie tooted</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center">
@@ -143,7 +142,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Products Section - Now with 4 products and no "View all" button */}
+      {/* Featured Products Section */}
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Populaarsed tooted</h2>
