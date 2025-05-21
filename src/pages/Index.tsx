@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
@@ -72,12 +71,21 @@ const Index = () => {
                       </p>
                     </div>
                     
-                    {/* Buttons with improved positioning and responsiveness */}
+                    {/* Buttons with consistent sizing */}
                     <div className="flex flex-wrap gap-3 md:gap-4 mt-auto mb-6 md:mb-10">
-                      <Button size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10" asChild>
+                      <Button 
+                        size="lg" 
+                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8" 
+                        asChild
+                      >
                         <Link to="/products">Vaata tooteid</Link>
                       </Button>
-                      <Button variant="outline" size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10 bg-white" asChild>
+                      <Button 
+                        variant="outline" 
+                        size="lg" 
+                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-white" 
+                        asChild
+                      >
                         <Link to="/inquiry">Küsi pakkumist</Link>
                       </Button>
                     </div>
