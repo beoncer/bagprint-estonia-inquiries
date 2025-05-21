@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { ProductProps } from "@/components/product/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import { fetchPopularProducts } from "@/utils/productUtils";
+import { Json } from "@/integrations/supabase/types";
 
 interface Product {
   id: string;
