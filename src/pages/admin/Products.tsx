@@ -30,15 +30,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusIcon, Trash2, Edit, Star, StarOff } from "lucide-react";
+import { Json } from "@/integrations/supabase/types";
 
 interface Product {
   id: string;
   type: string;
   name: string;
-  description: string;
-  image_url: string;
+  description: string | null;
+  image_url: string | null;
   pricing_without_print: Record<string, number>;
   pricing_with_print: Record<string, number>;
+  created_at: string;
+  updated_at: string;
 }
 
 interface PopularProduct {
@@ -80,7 +83,17 @@ const ProductsPage: React.FC = () => {
       if (error) throw error;
       
       if (data) {
-        setProducts(data);
+        // Convert Json type to Record<string, number>
+        const processedData: Product[] = data.map(product => ({
+          ...product,
+          pricing_without_print: typeof product.pricing_without_print === 'string' 
+            ? JSON.parse(product.pricing_without_print as string) 
+            : product.pricing_without_print as Record<string, number>,
+          pricing_with_print: typeof product.pricing_with_print === 'string'
+            ? JSON.parse(product.pricing_with_print as string)
+            : product.pricing_with_print as Record<string, number>
+        }));
+        setProducts(processedData);
       }
     } catch (error: any) {
       toast({
@@ -148,14 +161,16 @@ const ProductsPage: React.FC = () => {
         imageUrl = data.publicUrl;
       }
 
-      const newProduct = {
-        ...formData,
+      const newProductData = {
+        name: formData.name,
+        type: formData.type,
+        description: formData.description || null,
+        image_url: imageUrl || null,
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: pricingWithPrint,
-        image_url: imageUrl,
       };
 
-      const { data, error } = await supabase.from("products").insert(newProduct).select();
+      const { data, error } = await supabase.from("products").insert(newProductData).select();
       if (error) throw error;
 
       toast({
@@ -228,16 +243,18 @@ const ProductsPage: React.FC = () => {
         imageUrl = data.publicUrl;
       }
 
-      const updatedProduct = {
-        ...formData,
+      const updatedProductData = {
+        name: formData.name,
+        type: formData.type,
+        description: formData.description || null,
+        image_url: imageUrl,
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: pricingWithPrint,
-        image_url: imageUrl,
       };
 
       const { error } = await supabase
         .from("products")
-        .update(updatedProduct)
+        .update(updatedProductData)
         .eq("id", selectedProduct.id);
         
       if (error) throw error;
@@ -452,7 +469,7 @@ const ProductsPage: React.FC = () => {
                 <label htmlFor="description">Kirjeldus</label>
                 <Textarea
                   id="description"
-                  value={formData.description}
+                  value={formData.description || ""}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Sisesta toote kirjeldus"
                 />
@@ -580,7 +597,31 @@ const ProductsPage: React.FC = () => {
               <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
                 Tühista
               </Button>
-              <Button variant="destructive" onClick={handleDeleteProduct}>
+              <Button variant="destructive" onClick={() => {
+                /* Handle delete */
+                if (selectedProduct) {
+                  supabase.from("products")
+                    .delete()
+                    .eq("id", selectedProduct.id)
+                    .then(({ error }) => {
+                      if (error) {
+                        toast({
+                          title: "Viga toote kustutamisel",
+                          description: error.message,
+                          variant: "destructive",
+                        });
+                      } else {
+                        toast({
+                          title: "Toode kustutatud",
+                          description: "Toote kustutamine õnnestus",
+                        });
+                        setIsDeleteDialogOpen(false);
+                        setSelectedProduct(null);
+                        fetchProducts();
+                      }
+                    });
+                }
+              }}>
                 Kustuta
               </Button>
             </DialogFooter>
@@ -665,7 +706,24 @@ const ProductsPage: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleEditClick(product)}
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setFormData({
+                              type: product.type,
+                              name: product.name,
+                              description: product.description || "",
+                            });
+                            
+                            // Set pricing fields
+                            setPriceWithout50(product.pricing_without_print?.["50"]?.toString() || "");
+                            setPriceWithout100(product.pricing_without_print?.["100"]?.toString() || "");
+                            setPriceWithout500(product.pricing_without_print?.["500"]?.toString() || "");
+                            setPriceWith50(product.pricing_with_print?.["50"]?.toString() || "");
+                            setPriceWith100(product.pricing_with_print?.["100"]?.toString() || "");
+                            setPriceWith500(product.pricing_with_print?.["500"]?.toString() || "");
+                            
+                            setIsDialogOpen(true);
+                          }}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -673,7 +731,10 @@ const ProductsPage: React.FC = () => {
                           variant="outline"
                           size="sm"
                           className="text-red-600 hover:text-red-700"
-                          onClick={() => handleDeleteClick(product)}
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setIsDeleteDialogOpen(true);
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>

@@ -49,59 +49,34 @@ const AdminLayout: React.FC = () => {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  as={Link}
-                  to="/admin"
-                  isActive={location.pathname === "/admin"}
-                  tooltip="Töölaud"
-                >
-                  <LayoutDashboard className="h-5 w-5 mr-2" />
+                <Link to="/admin" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname === "/admin" ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <LayoutDashboard className="h-5 w-5" />
                   <span>Töölaud</span>
-                </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  as={Link}
-                  to="/admin/products"
-                  isActive={location.pathname.startsWith("/admin/products")}
-                  tooltip="Tooted"
-                >
-                  <ShoppingBag className="h-5 w-5 mr-2" />
+                <Link to="/admin/products" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/products") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <ShoppingBag className="h-5 w-5" />
                   <span>Tooted</span>
-                </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  as={Link}
-                  to="/admin/content"
-                  isActive={location.pathname.startsWith("/admin/content")}
-                  tooltip="Sisu"
-                >
-                  <FileText className="h-5 w-5 mr-2" />
+                <Link to="/admin/content" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/content") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <FileText className="h-5 w-5" />
                   <span>Sisu</span>
-                </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  as={Link}
-                  to="/admin/assets"
-                  isActive={location.pathname.startsWith("/admin/assets")}
-                  tooltip="Meedia"
-                >
-                  <ImageIcon className="h-5 w-5 mr-2" />
+                <Link to="/admin/assets" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/assets") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <ImageIcon className="h-5 w-5" />
                   <span>Meedia</span>
-                </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  as={Link}
-                  to="/admin/seo"
-                  isActive={location.pathname.startsWith("/admin/seo")}
-                  tooltip="SEO"
-                >
-                  <Search className="h-5 w-5 mr-2" />
+                <Link to="/admin/seo" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/seo") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <Search className="h-5 w-5" />
                   <span>SEO</span>
-                </SidebarMenuButton>
+                </Link>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
