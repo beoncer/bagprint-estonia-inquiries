@@ -53,7 +53,7 @@ const Products = () => {
           // Calculate starting price (minimum price from pricing_without_print)
           const priceValues = Object.values(pricingWithoutPrint as Record<string, number>);
           const startingPrice = priceValues.length > 0 
-            ? Math.min(...(priceValues as number[])) 
+            ? Math.min(...priceValues) 
             : 0;
           
           // Map product type to category
@@ -78,7 +78,6 @@ const Products = () => {
         
         setAllProducts(processedProducts);
         setFilteredProducts(processedProducts);
-        console.log("Products fetched:", processedProducts.length);
       }
     } catch (err) {
       console.error("Error processing products:", err);
