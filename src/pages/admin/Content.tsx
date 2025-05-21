@@ -60,7 +60,7 @@ const ContentPage: React.FC = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Viga sisu laadimisel",
+        title: "Error loading content",
         description: error.message,
         variant: "destructive",
       });
@@ -73,8 +73,8 @@ const ContentPage: React.FC = () => {
     try {
       if (!formData.key || !formData.page) {
         toast({
-          title: "Valideerimisviga",
-          description: "Võti ja leht on kohustuslikud väljad",
+          title: "Validation error",
+          description: "Key and page are required fields",
           variant: "destructive",
         });
         return;
@@ -92,8 +92,8 @@ const ContentPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Sisu lisatud",
-        description: "Sisu element on edukalt lisatud",
+        title: "Content added",
+        description: "Content item has been successfully added",
       });
 
       // Reset form and close dialog
@@ -107,7 +107,7 @@ const ContentPage: React.FC = () => {
       await fetchContentItems();
     } catch (error: any) {
       toast({
-        title: "Viga sisu lisamisel",
+        title: "Error adding content",
         description: error.message,
         variant: "destructive",
       });
@@ -118,8 +118,8 @@ const ContentPage: React.FC = () => {
     try {
       if (!selectedItem || !formData.key || !formData.page) {
         toast({
-          title: "Valideerimisviga",
-          description: "Võti ja leht on kohustuslikud väljad",
+          title: "Validation error",
+          description: "Key and page are required fields",
           variant: "destructive",
         });
         return;
@@ -137,8 +137,8 @@ const ContentPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Sisu uuendatud",
-        description: "Sisu element on edukalt uuendatud",
+        title: "Content updated",
+        description: "Content item has been successfully updated",
       });
 
       // Reset form and close dialog
@@ -153,7 +153,7 @@ const ContentPage: React.FC = () => {
       await fetchContentItems();
     } catch (error: any) {
       toast({
-        title: "Viga sisu uuendamisel",
+        title: "Error updating content",
         description: error.message,
         variant: "destructive",
       });
@@ -172,8 +172,8 @@ const ContentPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Sisu kustutatud",
-        description: "Sisu element on edukalt kustutatud",
+        title: "Content deleted",
+        description: "Content item has been successfully deleted",
       });
 
       setIsDeleteDialogOpen(false);
@@ -181,7 +181,7 @@ const ContentPage: React.FC = () => {
       await fetchContentItems();
     } catch (error: any) {
       toast({
-        title: "Viga sisu kustutamisel",
+        title: "Error deleting content",
         description: error.message,
         variant: "destructive",
       });
@@ -205,8 +205,8 @@ const ContentPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Sisu uuendatud",
-        description: "Sisu element on edukalt uuendatud",
+        title: "Content updated",
+        description: "Content item has been successfully updated",
       });
 
       // Update the local state
@@ -219,7 +219,7 @@ const ContentPage: React.FC = () => {
       setEditValue("");
     } catch (error: any) {
       toast({
-        title: "Viga sisu uuendamisel",
+        title: "Error updating content",
         description: error.message,
         variant: "destructive",
       });
@@ -254,67 +254,67 @@ const ContentPage: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Veebilehe sisu</h1>
+        <h1 className="text-3xl font-bold">Website Content</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-red-600 hover:bg-red-700">
-              <PlusIcon className="mr-2 h-4 w-4" /> Lisa uus sisu
+              <PlusIcon className="mr-2 h-4 w-4" /> Add New Content
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>
-                {selectedItem ? "Muuda sisu elementi" : "Lisa uus sisu element"}
+                {selectedItem ? "Edit Content Item" : "Add New Content Item"}
               </DialogTitle>
               <DialogDescription>
-                Täitke väljad sisu elemendi {selectedItem ? "muutmiseks" : "lisamiseks"}.
+                Complete the fields to {selectedItem ? "edit" : "add"} a content item.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <label htmlFor="key">Sisu võti</label>
+                <label htmlFor="key">Content Key</label>
                 <Input
                   id="key"
                   value={formData.key}
                   onChange={(e) => setFormData({ ...formData, key: e.target.value })}
-                  placeholder="Näiteks: homepage_title"
+                  placeholder="Example: homepage_title"
                 />
                 <p className="text-sm text-gray-500">
-                  Võti on unikaalne identifikaator, mida kasutatakse sisu kuvamiseks lehel.
+                  The key is a unique identifier used to display content on the page.
                 </p>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="page">Leht</label>
+                <label htmlFor="page">Page</label>
                 <Input
                   id="page"
                   value={formData.page}
                   onChange={(e) => setFormData({ ...formData, page: e.target.value })}
-                  placeholder="Näiteks: home, about, contact"
+                  placeholder="Example: home, about, contact"
                 />
                 <p className="text-sm text-gray-500">
-                  Sisestage lehe nimi, kus sisu kuvatakse.
+                  Enter the page name where the content will be displayed.
                 </p>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="value">Sisu väärtus</label>
+                <label htmlFor="value">Content Value</label>
                 <Textarea
                   id="value"
                   value={formData.value}
                   onChange={(e) => setFormData({ ...formData, value: e.target.value })}
-                  placeholder="Sisestage sisu tekst"
+                  placeholder="Enter content text"
                   rows={5}
                 />
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={handleDialogClose}>
-                Tühista
+                Cancel
               </Button>
               <Button 
                 className="bg-red-600 hover:bg-red-700" 
                 onClick={selectedItem ? handleEditContent : handleAddContent}
               >
-                {selectedItem ? "Salvesta muudatused" : "Lisa sisu"}
+                {selectedItem ? "Save Changes" : "Add Content"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -324,17 +324,17 @@ const ContentPage: React.FC = () => {
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Kustuta sisu element</DialogTitle>
+              <DialogTitle>Delete Content Item</DialogTitle>
               <DialogDescription>
-                Kas olete kindel, et soovite sisu elemendi kustutada? Seda tegevust ei saa tagasi võtta.
+                Are you sure you want to delete this content item? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-                Tühista
+                Cancel
               </Button>
               <Button variant="destructive" onClick={handleDeleteContent}>
-                Kustuta
+                Delete
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -350,17 +350,17 @@ const ContentPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Võti</TableHead>
-                <TableHead>Leht</TableHead>
-                <TableHead>Väärtus</TableHead>
-                <TableHead className="text-right">Tegevused</TableHead>
+                <TableHead>Key</TableHead>
+                <TableHead>Page</TableHead>
+                <TableHead>Value</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {contentItems.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-6 text-gray-500">
-                    Sisu elemente pole lisatud
+                    No content items added
                   </TableCell>
                 </TableRow>
               ) : (
@@ -398,7 +398,7 @@ const ContentPage: React.FC = () => {
                             size="sm"
                             onClick={() => handleInlineEdit(item)}
                           >
-                            <Edit className="h-4 w-4 mr-1" /> Muuda teksti
+                            <Edit className="h-4 w-4 mr-1" /> Edit Text
                           </Button>
                         )}
                         <Button

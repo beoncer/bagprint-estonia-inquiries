@@ -2,22 +2,45 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { PlusIcon, Trash2, Image } from "lucide-react";
 
 interface Asset {
   id: string;
-  type: "banner" | "logo";
+  type: string;
   url: string;
+  created_at: string;
 }
 
 const AssetsPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [assetType, setAssetType] = useState("banner");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     fetchAssets();
@@ -26,16 +49,19 @@ const AssetsPage: React.FC = () => {
   const fetchAssets = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("site_assets").select("*");
+      const { data, error } = await supabase
+        .from("site_assets")
+        .select("*")
+        .order("created_at", { ascending: false });
       
       if (error) throw error;
       
       if (data) {
-        setAssets(data as Asset[]);
+        setAssets(data);
       }
     } catch (error: any) {
       toast({
-        title: "Viga piltide laadimisel",
+        title: "Error loading assets",
         description: error.message,
         variant: "destructive",
       });
@@ -44,198 +70,302 @@ const AssetsPage: React.FC = () => {
     }
   };
 
-  const getBanner = () => {
-    return assets.find((asset) => asset.type === "banner");
-  };
+  const handleUpload = async () => {
+    if (!file) {
+      toast({
+        title: "Error",
+        description: "No file selected",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const getLogo = () => {
-    return assets.find((asset) => asset.type === "logo");
-  };
-
-  const handleFileUpload = async (type: "banner" | "logo", file: File | null) => {
-    if (!file) return;
-    
     try {
-      setUploading(true);
-      
-      // Create a unique file name
-      const fileName = `${type}-${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+      setIsUploading(true);
+      setUploadProgress(10);
       
       // Upload file to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
+      const filePath = `${assetType}/${fileName}`;
+      
+      setUploadProgress(30);
+      const { error: uploadError } = await supabase.storage
         .from("site-assets")
-        .upload(`${type}/${fileName}`, file);
-        
+        .upload(filePath, file);
+      
       if (uploadError) throw uploadError;
       
-      // Get the public URL of the uploaded file
-      const { data: urlData } = supabase.storage
+      setUploadProgress(70);
+      // Get public URL
+      const { data } = supabase.storage
         .from("site-assets")
-        .getPublicUrl(`${type}/${fileName}`);
-      
-      const publicUrl = urlData.publicUrl;
-      
-      // Check if we already have this asset type
-      const existingAsset = assets.find((asset) => asset.type === type);
-      
-      if (existingAsset) {
-        // Update existing asset
-        const { error } = await supabase
-          .from("site_assets")
-          .update({ url: publicUrl })
-          .eq("id", existingAsset.id);
-          
-        if (error) throw error;
-      } else {
-        // Create new asset
-        const { error } = await supabase.from("site_assets").insert({
-          type,
-          url: publicUrl,
-        });
+        .getPublicUrl(filePath);
         
-        if (error) throw error;
-      }
+      // Save reference in database
+      const { error } = await supabase
+        .from("site_assets")
+        .insert({
+          type: assetType,
+          url: data.publicUrl
+        });
       
+      if (error) throw error;
+      
+      setUploadProgress(100);
       toast({
-        title: "Pilt uuendatud",
-        description: `${type === "banner" ? "Banner" : "Logo"} on edukalt uuendatud.`,
+        title: "Upload successful",
+        description: "File has been uploaded",
       });
       
-      // Reset file input and refresh assets
-      if (type === "banner") {
-        setBannerFile(null);
-      } else {
-        setLogoFile(null);
-      }
-      
+      setFile(null);
+      setAssetType("banner");
+      setIsUploadDialogOpen(false);
       await fetchAssets();
-      
     } catch (error: any) {
       toast({
-        title: "Viga pildi üleslaadimisel",
+        title: "Upload failed",
         description: error.message,
         variant: "destructive",
       });
     } finally {
-      setUploading(false);
+      setIsUploading(false);
+    }
+  };
+
+  const handleDeleteAsset = async () => {
+    try {
+      if (!selectedAsset) return;
+      
+      // First try to delete from storage if URL contains storage path
+      if (selectedAsset.url.includes('supabase')) {
+        try {
+          // Extract path from URL - this is simplistic and may need adjustments
+          const urlParts = selectedAsset.url.split('site-assets/');
+          if (urlParts.length > 1) {
+            const path = urlParts[1];
+            await supabase.storage
+              .from("site-assets")
+              .remove([decodeURIComponent(path)]);
+          }
+        } catch (storageError) {
+          console.error("Error removing from storage:", storageError);
+          // Continue with DB deletion even if storage delete fails
+        }
+      }
+
+      // Then delete the database record
+      const { error } = await supabase
+        .from("site_assets")
+        .delete()
+        .eq("id", selectedAsset.id);
+        
+      if (error) throw error;
+
+      toast({
+        title: "Asset deleted",
+        description: "Asset has been deleted successfully",
+      });
+
+      setIsDeleteDialogOpen(false);
+      setSelectedAsset(null);
+      await fetchAssets();
+    } catch (error: any) {
+      toast({
+        title: "Error deleting asset",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteClick = (asset: Asset) => {
+    setSelectedAsset(asset);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      toast({
+        title: "URL copied",
+        description: "Asset URL has been copied to clipboard",
+      });
+    });
+  };
+
+  const getAssetTypeLabel = (type: string) => {
+    switch (type) {
+      case "banner": return "Banner";
+      case "logo": return "Logo";
+      case "product": return "Product Image";
+      case "icon": return "Icon";
+      default: return type;
     }
   };
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Meedia haldamine</h1>
-      
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Media Library</h1>
+        <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="bg-red-600 hover:bg-red-700">
+              <PlusIcon className="mr-2 h-4 w-4" /> Upload New Asset
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Asset</DialogTitle>
+              <DialogDescription>
+                Upload a new image to the media library.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div>
+                <label htmlFor="asset-type" className="block text-sm font-medium pb-2">
+                  Asset Type
+                </label>
+                <Select
+                  value={assetType}
+                  onValueChange={setAssetType}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select asset type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="banner">Banner</SelectItem>
+                    <SelectItem value="logo">Logo</SelectItem>
+                    <SelectItem value="product">Product Image</SelectItem>
+                    <SelectItem value="icon">Icon</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="file" className="block text-sm font-medium pb-2">
+                  File
+                </label>
+                <Input
+                  id="file"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                />
+              </div>
+              {isUploading && (
+                <div className="mt-2">
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-red-600 transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-center mt-1">Uploading: {uploadProgress}%</p>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsUploadDialogOpen(false)} disabled={isUploading}>
+                Cancel
+              </Button>
+              <Button 
+                className="bg-red-600 hover:bg-red-700" 
+                onClick={handleUpload} 
+                disabled={!file || isUploading}
+              >
+                Upload
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Asset</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this asset? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleDeleteAsset}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
       {loading ? (
         <div className="flex justify-center p-8">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600"></div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Banner Management */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Veebilehe banner</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {getBanner() ? (
-                <div className="aspect-[3/1] relative bg-gray-100 rounded-md overflow-hidden">
-                  <img
-                    src={getBanner()!.url}
-                    alt="Banner"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+        <div className="bg-white rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Preview</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>URL</TableHead>
+                <TableHead>Date Added</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {assets.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                    No assets uploaded yet
+                  </TableCell>
+                </TableRow>
               ) : (
-                <div className="aspect-[3/1] bg-gray-100 rounded-md flex items-center justify-center">
-                  <p className="text-gray-500">Banner puudub</p>
-                </div>
+                assets.map((asset) => (
+                  <TableRow key={asset.id}>
+                    <TableCell className="w-20">
+                      <div className="w-16 h-16 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
+                        {asset.url ? (
+                          <img
+                            src={asset.url}
+                            alt={`Asset ${asset.id}`}
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <Image className="w-6 h-6 text-gray-400" />
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>{getAssetTypeLabel(asset.type)}</TableCell>
+                    <TableCell className="max-w-md truncate">
+                      <Button 
+                        variant="link" 
+                        onClick={() => copyToClipboard(asset.url)}
+                        className="p-0 h-auto text-left text-blue-600 hover:text-blue-800"
+                      >
+                        {asset.url}
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(asset.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-600 hover:text-red-700"
+                        onClick={() => handleDeleteClick(asset)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
               )}
-              
-              <div className="space-y-2">
-                <label htmlFor="banner-upload" className="text-sm font-medium">
-                  Uuenda bannerit
-                </label>
-                <Input
-                  id="banner-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
-                />
-                <p className="text-xs text-gray-500">
-                  Soovitatud suurus: 1920x640px. Maksimaalne suurus: 5MB.
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="bg-red-600 hover:bg-red-700 w-full"
-                disabled={!bannerFile || uploading}
-                onClick={() => handleFileUpload("banner", bannerFile)}
-              >
-                {uploading ? (
-                  <span className="flex items-center">
-                    <span className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
-                    Laadin üles...
-                  </span>
-                ) : (
-                  "Salvesta banner"
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
-          
-          {/* Logo Management */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Veebilehe logo</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {getLogo() ? (
-                <div className="h-40 relative bg-gray-100 rounded-md overflow-hidden flex items-center justify-center p-4">
-                  <img
-                    src={getLogo()!.url}
-                    alt="Logo"
-                    className="max-w-full max-h-full object-contain"
-                  />
-                </div>
-              ) : (
-                <div className="h-40 bg-gray-100 rounded-md flex items-center justify-center">
-                  <p className="text-gray-500">Logo puudub</p>
-                </div>
-              )}
-              
-              <div className="space-y-2">
-                <label htmlFor="logo-upload" className="text-sm font-medium">
-                  Uuenda logo
-                </label>
-                <Input
-                  id="logo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
-                />
-                <p className="text-xs text-gray-500">
-                  Soovitatud suurus: 200x80px. Maksimaalne suurus: 2MB.
-                </p>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                className="bg-red-600 hover:bg-red-700 w-full"
-                disabled={!logoFile || uploading}
-                onClick={() => handleFileUpload("logo", logoFile)}
-              >
-                {uploading ? (
-                  <span className="flex items-center">
-                    <span className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
-                    Laadin üles...
-                  </span>
-                ) : (
-                  "Salvesta logo"
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

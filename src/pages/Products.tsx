@@ -48,7 +48,7 @@ const Products = () => {
           // Parse JSON pricing if stored as string
           const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
             ? JSON.parse(product.pricing_without_print as string)
-            : product.pricing_without_print;
+            : product.pricing_without_print as Record<string, number>;
           
           // Calculate starting price (minimum price from pricing_without_print)
           const priceValues = Object.values(pricingWithoutPrint as Record<string, number>);
@@ -76,6 +76,7 @@ const Products = () => {
           };
         });
         
+        console.log("Processed products:", processedProducts);
         setAllProducts(processedProducts);
         setFilteredProducts(processedProducts);
       }

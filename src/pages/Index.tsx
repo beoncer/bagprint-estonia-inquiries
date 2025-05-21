@@ -1,45 +1,142 @@
+
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
+import { ProductProps } from "@/components/product/ProductCard";
+import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
-// Sample product data - this would come from the backend in the real implementation
-const featuredProducts = [
-  {
-    id: "cotton1",
-    name: "Standard puuvillakott",
-    description: "Kõrgkvaliteedilised puuvillakotid. Saadaval erinevates värvides.",
-    image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop",
-    category: "cotton",
-    startingPrice: 1.50
-  },
-  {
-    id: "paper1",
-    name: "Paberkott - väike",
-    description: "Keskkonnasõbralikud väikesed paberkotid.",
-    image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
-    category: "paper",
-    startingPrice: 0.80
-  },
-  {
-    id: "drawstring1",
-    name: "Paelaga kott",
-    description: "Praktilised paelaga kotid. Ideaalsed üritusteks.",
-    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
-    category: "drawstring",
-    startingPrice: 1.20
-  },
-  {
-    id: "bag1",
-    name: "Sussikott",
-    description: "Kvaliteetsed ja vastupidavad sussikotid.",
-    image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=800&auto=format&fit=crop",
-    category: "shoebag",
-    startingPrice: 1.40
-  }
-];
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  type: string;
+  pricing_without_print: Json;
+  pricing_with_print: Json;
+}
 
 const Index = () => {
+  const [featuredProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPopularProducts();
+  }, []);
+
+  const fetchPopularProducts = async () => {
+    try {
+      setLoading(true);
+      // Fetch popular products from the join table
+      const { data: popularData, error: popularError } = await supabase
+        .from('popular_products')
+        .select('product_id');
+      
+      if (popularError) {
+        console.error('Error fetching popular products:', popularError);
+        return;
+      }
+      
+      if (popularData && popularData.length > 0) {
+        // Extract product IDs
+        const productIds = popularData.map(item => item.product_id);
+        
+        // Fetch the actual product details
+        const { data: productsData, error: productsError } = await supabase
+          .from('products')
+          .select('*')
+          .in('id', productIds);
+        
+        if (productsError) {
+          console.error('Error fetching product details:', productsError);
+          return;
+        }
+        
+        if (productsData) {
+          // Process the products data
+          const processedProducts: ProductProps[] = productsData.map((product: Product) => {
+            // Parse JSON pricing if stored as string
+            const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
+              ? JSON.parse(product.pricing_without_print as string)
+              : product.pricing_without_print as Record<string, number>;
+            
+            // Calculate starting price
+            const priceValues = Object.values(pricingWithoutPrint as Record<string, number>);
+            const startingPrice = priceValues.length > 0 
+              ? Math.min(...priceValues) 
+              : 0;
+            
+            // Map product type to category
+            let category: string;
+            switch (product.type) {
+              case "cotton_bag": category = "cotton"; break;
+              case "paper_bag": category = "paper"; break;
+              case "drawstring_bag": category = "drawstring"; break;
+              case "packaging_box": category = "packaging"; break;
+              default: category = "other";
+            }
+            
+            return {
+              id: product.id,
+              name: product.name,
+              description: product.description || "",
+              image: product.image_url || "/placeholder.svg",
+              category,
+              startingPrice,
+            };
+          });
+          
+          setFeaturedProducts(processedProducts);
+        }
+      }
+    } catch (err) {
+      console.error('Error processing popular products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // If no popular products are fetched, use this fallback data
+  const fallbackProducts = [
+    {
+      id: "cotton1",
+      name: "Standard puuvillakott",
+      description: "Kõrgkvaliteedilised puuvillakotid. Saadaval erinevates värvides.",
+      image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop",
+      category: "cotton",
+      startingPrice: 1.50
+    },
+    {
+      id: "paper1",
+      name: "Paberkott - väike",
+      description: "Keskkonnasõbralikud väikesed paberkotid.",
+      image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+      category: "paper",
+      startingPrice: 0.80
+    },
+    {
+      id: "drawstring1",
+      name: "Paelaga kott",
+      description: "Praktilised paelaga kotid. Ideaalsed üritusteks.",
+      image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+      category: "drawstring",
+      startingPrice: 1.20
+    },
+    {
+      id: "bag1",
+      name: "Sussikott",
+      description: "Kvaliteetsed ja vastupidavad sussikotid.",
+      image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=800&auto=format&fit=crop",
+      category: "shoebag",
+      startingPrice: 1.40
+    }
+  ];
+
+  // Use real data if available, otherwise use fallback
+  const productsToShow = featuredProducts.length > 0 ? featuredProducts : fallbackProducts;
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -212,7 +309,13 @@ const Index = () => {
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-2">
           <h2 className="text-3xl font-bold text-left mb-12">Populaarsed tooted</h2>
-          <ProductGrid products={featuredProducts} />
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+            </div>
+          ) : (
+            <ProductGrid products={productsToShow} />
+          )}
         </div>
       </section>
 
