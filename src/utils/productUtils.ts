@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 import { ProductProps } from "@/components/product/ProductCard";
@@ -188,9 +187,8 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching all products...");
     
-    // Log the Supabase client details to verify connection
-    console.log("Supabase client configured with URL:", 
-      supabase.supabaseUrl ? "URL configured" : "Missing URL");
+    // Check if Supabase client is available without accessing protected properties
+    console.log("Attempting to connect to Supabase database...");
     
     // Use a more explicit query that should work regardless of server settings
     const { data, error } = await supabase
