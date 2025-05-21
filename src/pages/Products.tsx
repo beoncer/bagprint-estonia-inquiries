@@ -6,22 +6,9 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { ProductProps } from "@/components/product/ProductCard";
-import { Json } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  image_url: string | null;
-  type: string;
-  pricing_without_print: Json;
-  pricing_with_print: Json;
-  created_at: string;
-  updated_at: string;
-}
+import { fetchAllProducts } from "@/utils/productUtils";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -33,99 +20,22 @@ const Products = () => {
   const { toast } = useToast();
   
   useEffect(() => {
-    fetchProducts();
+    loadProducts();
   }, []);
 
-  const fetchProducts = async () => {
+  const loadProducts = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      // Log to debug
-      console.log("Fetching products...");
-      
-      const { data, error } = await supabase.from("products").select("*");
-      
-      if (error) {
-        console.error("Error fetching products:", error);
-        toast({
-          variant: "destructive",
-          title: "Error loading products",
-          description: "Could not load products. Please try again later."
-        });
-        return;
-      }
-      
-      console.log("Raw products data:", data);
-      
-      if (data && data.length > 0) {
-        // Process the products data
-        const processedProducts: ProductProps[] = data.map((product: Product) => {
-          console.log("Processing product:", product.name, "Type:", product.type);
-          
-          // Parse pricing objects if needed
-          let pricingWithoutPrint: Record<string, number> = {};
-          
-          try {
-            if (typeof product.pricing_without_print === 'string') {
-              pricingWithoutPrint = JSON.parse(product.pricing_without_print);
-            } else if (product.pricing_without_print && typeof product.pricing_without_print === 'object') {
-              // Handle case when it's already an object
-              pricingWithoutPrint = product.pricing_without_print as Record<string, number>;
-            }
-            
-            console.log("Pricing data for", product.name, ":", pricingWithoutPrint);
-            
-            // Calculate starting price (minimum price from pricing_without_print)
-            const priceValues = Object.values(pricingWithoutPrint || {}).map(p => Number(p));
-            const startingPrice = priceValues.length > 0 
-              ? Math.min(...priceValues)
-              : 0;
-            
-            // Map product type to category
-            let category: string;
-            switch (product.type) {
-              case "cotton_bag": category = "cotton"; break;
-              case "paper_bag": category = "paper"; break;
-              case "drawstring_bag": category = "drawstring"; break;
-              case "packaging_box": category = "packaging"; break;
-              default: category = "other";
-            }
-            
-            return {
-              id: product.id,
-              name: product.name,
-              description: product.description || "",
-              image: product.image_url || "/placeholder.svg", // Use placeholder if no image
-              category,
-              startingPrice,
-            };
-          } catch (err) {
-            console.error(`Error processing product ${product.name}:`, err);
-            // Return a default product with error indication
-            return {
-              id: product.id,
-              name: product.name,
-              description: product.description || "Error loading product details",
-              image: "/placeholder.svg",
-              category: "other",
-              startingPrice: 0,
-            };
-          }
-        });
-        
-        console.log("Processed products:", processedProducts);
-        setAllProducts(processedProducts);
-        setFilteredProducts(processedProducts);
-      } else {
-        console.log("No products found");
-        setAllProducts([]);
-        setFilteredProducts([]);
-      }
+      const products = await fetchAllProducts();
+      console.log("Products loaded in Products.tsx:", products.length);
+      setAllProducts(products);
+      setFilteredProducts(products);
     } catch (err) {
-      console.error("Error processing products:", err);
+      console.error("Error in Products component:", err);
       toast({
         variant: "destructive",
-        title: "Error processing products",
-        description: "There was a problem preparing the products for display."
+        title: "Error loading products",
+        description: "Could not load products. Please try again later."
       });
     } finally {
       setLoading(false);
@@ -188,10 +98,6 @@ const Products = () => {
     { id: "drawstring", name: "Paelaga kotid" },
     { id: "packaging", name: "E-poe pakendid" },
   ];
-
-  // Insert debug log to check products
-  console.log("All Products State:", allProducts);
-  console.log("Filtered Products State:", filteredProducts);
 
   return (
     <Layout>

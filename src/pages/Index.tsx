@@ -4,9 +4,8 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
 import { ProductProps } from "@/components/product/ProductCard";
-import { supabase } from "@/integrations/supabase/client";
-import { Json } from "@/integrations/supabase/types";
 import { useToast } from "@/hooks/use-toast";
+import { fetchPopularProducts } from "@/utils/productUtils";
 
 interface Product {
   id: string;
@@ -24,107 +23,17 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchPopularProducts();
+    loadPopularProducts();
   }, []);
 
-  const fetchPopularProducts = async () => {
+  const loadPopularProducts = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      console.log("Fetching popular products...");
-      
-      // Fetch popular products from the join table
-      const { data: popularData, error: popularError } = await supabase
-        .from('popular_products')
-        .select('product_id');
-      
-      if (popularError) {
-        console.error('Error fetching popular products:', popularError);
-        return;
-      }
-      
-      console.log("Popular products data:", popularData);
-      
-      if (popularData && popularData.length > 0) {
-        // Extract product IDs
-        const productIds = popularData.map(item => item.product_id);
-        console.log("Popular product IDs:", productIds);
-        
-        // Fetch the actual product details
-        const { data: productsData, error: productsError } = await supabase
-          .from('products')
-          .select('*')
-          .in('id', productIds);
-        
-        if (productsError) {
-          console.error('Error fetching product details:', productsError);
-          return;
-        }
-        
-        console.log("Popular products details:", productsData);
-        
-        if (productsData && productsData.length > 0) {
-          // Process the products data
-          const processedProducts: ProductProps[] = productsData.map((product: Product) => {
-            console.log("Processing popular product:", product.name, product.type);
-            try {
-              // Parse JSON pricing if stored as string
-              let pricingWithoutPrint: Record<string, number> = {};
-              
-              if (typeof product.pricing_without_print === 'string') {
-                pricingWithoutPrint = JSON.parse(product.pricing_without_print);
-              } else if (product.pricing_without_print && typeof product.pricing_without_print === 'object') {
-                pricingWithoutPrint = product.pricing_without_print as Record<string, number>;
-              }
-              
-              console.log("Pricing data for", product.name, ":", pricingWithoutPrint);
-              
-              // Calculate starting price
-              const priceValues = Object.values(pricingWithoutPrint || {}).map(p => Number(p));
-              const startingPrice = priceValues.length > 0 
-                ? Math.min(...priceValues) 
-                : 0;
-              
-              // Map product type to category
-              let category: string;
-              switch (product.type) {
-                case "cotton_bag": category = "cotton"; break;
-                case "paper_bag": category = "paper"; break;
-                case "drawstring_bag": category = "drawstring"; break;
-                case "packaging_box": category = "packaging"; break;
-                default: category = "other";
-              }
-              
-              return {
-                id: product.id,
-                name: product.name,
-                description: product.description || "",
-                image: product.image_url || "/placeholder.svg",
-                category,
-                startingPrice,
-              };
-            } catch (err) {
-              console.error(`Error processing product ${product.name}:`, err);
-              return {
-                id: product.id,
-                name: product.name,
-                description: product.description || "Error loading product details",
-                image: "/placeholder.svg",
-                category: "other",
-                startingPrice: 0,
-              };
-            }
-          });
-          
-          console.log("Processed featured products:", processedProducts);
-          setFeaturedProducts(processedProducts);
-        } else {
-          console.log("No popular product details found");
-        }
-      } else {
-        console.log("No popular products found");
-      }
+      const products = await fetchPopularProducts();
+      console.log("Popular products loaded in Index.tsx:", products.length);
+      setFeaturedProducts(products);
     } catch (err) {
-      console.error('Error processing popular products:', err);
+      console.error("Error in Index component:", err);
       toast({
         variant: "destructive",
         title: "Error loading featured products",
