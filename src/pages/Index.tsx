@@ -117,7 +117,7 @@ const Index = () => {
                       </p>
                     </div>
                     
-                    {/* Buttons with consistent sizing */}
+                    {/* Buttons with consistent styling */}
                     <div className="flex flex-wrap gap-3 md:gap-4 mt-auto mb-6 md:mb-10">
                       <Button 
                         size="lg" 
@@ -127,9 +127,9 @@ const Index = () => {
                         <Link to="/products">Vaata tooteid</Link>
                       </Button>
                       <Button 
-                        variant="outline" 
+                        variant="secondary" 
                         size="lg" 
-                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-white" 
+                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-white text-primary hover:bg-gray-100" 
                         asChild
                       >
                         <Link to="/inquiry">Küsi pakkumist</Link>

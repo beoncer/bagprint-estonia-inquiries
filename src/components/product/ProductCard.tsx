@@ -23,11 +23,11 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
   // Process image URL if it's from Supabase
   useEffect(() => {
     if (image) {
-      if (image.includes('ixotpxliaerkzjznyipi.supabase.co')) {
-        // If it's a Supabase URL, make sure it's properly formed
-        if (!image.startsWith('https://')) {
-          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
-        }
+      // If image is from Supabase but doesn't have proper URL format
+      if (image.includes('ixotpxliaerkzjznyipi.supabase.co') && !image.startsWith('https://')) {
+        setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+      } else {
+        setImageUrl(image);
       }
     }
   }, [image]);

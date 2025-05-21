@@ -187,9 +187,6 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching all products...");
     
-    // Check if Supabase client is available without accessing protected properties
-    console.log("Attempting to connect to Supabase database...");
-    
     // Use a more explicit query that should work regardless of server settings
     const { data, error } = await supabase
       .from("products")
@@ -203,43 +200,41 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
       throw error;
     }
     
-    if (!data) {
-      console.log("No data returned from Supabase");
-      return [];
+    // IMPORTANT: When data is found in the database, ALWAYS use it and ignore fallbacks
+    if (data && data.length > 0) {
+      console.log(`Found ${data.length} products in database`);
+      
+      // Process the products data
+      const processedProducts = data.map((product: RawProduct) => {
+        try {
+          return processProductData(product);
+        } catch (err) {
+          console.error(`Error processing product ${product?.id}:`, err);
+          // Return fallback product
+          return {
+            id: product?.id || "error-id",
+            name: product?.name || "Error Loading Product",
+            description: "Error processing product data",
+            image: "/placeholder.svg",
+            category: "other",
+            startingPrice: 0,
+          };
+        }
+      });
+      
+      console.log(`Successfully processed ${processedProducts.length} products:`, processedProducts);
+      return processedProducts;
     }
     
-    if (data.length === 0) {
-      console.log("No products found in database");
-      // Important change: Only use fallback in development AND only if explicitly enabled
-      if (import.meta.env.MODE === 'development' && import.meta.env.VITE_USE_FALLBACK_PRODUCTS === 'true') {
-        console.log("Using fallback products for development");
-        return fallbackProducts;
-      }
-      return [];
+    console.log("No products found in database");
+    // Only use fallbacks in development AND only if explicitly enabled via env
+    if (import.meta.env.MODE === 'development' && import.meta.env.VITE_USE_FALLBACK_PRODUCTS === 'true') {
+      console.log("Using fallback products for development");
+      return fallbackProducts;
     }
     
-    console.log(`Found ${data.length} products in database`);
-    
-    // Process the products data
-    const processedProducts = data.map((product: RawProduct) => {
-      try {
-        return processProductData(product);
-      } catch (err) {
-        console.error(`Error processing product ${product?.id}:`, err);
-        // Return fallback product
-        return {
-          id: product?.id || "error-id",
-          name: product?.name || "Error Loading Product",
-          description: "Error processing product data",
-          image: "/placeholder.svg",
-          category: "other",
-          startingPrice: 0,
-        };
-      }
-    });
-    
-    console.log(`Successfully processed ${processedProducts.length} products:`, processedProducts);
-    return processedProducts;
+    // If no products in database and fallbacks not enabled, return empty array
+    return [];
   } catch (err) {
     console.error("Critical error in fetchAllProducts:", err);
     
