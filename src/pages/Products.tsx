@@ -20,14 +20,16 @@ const Products = () => {
   const { toast } = useToast();
   
   useEffect(() => {
+    console.log("Products component mounted");
     loadProducts();
   }, []);
 
   const loadProducts = async () => {
     setLoading(true);
     try {
+      console.log("Starting to load products in Products.tsx");
       const products = await fetchAllProducts();
-      console.log("Products loaded in Products.tsx:", products.length);
+      console.log("Products loaded in Products.tsx:", products);
       setAllProducts(products);
       setFilteredProducts(products);
     } catch (err) {
@@ -56,6 +58,9 @@ const Products = () => {
   useEffect(() => {
     if (allProducts.length === 0) return;
     
+    console.log("Applying filters:", { activeCategory, searchTerm });
+    console.log("All products before filtering:", allProducts);
+    
     let result = [...allProducts];
     
     // Apply category filter
@@ -72,10 +77,12 @@ const Products = () => {
       );
     }
     
+    console.log("Filtered products:", result);
     setFilteredProducts(result);
   }, [activeCategory, searchTerm, allProducts]);
   
   const handleCategoryChange = (categoryId: string) => {
+    console.log("Category changed to:", categoryId);
     if (categoryId === "all") {
       // Remove category param if "all" is selected
       searchParams.delete("category");
@@ -88,6 +95,7 @@ const Products = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Search submitted with term:", searchTerm);
     // The filtering is already handled by the useEffect
   };
 

@@ -40,12 +40,15 @@ export const parsePricingData = (pricingData: Json): Record<string, number> => {
  * Converts a product type to a category string
  */
 export const mapProductTypeToCategory = (type: string): string => {
+  console.log("Mapping product type:", type);
   switch (type) {
     case "cotton_bag": return "cotton";
     case "paper_bag": return "paper";
     case "drawstring_bag": return "drawstring";
     case "packaging_box": return "packaging";
-    default: return "other";
+    default: 
+      console.log(`Unknown product type: ${type}, defaulting to "other"`);
+      return "other";
   }
 };
 
@@ -73,6 +76,7 @@ export const processProductData = (product: RawProduct): ProductProps => {
     
     // Map product type to category
     const category = mapProductTypeToCategory(product.type);
+    console.log(`Category for ${product.name}: ${category}`);
     
     return {
       id: product.id,
@@ -102,7 +106,7 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching all products...");
     
-    // Clear response before making a new request
+    // Make sure to use an appropriate timeout
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -148,7 +152,7 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching popular products...");
     
-    // Fetch popular products from the join table
+    // First check if we have any popular products
     const { data: popularData, error: popularError } = await supabase
       .from('popular_products')
       .select('product_id');
@@ -161,8 +165,19 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
     console.log("Popular products data:", popularData);
     
     if (!popularData || popularData.length === 0) {
-      console.log("No popular products found");
-      return [];
+      console.log("No popular products found - fetching some regular products instead");
+      // If no popular products, just return some regular products
+      const { data: regularProducts, error: regularError } = await supabase
+        .from('products')
+        .select('*')
+        .limit(4);
+        
+      if (regularError || !regularProducts) {
+        console.error('Error fetching regular products as fallback:', regularError);
+        return [];
+      }
+      
+      return regularProducts.map((product: RawProduct) => processProductData(product));
     }
     
     // Extract product IDs

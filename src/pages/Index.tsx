@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,14 +24,16 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log("Index component mounted");
     loadPopularProducts();
   }, []);
 
   const loadPopularProducts = async () => {
     setLoading(true);
     try {
+      console.log("Starting to load popular products in Index.tsx");
       const products = await fetchPopularProducts();
-      console.log("Popular products loaded in Index.tsx:", products.length);
+      console.log("Popular products loaded in Index.tsx:", products);
       setFeaturedProducts(products);
     } catch (err) {
       console.error("Error in Index component:", err);
@@ -262,7 +263,14 @@ const Index = () => {
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
             </div>
           ) : (
-            <ProductGrid products={productsToShow} />
+            <>
+              <ProductGrid products={productsToShow} />
+              {featuredProducts.length === 0 && (
+                <p className="text-center text-gray-500 mt-4">
+                  Kasutame praegu näidistooteid. Tegelikud tooted kuvatakse kohe, kui need on saadaval.
+                </p>
+              )}
+            </>
           )}
         </div>
       </section>
