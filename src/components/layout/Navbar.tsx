@@ -3,9 +3,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -13,7 +15,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full z-50">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto py-4">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <Link to="/" className="text-4xl font-bold text-primary">
@@ -94,7 +96,7 @@ const Navbar = () => {
                 >
                   Kontakt
                 </Link>
-                <Button asChild className="w-full mt-2 mx-4">
+                <Button asChild className="w-full mt-2">
                   <Link 
                     to="/inquiry" 
                     onClick={() => setIsOpen(false)}
