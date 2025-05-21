@@ -16,6 +16,9 @@ export interface ProductProps {
 const ProductCard = ({ id, name, description, image, startingPrice }: ProductProps) => {
   const [imageError, setImageError] = useState(false);
   
+  // Make sure ID is valid to prevent broken links
+  const safeId = id || 'unknown';
+  
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
       <div className="aspect-square w-full relative overflow-hidden">
@@ -24,7 +27,7 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
           alt={name} 
           className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
           onError={() => {
-            console.log(`Image error for product ${id} (${name}), using placeholder. Image URL was: ${image}`);
+            console.log(`Image error for product ${safeId} (${name}), using placeholder. Image URL was: ${image}`);
             setImageError(true);
           }}
         />
@@ -38,10 +41,10 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
         <Button variant="outline" asChild>
-          <Link to={`/products/${id}`}>Vaata lähemalt</Link>
+          <Link to={`/products/${safeId}`}>Vaata lähemalt</Link>
         </Button>
         <Button asChild>
-          <Link to={`/inquiry?product=${id}`}>Küsi pakkumist</Link>
+          <Link to={`/inquiry?product=${safeId}`}>Küsi pakkumist</Link>
         </Button>
       </CardFooter>
     </Card>

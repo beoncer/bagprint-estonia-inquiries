@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ProductProps } from "@/components/product/ProductCard";
 import { useToast } from "@/hooks/use-toast";
-import { fetchAllProducts } from "@/utils/productUtils";
+import { fetchAllProducts, fallbackProducts } from "@/utils/productUtils";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,6 +18,7 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [useFallback, setUseFallback] = useState(false);
   const { toast } = useToast();
   
   // Load products on component mount
@@ -29,6 +30,8 @@ const Products = () => {
   const loadProducts = async () => {
     setLoading(true);
     setLoadError(null);
+    setUseFallback(false);
+    
     try {
       console.log("Starting to load products in Products.tsx");
       const products = await fetchAllProducts();
@@ -36,30 +39,72 @@ const Products = () => {
       
       if (!products || products.length === 0) {
         console.log("No products returned from fetchAllProducts");
-        setLoadError("No products found. Please check back later.");
-        toast({
-          variant: "destructive",
-          title: "No products found",
-          description: "We couldn't find any products. Please check back later."
-        });
+        
+        // Show a different message when in development mode
+        if (import.meta.env.MODE === 'development') {
+          setUseFallback(true);
+          setLoadError(null);
+          
+          toast({
+            title: "Using demo products",
+            description: "No products found in database. Using demo products for development."
+          });
+          
+          // Set fallback products
+          setAllProducts(fallbackProducts);
+          setFilteredProducts(fallbackProducts);
+        } else {
+          setLoadError("No products found. Please check back later.");
+          toast({
+            variant: "destructive",
+            title: "No products found",
+            description: "We couldn't find any products. Please check back later."
+          });
+          
+          setAllProducts([]);
+          setFilteredProducts([]);
+        }
       } else {
         setLoadError(null);
+        setUseFallback(false);
+        
         toast({
           title: `${products.length} products loaded`,
           description: "Products loaded successfully."
         });
+        
+        setAllProducts(products);
+        setFilteredProducts(products);
       }
-      
-      setAllProducts(products || []);
-      setFilteredProducts(products || []);
     } catch (err) {
       console.error("Error in Products component:", err);
-      setLoadError("Failed to load products. Please try refreshing the page.");
-      toast({
-        variant: "destructive",
-        title: "Error loading products",
-        description: "Could not load products. Please try again later."
-      });
+      
+      // In development mode, use fallback products
+      if (import.meta.env.MODE === 'development') {
+        console.log("Using fallback products after error");
+        setUseFallback(true);
+        setLoadError(null);
+        
+        toast({
+          variant: "warning",
+          title: "Database error",
+          description: "Error connecting to database. Using demo products for development."
+        });
+        
+        setAllProducts(fallbackProducts);
+        setFilteredProducts(fallbackProducts);
+      } else {
+        setLoadError("Failed to load products. Please try refreshing the page.");
+        
+        toast({
+          variant: "destructive",
+          title: "Error loading products",
+          description: "Could not load products. Please try again later."
+        });
+        
+        setAllProducts([]);
+        setFilteredProducts([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -194,6 +239,13 @@ const Products = () => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <>
+              {useFallback && (
+                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-amber-700">
+                    <strong>Arendusrežiim:</strong> Näidistoodete andmed. Ühendage Supabase andmebaasiga või lisage tooteid andmebaasi.
+                  </p>
+                </div>
+              )}
               <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
               <ProductGrid products={filteredProducts} />
             </>

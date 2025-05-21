@@ -15,6 +15,42 @@ export interface RawProduct {
   updated_at?: string;
 }
 
+// Fallback products to use when database is empty
+export const fallbackProducts: ProductProps[] = [
+  {
+    id: "cotton1",
+    name: "Standard puuvillakott",
+    description: "Kõrgkvaliteedilised puuvillakotid. Saadaval erinevates värvides.",
+    image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop",
+    category: "cotton",
+    startingPrice: 1.50
+  },
+  {
+    id: "paper1",
+    name: "Paberkott - väike",
+    description: "Keskkonnasõbralikud väikesed paberkotid.",
+    image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+    category: "paper",
+    startingPrice: 0.80
+  },
+  {
+    id: "drawstring1",
+    name: "Paelaga kott",
+    description: "Praktilised paelaga kotid. Ideaalsed üritusteks.",
+    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+    category: "drawstring",
+    startingPrice: 1.20
+  },
+  {
+    id: "packaging1",
+    name: "E-poe pakend",
+    description: "Kvaliteetsed pakendid e-poele. Tugevad ja esinduslikud.",
+    image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=800&auto=format&fit=crop",
+    category: "packaging",
+    startingPrice: 1.40
+  }
+];
+
 /**
  * Safely parses JSON pricing data
  */
@@ -157,7 +193,7 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
       .from("products")
       .select("*");
     
-    console.log("Supabase raw response:", { data, error });
+    console.log("Supabase response:", { data, error });
     
     if (error) {
       console.error("Error fetching products:", error);
@@ -169,12 +205,17 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
       return [];
     }
     
-    console.log(`Found ${data.length} products in database`);
-    
     if (data.length === 0) {
-      console.log("Empty products array returned from Supabase");
+      console.log("No products found in database");
+      // If we're in development and there's no products, return fallback products
+      if (import.meta.env.MODE === 'development') {
+        console.log("Using fallback products for development");
+        return fallbackProducts;
+      }
       return [];
     }
+    
+    console.log(`Found ${data.length} products in database`);
     
     // Process the products data
     const processedProducts = data.map((product: RawProduct) => {
@@ -198,6 +239,12 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
     return processedProducts;
   } catch (err) {
     console.error("Critical error in fetchAllProducts:", err);
+    
+    // In development mode, use fallback products instead of showing an empty page
+    if (import.meta.env.MODE === 'development') {
+      console.log("Using fallback products for development after error");
+      return fallbackProducts;
+    }
     return [];
   }
 };
@@ -275,11 +322,23 @@ const fetchSomeFallbackProducts = async (): Promise<ProductProps[]> => {
     
     if (error) {
       console.error('Error fetching fallback products:', error);
+      
+      // In development mode, use hardcoded products
+      if (import.meta.env.MODE === 'development') {
+        console.log("Using hardcoded fallback products for development");
+        return fallbackProducts;
+      }
       return [];
     }
     
     if (!data || data.length === 0) {
       console.log("No fallback products found");
+      
+      // In development mode, use hardcoded products
+      if (import.meta.env.MODE === 'development') {
+        console.log("Using hardcoded fallback products for development");
+        return fallbackProducts;
+      }
       return [];
     }
     
@@ -289,6 +348,12 @@ const fetchSomeFallbackProducts = async (): Promise<ProductProps[]> => {
     return processedProducts;
   } catch (err) {
     console.error('Error in fetchSomeFallbackProducts:', err);
+    
+    // In development mode, use hardcoded products
+    if (import.meta.env.MODE === 'development') {
+      console.log("Using hardcoded fallback products after error");
+      return fallbackProducts;
+    }
     return [];
   }
 };
