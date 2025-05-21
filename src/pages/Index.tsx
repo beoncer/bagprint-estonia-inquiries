@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -117,19 +118,21 @@ const Index = () => {
                       </p>
                     </div>
                     
-                    {/* Buttons with consistent styling */}
+                    {/* Buttons with improved styling */}
                     <div className="flex flex-wrap gap-3 md:gap-4 mt-auto mb-6 md:mb-10">
+                      {/* Primary button with fixed styling - making sure it's visible on all devices */}
                       <Button 
                         size="lg" 
-                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8" 
+                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-red-500 hover:bg-red-600 text-white font-medium shadow-md" 
                         asChild
                       >
                         <Link to="/products">Vaata tooteid</Link>
                       </Button>
+                      {/* Secondary button with fixed styling and opacity */}
                       <Button 
-                        variant="secondary" 
+                        variant="outline" 
                         size="lg" 
-                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-white text-primary hover:bg-gray-100" 
+                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-white text-primary hover:bg-gray-100 border border-gray-200 shadow-sm" 
                         asChild
                       >
                         <Link to="/inquiry">Küsi pakkumist</Link>

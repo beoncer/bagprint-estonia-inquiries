@@ -23,8 +23,8 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
   // Process image URL if it's from Supabase
   useEffect(() => {
     if (image) {
-      // If image is from Supabase but doesn't have proper URL format
-      if (image.includes('ixotpxliaerkzjznyipi.supabase.co') && !image.startsWith('https://')) {
+      // Handle Supabase storage URLs correctly
+      if (image.includes('supabase.co') && !image.startsWith('https://')) {
         setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
       } else {
         setImageUrl(image);
