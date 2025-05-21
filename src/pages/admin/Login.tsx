@@ -33,7 +33,7 @@ const AdminLogin: React.FC = () => {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4">Laadin...</p>
+          <p className="mt-4">Loading...</p>
         </div>
       </div>
     );
@@ -48,30 +48,30 @@ const AdminLogin: React.FC = () => {
       <Card className="w-[400px]">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-red-600">Admin Panel</CardTitle>
-          <CardDescription>Logige sisse, et jätkata</CardDescription>
+          <CardDescription>Sign in to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Logi sisse</TabsTrigger>
-              <TabsTrigger value="register">Registreeri</TabsTrigger>
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
               <form onSubmit={handleLogin}>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">E-post</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="teie@email.ee"
+                      placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password">Parool</Label>
+                    <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
                       type="password"
@@ -85,7 +85,7 @@ const AdminLogin: React.FC = () => {
                     type="submit"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Sisselogimine..." : "Logi sisse"}
+                    {isSubmitting ? "Signing in..." : "Sign in"}
                   </Button>
                 </div>
               </form>
@@ -94,18 +94,18 @@ const AdminLogin: React.FC = () => {
               <form onSubmit={handleSignUp}>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="register-email">E-post</Label>
+                    <Label htmlFor="register-email">Email</Label>
                     <Input
                       id="register-email"
                       type="email"
-                      placeholder="teie@email.ee"
+                      placeholder="your@email.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="register-password">Parool</Label>
+                    <Label htmlFor="register-password">Password</Label>
                     <Input
                       id="register-password"
                       type="password"
@@ -119,7 +119,7 @@ const AdminLogin: React.FC = () => {
                     type="submit"
                     disabled={isSubmitting}
                   >
-                    {isSubmitting ? "Registreerimine..." : "Registreeri"}
+                    {isSubmitting ? "Registering..." : "Register"}
                   </Button>
                 </div>
               </form>
@@ -127,7 +127,7 @@ const AdminLogin: React.FC = () => {
           </Tabs>
         </CardContent>
         <CardFooter className="text-center text-sm text-gray-500">
-          Bagprint.ee admin paneel
+          Bagprint.ee admin panel
         </CardFooter>
       </Card>
     </div>

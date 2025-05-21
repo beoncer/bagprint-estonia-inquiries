@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShoppingBag, FileText, ImageIcon, Settings, Search, LogOut } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, FileText, ImageIcon, Search, LogOut, HelpCircle } from "lucide-react";
 
 const AdminLayout: React.FC = () => {
   const { user, loading, signOut } = useAuth();
@@ -76,6 +76,12 @@ const AdminLayout: React.FC = () => {
                 <Link to="/admin/seo" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/seo") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <Search className="h-5 w-5" />
                   <span>SEO</span>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/manual" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/manual") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <HelpCircle className="h-5 w-5" />
+                  <span>User Manual</span>
                 </Link>
               </SidebarMenuItem>
             </SidebarMenu>

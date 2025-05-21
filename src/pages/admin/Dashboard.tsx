@@ -73,36 +73,36 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Töölaud</h1>
+      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Tooted</CardTitle>
+            <CardTitle className="text-sm font-medium">Products</CardTitle>
             <ShoppingBag className="h-5 w-5 text-gray-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.productCount}</div>
-            <p className="text-xs text-gray-500">Toodete arv</p>
+            <p className="text-xs text-gray-500">Number of products</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Sisu</CardTitle>
+            <CardTitle className="text-sm font-medium">Content</CardTitle>
             <FileText className="h-5 w-5 text-gray-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.contentCount}</div>
-            <p className="text-xs text-gray-500">Sisu elementide arv</p>
+            <p className="text-xs text-gray-500">Number of content elements</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium">Meedia</CardTitle>
+            <CardTitle className="text-sm font-medium">Media</CardTitle>
             <ImageIcon className="h-5 w-5 text-gray-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.assetsCount}</div>
-            <p className="text-xs text-gray-500">Banner ja logo</p>
+            <p className="text-xs text-gray-500">Banner and logo</p>
           </CardContent>
         </Card>
         <Card>
@@ -112,15 +112,15 @@ const AdminDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{data.seoCount}</div>
-            <p className="text-xs text-gray-500">SEO metaandmete arv</p>
+            <p className="text-xs text-gray-500">Number of SEO metadata</p>
           </CardContent>
         </Card>
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Tere tulemast!</h2>
+        <h2 className="text-2xl font-bold mb-4">Welcome!</h2>
         <p className="text-gray-600">
-          Selles admin panelis saate hallata oma veebisaidi sisu, tooteid, pilte ja SEO seadeid.
-          Kasutage vasakul asuvat külgriba erinevate sektsioonide vahel navigeerimiseks.
+          In this admin panel, you can manage your website content, products, images, and SEO settings.
+          Use the sidebar on the left to navigate between different sections.
         </p>
       </div>
     </div>

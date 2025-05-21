@@ -22,6 +22,7 @@ import AdminProducts from "./pages/admin/Products";
 import AdminContent from "./pages/admin/Content";
 import AdminAssets from "./pages/admin/Assets";
 import AdminSEO from "./pages/admin/SEO";
+import AdminManual from "./pages/admin/Manual";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="content" element={<AdminContent />} />
               <Route path="assets" element={<AdminAssets />} />
               <Route path="seo" element={<AdminSEO />} />
+              <Route path="manual" element={<AdminManual />} />
             </Route>
             
             {/* 404 Route */}
