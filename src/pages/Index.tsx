@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
@@ -44,21 +45,21 @@ const Index = () => {
     <Layout>
       {/* Hero Section */}
       <section className="py-6">
-        <div className="container mx-auto">
+        <div className="container mx-auto px-2">
           <div 
             className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
             style={{
               backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: "520px" // Reduced from 650px by 1/5
+              height: "520px"
             }}
           >
             <div className="absolute inset-0 bg-white/45"></div>
             <div className="relative z-10 h-full">
               <div className="flex flex-col md:flex-row items-center justify-between h-full">
                 <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-6 md:py-10 px-4 md:px-6">
-                  <div className="mt-6 md:mt-16"> {/* Adjusted top spacing for better responsiveness */}
+                  <div className="mt-6 md:mt-16">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
                       Kvaliteetsed kotid ja pakendid teie brändile
                     </h1>
@@ -67,8 +68,8 @@ const Index = () => {
                       e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
                     </p>
                   </div>
-                  {/* Ensure buttons are always visible by moving them higher in the container */}
-                  <div className="flex flex-wrap gap-3 md:gap-4 mb-6 md:mb-10">
+                  {/* Moved buttons to a more visible position and adjusted responsiveness */}
+                  <div className="flex flex-wrap gap-3 md:gap-4 mb-10 sm:mb-12 md:mb-16">
                     <Button size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10" asChild>
                       <Link to="/products">Vaata tooteid</Link>
                     </Button>
@@ -85,7 +86,7 @@ const Index = () => {
 
       {/* Why Choose Us Section */}
       <section className="py-12">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2">
           <h2 className="text-3xl font-bold text-left mb-12">Miks valida meid</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -131,7 +132,7 @@ const Index = () => {
 
       {/* Updated Categories Section */}
       <section className="py-16">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2">
           <h2 className="text-3xl font-bold text-left mb-10">Meie tooted</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -196,7 +197,7 @@ const Index = () => {
 
       {/* Featured Products Section */}
       <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-2">
           <h2 className="text-3xl font-bold text-left mb-12">Populaarsed tooted</h2>
           <ProductGrid products={featuredProducts} />
         </div>
@@ -204,7 +205,7 @@ const Index = () => {
 
       {/* CTA Section */}
       <section className="bg-primary py-16">
-        <div className="container mx-auto px-4 text-center">
+        <div className="container mx-auto px-2 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Valmis alustama?
           </h2>

@@ -4,7 +4,7 @@ import { Phone, Mail } from "lucide-react";
 const TopBar = () => {
   return (
     <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-2">
         <div className="flex justify-between items-center text-sm">
           {/* Left side - now contains the text */}
           <div className="hidden md:block">
