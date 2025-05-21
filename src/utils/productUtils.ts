@@ -188,10 +188,15 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching all products...");
     
-    // Use simpler query with more explicit options
+    // Log the Supabase client details to verify connection
+    console.log("Supabase client configured with URL:", 
+      supabase.supabaseUrl ? "URL configured" : "Missing URL");
+    
+    // Use a more explicit query that should work regardless of server settings
     const { data, error } = await supabase
       .from("products")
-      .select("*");
+      .select("*")
+      .order('created_at', { ascending: false });
     
     console.log("Supabase response:", { data, error });
     

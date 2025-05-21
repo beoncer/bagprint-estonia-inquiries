@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface ProductProps {
   id: string;
@@ -15,19 +15,30 @@ export interface ProductProps {
 
 const ProductCard = ({ id, name, description, image, startingPrice }: ProductProps) => {
   const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState(image);
   
   // Make sure ID is valid to prevent broken links
   const safeId = id || 'unknown';
+  
+  // Sometimes Supabase URLs might be incomplete or need processing
+  useEffect(() => {
+    if (image && image.includes('ixotpxliaerkzjznyipi.supabase.co')) {
+      // If it's a Supabase URL, make sure it's properly formed
+      if (!image.startsWith('https://')) {
+        setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+      }
+    }
+  }, [image]);
   
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
       <div className="aspect-square w-full relative overflow-hidden">
         <img 
-          src={imageError ? '/placeholder.svg' : image} 
+          src={imageError ? '/placeholder.svg' : imageUrl} 
           alt={name} 
           className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
           onError={() => {
-            console.log(`Image error for product ${safeId} (${name}), using placeholder. Image URL was: ${image}`);
+            console.log(`Image error for product ${safeId} (${name}), using placeholder. Image URL was: ${imageUrl}`);
             setImageError(true);
           }}
         />

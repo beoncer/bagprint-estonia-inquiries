@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -86,7 +85,7 @@ const Products = () => {
         setLoadError(null);
         
         toast({
-          variant: "warning",
+          variant: "destructive",
           title: "Database error",
           description: "Error connecting to database. Using demo products for development."
         });
