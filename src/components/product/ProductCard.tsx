@@ -2,6 +2,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export interface ProductProps {
   id: string;
@@ -13,16 +14,18 @@ export interface ProductProps {
 }
 
 const ProductCard = ({ id, name, description, image, startingPrice }: ProductProps) => {
+  const [imageError, setImageError] = useState(false);
+  
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">
       <div className="aspect-square w-full relative overflow-hidden">
         <img 
-          src={image} 
+          src={imageError ? '/placeholder.svg' : image} 
           alt={name} 
           className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            // Replace broken image with placeholder
-            (e.target as HTMLImageElement).src = '/placeholder.svg';
+          onError={() => {
+            console.log(`Image error for product ${id}, using placeholder`);
+            setImageError(true);
           }}
         />
       </div>

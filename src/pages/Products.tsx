@@ -20,6 +20,7 @@ const Products = () => {
   const [loadError, setLoadError] = useState<string | null>(null);
   const { toast } = useToast();
   
+  // Load products on component mount
   useEffect(() => {
     console.log("Products component mounted");
     loadProducts();
@@ -33,15 +34,24 @@ const Products = () => {
       const products = await fetchAllProducts();
       console.log("Products loaded in Products.tsx:", products);
       
-      if (products.length === 0) {
+      if (!products || products.length === 0) {
         console.log("No products returned from fetchAllProducts");
         setLoadError("No products found. Please check back later.");
+        toast({
+          variant: "destructive",
+          title: "No products found",
+          description: "We couldn't find any products. Please check back later."
+        });
       } else {
         setLoadError(null);
+        toast({
+          title: `${products.length} products loaded`,
+          description: "Products loaded successfully."
+        });
       }
       
-      setAllProducts(products);
-      setFilteredProducts(products);
+      setAllProducts(products || []);
+      setFilteredProducts(products || []);
     } catch (err) {
       console.error("Error in Products component:", err);
       setLoadError("Failed to load products. Please try refreshing the page.");
@@ -59,6 +69,7 @@ const Products = () => {
   useEffect(() => {
     const categoryFromUrl = searchParams.get("category");
     if (categoryFromUrl) {
+      console.log("Category from URL:", categoryFromUrl);
       setActiveCategory(categoryFromUrl);
     } else {
       setActiveCategory("all");
@@ -67,7 +78,7 @@ const Products = () => {
   
   // Apply filters when category or search term changes
   useEffect(() => {
-    if (allProducts.length === 0) return;
+    if (!allProducts || allProducts.length === 0) return;
     
     console.log("Applying filters:", { activeCategory, searchTerm });
     console.log("All products before filtering:", allProducts);
@@ -76,16 +87,20 @@ const Products = () => {
     
     // Apply category filter
     if (activeCategory !== "all") {
+      console.log(`Filtering by category: ${activeCategory}`);
       result = result.filter(product => product.category === activeCategory);
+      console.log(`After category filter: ${result.length} products`);
     }
     
     // Apply search filter
     if (searchTerm.trim() !== "") {
       const searchLower = searchTerm.toLowerCase();
+      console.log(`Filtering by search term: ${searchLower}`);
       result = result.filter(product => 
         product.name.toLowerCase().includes(searchLower) || 
         product.description.toLowerCase().includes(searchLower)
       );
+      console.log(`After search filter: ${result.length} products`);
     }
     
     console.log("Filtered products:", result);
@@ -111,6 +126,7 @@ const Products = () => {
   };
   
   const handleRetry = () => {
+    console.log("Retrying product load...");
     loadProducts();
   };
 

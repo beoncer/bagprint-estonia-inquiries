@@ -2,7 +2,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
 import { ProductProps } from "@/components/product/ProductCard";
-import { toast } from "@/hooks/use-toast";
 
 export interface RawProduct {
   id: string;
@@ -20,27 +19,33 @@ export interface RawProduct {
  * Safely parses JSON pricing data
  */
 export const parsePricingData = (pricingData: Json): Record<string, number> => {
-  try {
-    console.log("Parsing pricing data:", pricingData);
-    
-    // If it's already an object, return it directly
-    if (pricingData && typeof pricingData === 'object') {
-      console.log("Pricing data is already an object");
-      return pricingData as Record<string, number>;
-    }
-    
-    // If it's a string, try to parse it
-    if (typeof pricingData === 'string') {
-      console.log("Pricing data is a string, parsing");
-      return JSON.parse(pricingData);
-    }
-    
-    console.log("Pricing data is invalid, returning empty object");
-    return {};
-  } catch (err) {
-    console.error("Error parsing pricing data:", err, "Raw data:", pricingData);
+  console.log("Raw pricing data:", pricingData);
+  
+  // If it's null or undefined, return empty object
+  if (pricingData === null || pricingData === undefined) {
+    console.log("Pricing data is null or undefined, returning empty object");
     return {};
   }
+  
+  // If it's already an object, return it directly
+  if (typeof pricingData === 'object') {
+    console.log("Pricing data is an object");
+    return pricingData as Record<string, number>;
+  }
+  
+  // If it's a string, try to parse it
+  if (typeof pricingData === 'string') {
+    try {
+      console.log("Pricing data is a string, parsing");
+      return JSON.parse(pricingData);
+    } catch (err) {
+      console.error("Error parsing pricing data string:", err);
+      return {};
+    }
+  }
+  
+  console.log("Pricing data is of unexpected type, returning empty object");
+  return {};
 };
 
 /**
@@ -48,7 +53,7 @@ export const parsePricingData = (pricingData: Json): Record<string, number> => {
  */
 export const mapProductTypeToCategory = (type: string): string => {
   console.log("Mapping product type:", type);
-  switch (type) {
+  switch (type?.toLowerCase()) {
     case "cotton_bag": return "cotton";
     case "paper_bag": return "paper";
     case "drawstring_bag": return "drawstring";
@@ -69,8 +74,12 @@ export const getStartingPrice = (pricingData: Record<string, number>): number =>
     return 0;
   }
   
-  const priceValues = Object.values(pricingData).map(p => Number(p));
-  console.log("Price values:", priceValues);
+  // Filter out non-numeric values and convert string numbers to actual numbers
+  const priceValues = Object.values(pricingData)
+    .filter(p => !isNaN(Number(p)))
+    .map(p => Number(p));
+  
+  console.log("Valid price values:", priceValues);
   return priceValues.length > 0 ? Math.min(...priceValues) : 0;
 };
 
@@ -79,8 +88,11 @@ export const getStartingPrice = (pricingData: Record<string, number>): number =>
  */
 export const processProductData = (product: RawProduct): ProductProps => {
   try {
-    console.log(`Processing product: ${product.name}, type: ${product.type}, id: ${product.id}`);
-    console.log("Raw product data:", product);
+    console.log("Processing product:", product);
+    
+    if (!product || !product.id) {
+      throw new Error("Invalid product data");
+    }
     
     // Parse pricing data
     const pricingWithoutPrint = parsePricingData(product.pricing_without_print);
@@ -93,20 +105,23 @@ export const processProductData = (product: RawProduct): ProductProps => {
     const category = mapProductTypeToCategory(product.type);
     console.log(`Category for ${product.name}: ${category}`);
     
-    return {
+    const processedProduct = {
       id: product.id,
-      name: product.name,
+      name: product.name || "Unnamed Product",
       description: product.description || "",
       image: product.image_url || "/placeholder.svg",
       category,
       startingPrice,
     };
+    
+    console.log("Processed product:", processedProduct);
+    return processedProduct;
   } catch (err) {
-    console.error(`Error processing product ${product.name}:`, err);
+    console.error(`Error processing product:`, err);
     return {
-      id: product.id,
-      name: product.name || "Unknown Product",
-      description: product.description || "Error loading product details",
+      id: product?.id || "error-id",
+      name: product?.name || "Error Loading Product",
+      description: "Error loading product details",
       image: "/placeholder.svg",
       category: "other",
       startingPrice: 0,
@@ -123,20 +138,14 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
     
     const { data, error } = await supabase
       .from("products")
-      .select("*")
-      .order('created_at', { ascending: false });
+      .select("*");
+    
+    console.log("Supabase response:", { data, error });
     
     if (error) {
       console.error("Error fetching products:", error);
-      toast({
-        variant: "destructive",
-        title: "Error loading products",
-        description: "Could not load products. Please try again later."
-      });
-      return [];
+      throw error;
     }
-    
-    console.log("Raw products data:", data);
     
     if (!data || data.length === 0) {
       console.log("No products found in database");
@@ -149,12 +158,7 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
     
     return processedProducts;
   } catch (err) {
-    console.error("Error processing products:", err);
-    toast({
-      variant: "destructive",
-      title: "Error processing products",
-      description: "There was a problem preparing the products for display."
-    });
+    console.error("Error in fetchAllProducts:", err);
     return [];
   }
 };
@@ -171,12 +175,12 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
       .from('popular_products')
       .select('product_id');
     
+    console.log("Popular products response:", { popularData, popularError });
+    
     if (popularError) {
       console.error('Error fetching popular products:', popularError);
       return fetchSomeFallbackProducts();
     }
-    
-    console.log("Popular products data:", popularData);
     
     if (!popularData || popularData.length === 0) {
       console.log("No popular products found - fetching some regular products instead");
@@ -193,12 +197,17 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
       .select('*')
       .in('id', productIds);
     
-    if (productsError || !productsData || productsData.length === 0) {
+    console.log("Popular product details response:", { productsData, productsError });
+    
+    if (productsError) {
       console.error('Error fetching product details:', productsError);
       return fetchSomeFallbackProducts();
     }
     
-    console.log("Popular products details:", productsData);
+    if (!productsData || productsData.length === 0) {
+      console.log("No product details found for popular products");
+      return fetchSomeFallbackProducts();
+    }
     
     // Process the products data
     const processedProducts = productsData.map((product: RawProduct) => processProductData(product));
@@ -217,18 +226,30 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
 const fetchSomeFallbackProducts = async (): Promise<ProductProps[]> => {
   console.log("Fetching fallback products");
   
-  const { data, error } = await supabase
-    .from('products')
-    .select('*')
-    .limit(4);
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .limit(4);
+      
+    console.log("Fallback products response:", { data, error });
     
-  if (error || !data || data.length === 0) {
-    console.error('Error fetching fallback products:', error);
+    if (error) {
+      console.error('Error fetching fallback products:', error);
+      return [];
+    }
+    
+    if (!data || data.length === 0) {
+      console.log("No fallback products found");
+      return [];
+    }
+    
+    const processedProducts = data.map((product: RawProduct) => processProductData(product));
+    console.log("Processed fallback products:", processedProducts);
+    
+    return processedProducts;
+  } catch (err) {
+    console.error('Error in fetchSomeFallbackProducts:', err);
     return [];
   }
-  
-  const processedProducts = data.map((product: RawProduct) => processProductData(product));
-  console.log("Processed fallback products:", processedProducts);
-  
-  return processedProducts;
 };
