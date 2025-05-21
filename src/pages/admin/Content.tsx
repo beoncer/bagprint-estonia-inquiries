@@ -86,24 +86,26 @@ const ContentPage: React.FC = () => {
   const fetchPageOptions = async () => {
     try {
       // Get unique pages from website_content table
-      const { data: contentPages, error: contentError } = await supabase
+      const { data: contentPagesData, error: contentError } = await supabase
         .from("website_content")
-        .select("page")
-        .distinct();
+        .select("page");
       
       // Get unique pages from seo_metadata table
-      const { data: seoPages, error: seoError } = await supabase
+      const { data: seoPagesData, error: seoError } = await supabase
         .from("seo_metadata")
-        .select("page")
-        .distinct();
+        .select("page");
       
       if (contentError) throw contentError;
       if (seoError) throw seoError;
       
-      // Combine and deduplicate pages from both sources
+      // Extract page values and remove duplicates manually
+      const contentPages = contentPagesData?.map(item => item.page) || [];
+      const seoPages = seoPagesData?.map(item => item.page) || [];
+      
+      // Combine and deduplicate pages
       const allPages = [
-        ...(contentPages || []).map(item => item.page),
-        ...(seoPages || []).map(item => item.page)
+        ...contentPages,
+        ...seoPages
       ];
       
       // Add default pages

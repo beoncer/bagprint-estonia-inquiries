@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductProps } from "@/components/product/ProductCard";
+import { Json } from "@/integrations/supabase/types";
 
 interface Product {
   id: string;
@@ -15,8 +16,10 @@ interface Product {
   description: string | null;
   image_url: string | null;
   type: string;
-  pricing_without_print: Record<string, number>;
-  pricing_with_print: Record<string, number>;
+  pricing_without_print: Json;
+  pricing_with_print: Json;
+  created_at: string;
+  updated_at: string;
 }
 
 const Products = () => {
@@ -45,14 +48,22 @@ const Products = () => {
         // Process the products data
         const processedProducts: ProductProps[] = data.map((product: Product) => {
           // Parse pricing objects if needed
-          const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
-            ? JSON.parse(product.pricing_without_print as string)
-            : product.pricing_without_print;
+          let pricingWithoutPrint: Record<string, number> = {};
+          
+          if (typeof product.pricing_without_print === 'string') {
+            try {
+              pricingWithoutPrint = JSON.parse(product.pricing_without_print);
+            } catch (e) {
+              console.error("Error parsing pricing_without_print:", e);
+            }
+          } else if (product.pricing_without_print && typeof product.pricing_without_print === 'object') {
+            pricingWithoutPrint = product.pricing_without_print as Record<string, number>;
+          }
           
           // Calculate starting price (minimum price from pricing_without_print)
           const priceValues = Object.values(pricingWithoutPrint || {});
           const startingPrice = priceValues.length > 0 
-            ? Math.min(...priceValues) 
+            ? Math.min(...priceValues.map(price => Number(price)))
             : 0;
           
           // Map product type to category
