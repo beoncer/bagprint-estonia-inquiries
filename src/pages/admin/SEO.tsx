@@ -22,6 +22,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PlusIcon, Edit } from "lucide-react";
 
 interface SEOMetadata {
@@ -32,8 +39,14 @@ interface SEOMetadata {
   keywords: string;
 }
 
+interface PageOption {
+  value: string;
+  label: string;
+}
+
 const SEOPage: React.FC = () => {
   const [seoEntries, setSEOEntries] = useState<SEOMetadata[]>([]);
+  const [pageOptions, setPageOptions] = useState<PageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedEntry, setSelectedEntry] = useState<SEOMetadata | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -46,6 +59,7 @@ const SEOPage: React.FC = () => {
 
   useEffect(() => {
     fetchSEOEntries();
+    fetchPageOptions();
   }, []);
 
   const fetchSEOEntries = async () => {
@@ -66,6 +80,44 @@ const SEOPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPageOptions = async () => {
+    try {
+      // Get unique pages from website_content table
+      const { data: contentPages, error: contentError } = await supabase
+        .from("website_content")
+        .select("page")
+        .distinct();
+      
+      // Get unique pages from seo_metadata table
+      const { data: seoPages, error: seoError } = await supabase
+        .from("seo_metadata")
+        .select("page")
+        .distinct();
+      
+      if (contentError) throw contentError;
+      if (seoError) throw seoError;
+      
+      // Combine and deduplicate pages
+      const allPages = [
+        ...(contentPages || []).map(item => item.page),
+        ...(seoPages || []).map(item => item.page)
+      ];
+      
+      // Add default pages
+      const defaultPages = ["home", "products", "contact", "about"];
+      const uniquePages = Array.from(new Set([...allPages, ...defaultPages])).sort();
+      
+      const options = uniquePages.map(page => ({
+        value: page,
+        label: page.charAt(0).toUpperCase() + page.slice(1)
+      }));
+      
+      setPageOptions(options);
+    } catch (error: any) {
+      console.error("Error fetching page options:", error);
     }
   };
 
@@ -107,6 +159,7 @@ const SEOPage: React.FC = () => {
       setIsDialogOpen(false);
       
       await fetchSEOEntries();
+      await fetchPageOptions();
     } catch (error: any) {
       toast({
         title: "Error adding SEO data",
@@ -208,14 +261,23 @@ const SEOPage: React.FC = () => {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <label htmlFor="page">Page</label>
-                <Input
-                  id="page"
-                  value={formData.page}
-                  onChange={(e) => setFormData({ ...formData, page: e.target.value })}
-                  placeholder="Example: home, products, contact"
-                />
+                <Select 
+                  value={formData.page} 
+                  onValueChange={(value) => setFormData({ ...formData, page: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a page" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pageOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <p className="text-sm text-gray-500">
-                  Enter the page identifier (URL path, e.g., "home" for homepage).
+                  Select the page for this SEO metadata (URL path, e.g., "home" for homepage).
                 </p>
               </div>
               <div className="grid gap-2">

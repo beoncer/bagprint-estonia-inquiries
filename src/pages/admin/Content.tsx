@@ -22,6 +22,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { PlusIcon, Edit, Save, Trash2, Check } from "lucide-react";
 
 interface ContentItem {
@@ -31,8 +38,14 @@ interface ContentItem {
   page: string;
 }
 
+interface PageOption {
+  value: string;
+  label: string;
+}
+
 const ContentPage: React.FC = () => {
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
+  const [pageOptions, setPageOptions] = useState<PageOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -47,6 +60,7 @@ const ContentPage: React.FC = () => {
 
   useEffect(() => {
     fetchContentItems();
+    fetchPageOptions();
   }, []);
 
   const fetchContentItems = async () => {
@@ -66,6 +80,44 @@ const ContentPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPageOptions = async () => {
+    try {
+      // Get unique pages from website_content table
+      const { data: contentPages, error: contentError } = await supabase
+        .from("website_content")
+        .select("page")
+        .distinct();
+      
+      // Get unique pages from seo_metadata table
+      const { data: seoPages, error: seoError } = await supabase
+        .from("seo_metadata")
+        .select("page")
+        .distinct();
+      
+      if (contentError) throw contentError;
+      if (seoError) throw seoError;
+      
+      // Combine and deduplicate pages from both sources
+      const allPages = [
+        ...(contentPages || []).map(item => item.page),
+        ...(seoPages || []).map(item => item.page)
+      ];
+      
+      // Add default pages
+      const defaultPages = ["home", "products", "contact", "about"];
+      const uniquePages = Array.from(new Set([...allPages, ...defaultPages])).sort();
+      
+      const options = uniquePages.map(page => ({
+        value: page,
+        label: page.charAt(0).toUpperCase() + page.slice(1)
+      }));
+      
+      setPageOptions(options);
+    } catch (error: any) {
+      console.error("Error fetching page options:", error);
     }
   };
 
@@ -105,6 +157,7 @@ const ContentPage: React.FC = () => {
       setIsDialogOpen(false);
       
       await fetchContentItems();
+      await fetchPageOptions();
     } catch (error: any) {
       toast({
         title: "Error adding content",
@@ -285,14 +338,23 @@ const ContentPage: React.FC = () => {
               </div>
               <div className="grid gap-2">
                 <label htmlFor="page">Page</label>
-                <Input
-                  id="page"
-                  value={formData.page}
-                  onChange={(e) => setFormData({ ...formData, page: e.target.value })}
-                  placeholder="Example: home, about, contact"
-                />
+                <Select 
+                  value={formData.page} 
+                  onValueChange={(value) => setFormData({ ...formData, page: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a page" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {pageOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <p className="text-sm text-gray-500">
-                  Enter the page name where the content will be displayed.
+                  Select the page where the content will be displayed.
                 </p>
               </div>
               <div className="grid gap-2">

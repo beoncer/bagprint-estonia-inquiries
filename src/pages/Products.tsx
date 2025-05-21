@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductProps } from "@/components/product/ProductCard";
-import { Json } from "@/integrations/supabase/types";
 
 interface Product {
   id: string;
@@ -16,8 +15,8 @@ interface Product {
   description: string | null;
   image_url: string | null;
   type: string;
-  pricing_without_print: Json;
-  pricing_with_print: Json;
+  pricing_without_print: Record<string, number>;
+  pricing_with_print: Record<string, number>;
 }
 
 const Products = () => {
@@ -45,13 +44,13 @@ const Products = () => {
       if (data) {
         // Process the products data
         const processedProducts: ProductProps[] = data.map((product: Product) => {
-          // Parse JSON pricing if stored as string
+          // Parse pricing objects if needed
           const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
             ? JSON.parse(product.pricing_without_print as string)
-            : product.pricing_without_print as Record<string, number>;
+            : product.pricing_without_print;
           
           // Calculate starting price (minimum price from pricing_without_print)
-          const priceValues = Object.values(pricingWithoutPrint as Record<string, number>);
+          const priceValues = Object.values(pricingWithoutPrint || {});
           const startingPrice = priceValues.length > 0 
             ? Math.min(...priceValues) 
             : 0;
@@ -143,6 +142,10 @@ const Products = () => {
     { id: "drawstring", name: "Drawstring Bags" },
     { id: "packaging", name: "E-commerce Packaging" },
   ];
+
+  // Insert debug log to check products
+  console.log("All Products State:", allProducts);
+  console.log("Filtered Products State:", filteredProducts);
 
   return (
     <Layout>
