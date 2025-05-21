@@ -9,6 +9,7 @@ import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProductProps } from "@/components/product/ProductCard";
 import { Json } from "@/integrations/supabase/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -29,6 +30,7 @@ const Products = () => {
   const [allProducts, setAllProducts] = useState<ProductProps[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
   useEffect(() => {
     fetchProducts();
@@ -44,6 +46,11 @@ const Products = () => {
       
       if (error) {
         console.error("Error fetching products:", error);
+        toast({
+          variant: "destructive",
+          title: "Error loading products",
+          description: "Could not load products. Please try again later."
+        });
         return;
       }
       
@@ -52,43 +59,57 @@ const Products = () => {
       if (data && data.length > 0) {
         // Process the products data
         const processedProducts: ProductProps[] = data.map((product: Product) => {
+          console.log("Processing product:", product.name, "Type:", product.type);
+          
           // Parse pricing objects if needed
           let pricingWithoutPrint: Record<string, number> = {};
           
-          if (typeof product.pricing_without_print === 'string') {
-            try {
+          try {
+            if (typeof product.pricing_without_print === 'string') {
               pricingWithoutPrint = JSON.parse(product.pricing_without_print);
-            } catch (e) {
-              console.error("Error parsing pricing_without_print:", e);
+            } else if (product.pricing_without_print && typeof product.pricing_without_print === 'object') {
+              // Handle case when it's already an object
+              pricingWithoutPrint = product.pricing_without_print as Record<string, number>;
             }
-          } else if (product.pricing_without_print && typeof product.pricing_without_print === 'object') {
-            pricingWithoutPrint = product.pricing_without_print as Record<string, number>;
+            
+            console.log("Pricing data for", product.name, ":", pricingWithoutPrint);
+            
+            // Calculate starting price (minimum price from pricing_without_print)
+            const priceValues = Object.values(pricingWithoutPrint || {}).map(p => Number(p));
+            const startingPrice = priceValues.length > 0 
+              ? Math.min(...priceValues)
+              : 0;
+            
+            // Map product type to category
+            let category: string;
+            switch (product.type) {
+              case "cotton_bag": category = "cotton"; break;
+              case "paper_bag": category = "paper"; break;
+              case "drawstring_bag": category = "drawstring"; break;
+              case "packaging_box": category = "packaging"; break;
+              default: category = "other";
+            }
+            
+            return {
+              id: product.id,
+              name: product.name,
+              description: product.description || "",
+              image: product.image_url || "/placeholder.svg", // Use placeholder if no image
+              category,
+              startingPrice,
+            };
+          } catch (err) {
+            console.error(`Error processing product ${product.name}:`, err);
+            // Return a default product with error indication
+            return {
+              id: product.id,
+              name: product.name,
+              description: product.description || "Error loading product details",
+              image: "/placeholder.svg",
+              category: "other",
+              startingPrice: 0,
+            };
           }
-          
-          // Calculate starting price (minimum price from pricing_without_print)
-          const priceValues = Object.values(pricingWithoutPrint || {});
-          const startingPrice = priceValues.length > 0 
-            ? Math.min(...priceValues.map(price => Number(price)))
-            : 0;
-          
-          // Map product type to category
-          let category: string;
-          switch (product.type) {
-            case "cotton_bag": category = "cotton"; break;
-            case "paper_bag": category = "paper"; break;
-            case "drawstring_bag": category = "drawstring"; break;
-            case "packaging_box": category = "packaging"; break;
-            default: category = "other";
-          }
-          
-          return {
-            id: product.id,
-            name: product.name,
-            description: product.description || "",
-            image: product.image_url || "/placeholder.svg", // Use placeholder if no image
-            category,
-            startingPrice,
-          };
         });
         
         console.log("Processed products:", processedProducts);
@@ -101,6 +122,11 @@ const Products = () => {
       }
     } catch (err) {
       console.error("Error processing products:", err);
+      toast({
+        variant: "destructive",
+        title: "Error processing products",
+        description: "There was a problem preparing the products for display."
+      });
     } finally {
       setLoading(false);
     }
@@ -156,11 +182,11 @@ const Products = () => {
   };
 
   const categories = [
-    { id: "all", name: "All Products" },
-    { id: "cotton", name: "Cotton Bags" },
-    { id: "paper", name: "Paper Bags" },
-    { id: "drawstring", name: "Drawstring Bags" },
-    { id: "packaging", name: "E-commerce Packaging" },
+    { id: "all", name: "Kõik tooted" },
+    { id: "cotton", name: "Puuvillakotid" },
+    { id: "paper", name: "Paberkotid" },
+    { id: "drawstring", name: "Paelaga kotid" },
+    { id: "packaging", name: "E-poe pakendid" },
   ];
 
   // Insert debug log to check products
@@ -171,9 +197,9 @@ const Products = () => {
     <Layout>
       <div className="bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">Our Products</h1>
+          <h1 className="text-3xl font-bold mb-2">Meie tooted</h1>
           <p className="text-gray-600 mb-8">
-            Browse our wide selection of bags and packaging that you can customize for your brand.
+            Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
           </p>
           
           {/* Search and Filter Section */}
@@ -197,7 +223,7 @@ const Products = () => {
                 <form onSubmit={handleSearch} className="relative">
                   <Input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder="Otsi tooteid..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2"
@@ -215,18 +241,18 @@ const Products = () => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <>
-              <p className="mb-6">Showing {filteredProducts.length} products</p>
+              <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
               <ProductGrid products={filteredProducts} />
             </>
           ) : (
             <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">No products found</h3>
-              <p className="text-gray-600 mb-6">Try changing your search filter or browse all products</p>
+              <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
+              <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
               <Button onClick={() => {
                 setSearchTerm("");
                 handleCategoryChange("all");
               }}>
-                Show all products
+                Näita kõiki tooteid
               </Button>
             </div>
           )}

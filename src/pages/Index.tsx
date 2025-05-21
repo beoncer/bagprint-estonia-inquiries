@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { ProductProps } from "@/components/product/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { Json } from "@/integrations/supabase/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -21,6 +21,7 @@ interface Product {
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchPopularProducts();
@@ -29,6 +30,8 @@ const Index = () => {
   const fetchPopularProducts = async () => {
     try {
       setLoading(true);
+      console.log("Fetching popular products...");
+      
       // Fetch popular products from the join table
       const { data: popularData, error: popularError } = await supabase
         .from('popular_products')
@@ -39,9 +42,12 @@ const Index = () => {
         return;
       }
       
+      console.log("Popular products data:", popularData);
+      
       if (popularData && popularData.length > 0) {
         // Extract product IDs
         const productIds = popularData.map(item => item.product_id);
+        console.log("Popular product IDs:", productIds);
         
         // Fetch the actual product details
         const { data: productsData, error: productsError } = await supabase
@@ -54,45 +60,76 @@ const Index = () => {
           return;
         }
         
-        if (productsData) {
+        console.log("Popular products details:", productsData);
+        
+        if (productsData && productsData.length > 0) {
           // Process the products data
           const processedProducts: ProductProps[] = productsData.map((product: Product) => {
-            // Parse JSON pricing if stored as string
-            const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
-              ? JSON.parse(product.pricing_without_print as string)
-              : product.pricing_without_print as Record<string, number>;
-            
-            // Calculate starting price
-            const priceValues = Object.values(pricingWithoutPrint as Record<string, number>);
-            const startingPrice = priceValues.length > 0 
-              ? Math.min(...priceValues) 
-              : 0;
-            
-            // Map product type to category
-            let category: string;
-            switch (product.type) {
-              case "cotton_bag": category = "cotton"; break;
-              case "paper_bag": category = "paper"; break;
-              case "drawstring_bag": category = "drawstring"; break;
-              case "packaging_box": category = "packaging"; break;
-              default: category = "other";
+            console.log("Processing popular product:", product.name, product.type);
+            try {
+              // Parse JSON pricing if stored as string
+              let pricingWithoutPrint: Record<string, number> = {};
+              
+              if (typeof product.pricing_without_print === 'string') {
+                pricingWithoutPrint = JSON.parse(product.pricing_without_print);
+              } else if (product.pricing_without_print && typeof product.pricing_without_print === 'object') {
+                pricingWithoutPrint = product.pricing_without_print as Record<string, number>;
+              }
+              
+              console.log("Pricing data for", product.name, ":", pricingWithoutPrint);
+              
+              // Calculate starting price
+              const priceValues = Object.values(pricingWithoutPrint || {}).map(p => Number(p));
+              const startingPrice = priceValues.length > 0 
+                ? Math.min(...priceValues) 
+                : 0;
+              
+              // Map product type to category
+              let category: string;
+              switch (product.type) {
+                case "cotton_bag": category = "cotton"; break;
+                case "paper_bag": category = "paper"; break;
+                case "drawstring_bag": category = "drawstring"; break;
+                case "packaging_box": category = "packaging"; break;
+                default: category = "other";
+              }
+              
+              return {
+                id: product.id,
+                name: product.name,
+                description: product.description || "",
+                image: product.image_url || "/placeholder.svg",
+                category,
+                startingPrice,
+              };
+            } catch (err) {
+              console.error(`Error processing product ${product.name}:`, err);
+              return {
+                id: product.id,
+                name: product.name,
+                description: product.description || "Error loading product details",
+                image: "/placeholder.svg",
+                category: "other",
+                startingPrice: 0,
+              };
             }
-            
-            return {
-              id: product.id,
-              name: product.name,
-              description: product.description || "",
-              image: product.image_url || "/placeholder.svg",
-              category,
-              startingPrice,
-            };
           });
           
+          console.log("Processed featured products:", processedProducts);
           setFeaturedProducts(processedProducts);
+        } else {
+          console.log("No popular product details found");
         }
+      } else {
+        console.log("No popular products found");
       }
     } catch (err) {
       console.error('Error processing popular products:', err);
+      toast({
+        variant: "destructive",
+        title: "Error loading featured products",
+        description: "Could not load featured products. Using fallback products instead."
+      });
     } finally {
       setLoading(false);
     }
