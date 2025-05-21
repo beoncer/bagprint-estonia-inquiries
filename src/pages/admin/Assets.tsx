@@ -35,7 +35,7 @@ const AssetsPage: React.FC = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Viga piltide laadimisel",
+        title: "Error loading images",
         description: error.message,
         variant: "destructive",
       });
@@ -97,8 +97,8 @@ const AssetsPage: React.FC = () => {
       }
       
       toast({
-        title: "Pilt uuendatud",
-        description: `${type === "banner" ? "Banner" : "Logo"} on edukalt uuendatud.`,
+        title: "Image updated",
+        description: `${type === "banner" ? "Banner" : "Logo"} has been successfully updated.`,
       });
       
       // Reset file input and refresh assets
@@ -112,7 +112,7 @@ const AssetsPage: React.FC = () => {
       
     } catch (error: any) {
       toast({
-        title: "Viga pildi üleslaadimisel",
+        title: "Error uploading image",
         description: error.message,
         variant: "destructive",
       });
@@ -123,7 +123,7 @@ const AssetsPage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-6">Meedia haldamine</h1>
+      <h1 className="text-3xl font-bold mb-6">Media Management</h1>
       
       {loading ? (
         <div className="flex justify-center p-8">
@@ -134,7 +134,7 @@ const AssetsPage: React.FC = () => {
           {/* Banner Management */}
           <Card>
             <CardHeader>
-              <CardTitle>Veebilehe banner</CardTitle>
+              <CardTitle>Website Banner</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {getBanner() ? (
@@ -147,13 +147,13 @@ const AssetsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="aspect-[3/1] bg-gray-100 rounded-md flex items-center justify-center">
-                  <p className="text-gray-500">Banner puudub</p>
+                  <p className="text-gray-500">No banner available</p>
                 </div>
               )}
               
               <div className="space-y-2">
                 <label htmlFor="banner-upload" className="text-sm font-medium">
-                  Uuenda bannerit
+                  Update banner
                 </label>
                 <Input
                   id="banner-upload"
@@ -162,7 +162,7 @@ const AssetsPage: React.FC = () => {
                   onChange={(e) => setBannerFile(e.target.files?.[0] || null)}
                 />
                 <p className="text-xs text-gray-500">
-                  Soovitatud suurus: 1920x640px. Maksimaalne suurus: 5MB.
+                  Recommended size: 1920x640px. Maximum size: 5MB.
                 </p>
               </div>
             </CardContent>
@@ -175,10 +175,10 @@ const AssetsPage: React.FC = () => {
                 {uploading ? (
                   <span className="flex items-center">
                     <span className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
-                    Laadin üles...
+                    Uploading...
                   </span>
                 ) : (
-                  "Salvesta banner"
+                  "Save Banner"
                 )}
               </Button>
             </CardFooter>
@@ -187,7 +187,7 @@ const AssetsPage: React.FC = () => {
           {/* Logo Management */}
           <Card>
             <CardHeader>
-              <CardTitle>Veebilehe logo</CardTitle>
+              <CardTitle>Website Logo</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {getLogo() ? (
@@ -200,13 +200,13 @@ const AssetsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="h-40 bg-gray-100 rounded-md flex items-center justify-center">
-                  <p className="text-gray-500">Logo puudub</p>
+                  <p className="text-gray-500">No logo available</p>
                 </div>
               )}
               
               <div className="space-y-2">
                 <label htmlFor="logo-upload" className="text-sm font-medium">
-                  Uuenda logo
+                  Update logo
                 </label>
                 <Input
                   id="logo-upload"
@@ -215,7 +215,7 @@ const AssetsPage: React.FC = () => {
                   onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
                 />
                 <p className="text-xs text-gray-500">
-                  Soovitatud suurus: 200x80px. Maksimaalne suurus: 2MB.
+                  Recommended size: 200x80px. Maximum size: 2MB.
                 </p>
               </div>
             </CardContent>
@@ -228,10 +228,10 @@ const AssetsPage: React.FC = () => {
                 {uploading ? (
                   <span className="flex items-center">
                     <span className="animate-spin mr-2 h-4 w-4 border-t-2 border-b-2 border-white rounded-full"></span>
-                    Laadin üles...
+                    Uploading...
                   </span>
                 ) : (
-                  "Salvesta logo"
+                  "Save Logo"
                 )}
               </Button>
             </CardFooter>
