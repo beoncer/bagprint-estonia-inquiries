@@ -21,17 +21,24 @@ export interface RawProduct {
  */
 export const parsePricingData = (pricingData: Json): Record<string, number> => {
   try {
-    if (typeof pricingData === 'string') {
-      return JSON.parse(pricingData);
-    } 
+    console.log("Parsing pricing data:", pricingData);
     
+    // If it's already an object, return it directly
     if (pricingData && typeof pricingData === 'object') {
+      console.log("Pricing data is already an object");
       return pricingData as Record<string, number>;
     }
     
+    // If it's a string, try to parse it
+    if (typeof pricingData === 'string') {
+      console.log("Pricing data is a string, parsing");
+      return JSON.parse(pricingData);
+    }
+    
+    console.log("Pricing data is invalid, returning empty object");
     return {};
   } catch (err) {
-    console.error("Error parsing pricing data:", err);
+    console.error("Error parsing pricing data:", err, "Raw data:", pricingData);
     return {};
   }
 };
@@ -56,7 +63,14 @@ export const mapProductTypeToCategory = (type: string): string => {
  * Gets the minimum price from pricing data
  */
 export const getStartingPrice = (pricingData: Record<string, number>): number => {
+  console.log("Getting starting price from:", pricingData);
+  if (!pricingData || Object.keys(pricingData).length === 0) {
+    console.log("No pricing data available, using default price 0");
+    return 0;
+  }
+  
   const priceValues = Object.values(pricingData).map(p => Number(p));
+  console.log("Price values:", priceValues);
   return priceValues.length > 0 ? Math.min(...priceValues) : 0;
 };
 
@@ -66,6 +80,7 @@ export const getStartingPrice = (pricingData: Record<string, number>): number =>
 export const processProductData = (product: RawProduct): ProductProps => {
   try {
     console.log(`Processing product: ${product.name}, type: ${product.type}, id: ${product.id}`);
+    console.log("Raw product data:", product);
     
     // Parse pricing data
     const pricingWithoutPrint = parsePricingData(product.pricing_without_print);
@@ -90,7 +105,7 @@ export const processProductData = (product: RawProduct): ProductProps => {
     console.error(`Error processing product ${product.name}:`, err);
     return {
       id: product.id,
-      name: product.name,
+      name: product.name || "Unknown Product",
       description: product.description || "Error loading product details",
       image: "/placeholder.svg",
       category: "other",
@@ -106,7 +121,6 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching all products...");
     
-    // Make sure to use an appropriate timeout
     const { data, error } = await supabase
       .from("products")
       .select("*")
@@ -159,25 +173,14 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
     
     if (popularError) {
       console.error('Error fetching popular products:', popularError);
-      return [];
+      return fetchSomeFallbackProducts();
     }
     
     console.log("Popular products data:", popularData);
     
     if (!popularData || popularData.length === 0) {
       console.log("No popular products found - fetching some regular products instead");
-      // If no popular products, just return some regular products
-      const { data: regularProducts, error: regularError } = await supabase
-        .from('products')
-        .select('*')
-        .limit(4);
-        
-      if (regularError || !regularProducts) {
-        console.error('Error fetching regular products as fallback:', regularError);
-        return [];
-      }
-      
-      return regularProducts.map((product: RawProduct) => processProductData(product));
+      return fetchSomeFallbackProducts();
     }
     
     // Extract product IDs
@@ -190,17 +193,12 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
       .select('*')
       .in('id', productIds);
     
-    if (productsError) {
+    if (productsError || !productsData || productsData.length === 0) {
       console.error('Error fetching product details:', productsError);
-      return [];
+      return fetchSomeFallbackProducts();
     }
     
     console.log("Popular products details:", productsData);
-    
-    if (!productsData || productsData.length === 0) {
-      console.log("No popular product details found");
-      return [];
-    }
     
     // Process the products data
     const processedProducts = productsData.map((product: RawProduct) => processProductData(product));
@@ -209,11 +207,28 @@ export const fetchPopularProducts = async (): Promise<ProductProps[]> => {
     return processedProducts;
   } catch (err) {
     console.error('Error processing popular products:', err);
-    toast({
-      variant: "destructive",
-      title: "Error loading featured products",
-      description: "Could not load featured products. Using fallback products instead."
-    });
+    return fetchSomeFallbackProducts();
+  }
+};
+
+/**
+ * Fallback function to fetch regular products when popular ones aren't available
+ */
+const fetchSomeFallbackProducts = async (): Promise<ProductProps[]> => {
+  console.log("Fetching fallback products");
+  
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .limit(4);
+    
+  if (error || !data || data.length === 0) {
+    console.error('Error fetching fallback products:', error);
     return [];
   }
+  
+  const processedProducts = data.map((product: RawProduct) => processProductData(product));
+  console.log("Processed fallback products:", processedProducts);
+  
+  return processedProducts;
 };

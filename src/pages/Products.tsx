@@ -17,6 +17,7 @@ const Products = () => {
   const [allProducts, setAllProducts] = useState<ProductProps[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const { toast } = useToast();
   
   useEffect(() => {
@@ -26,14 +27,24 @@ const Products = () => {
 
   const loadProducts = async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       console.log("Starting to load products in Products.tsx");
       const products = await fetchAllProducts();
       console.log("Products loaded in Products.tsx:", products);
+      
+      if (products.length === 0) {
+        console.log("No products returned from fetchAllProducts");
+        setLoadError("No products found. Please check back later.");
+      } else {
+        setLoadError(null);
+      }
+      
       setAllProducts(products);
       setFilteredProducts(products);
     } catch (err) {
       console.error("Error in Products component:", err);
+      setLoadError("Failed to load products. Please try refreshing the page.");
       toast({
         variant: "destructive",
         title: "Error loading products",
@@ -98,6 +109,10 @@ const Products = () => {
     console.log("Search submitted with term:", searchTerm);
     // The filtering is already handled by the useEffect
   };
+  
+  const handleRetry = () => {
+    loadProducts();
+  };
 
   const categories = [
     { id: "all", name: "Kõik tooted" },
@@ -152,6 +167,14 @@ const Products = () => {
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+            </div>
+          ) : loadError ? (
+            <div className="text-center py-20">
+              <h3 className="text-xl font-semibold mb-2">{loadError}</h3>
+              <p className="text-gray-600 mb-6">Andmete laadimisel tekkis viga. Proovige uuesti.</p>
+              <Button onClick={handleRetry}>
+                Proovi uuesti
+              </Button>
             </div>
           ) : filteredProducts.length > 0 ? (
             <>

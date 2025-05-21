@@ -20,6 +20,10 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
           src={image} 
           alt={name} 
           className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
+          onError={(e) => {
+            // Replace broken image with placeholder
+            (e.target as HTMLImageElement).src = '/placeholder.svg';
+          }}
         />
       </div>
       <CardContent className="p-4 flex-grow">
