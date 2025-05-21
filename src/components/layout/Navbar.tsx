@@ -15,7 +15,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full z-50">
-      <div className="container mx-auto py-4" style={{ paddingLeft: '1rem', paddingRight: '1rem' }}>
+      <div className="container mx-auto py-4">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <Link to="/" className="text-4xl font-bold text-primary">

@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
@@ -51,9 +50,7 @@ const Index = () => {
             backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            height: "520px", // Reduced from 650px by 1/5
-            paddingLeft: '1rem',
-            paddingRight: '1rem'
+            height: "520px" // Reduced from 650px by 1/5
           }}
         >
           <div className="absolute inset-0 bg-white/45"></div>
