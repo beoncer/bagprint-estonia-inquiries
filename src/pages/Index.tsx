@@ -59,23 +59,28 @@ const Index = () => {
             <div className="relative z-10 h-full">
               <div className="flex flex-col md:flex-row items-center justify-between h-full">
                 <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-6 md:py-10 px-4 md:px-6">
-                  <div className="mt-6 md:mt-16">
-                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-                      Kvaliteetsed kotid ja pakendid teie brändile
-                    </h1>
-                    <p className="text-lg md:text-xl text-gray-600 mb-6 md:mb-8">
-                      Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
-                      e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
-                    </p>
-                  </div>
-                  {/* Moved buttons to a more visible position and adjusted responsiveness */}
-                  <div className="flex flex-wrap gap-3 md:gap-4 mb-10 sm:mb-12 md:mb-16">
-                    <Button size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10" asChild>
-                      <Link to="/products">Vaata tooteid</Link>
-                    </Button>
-                    <Button variant="outline" size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10 bg-white" asChild>
-                      <Link to="/inquiry">Küsi pakkumist</Link>
-                    </Button>
+                  {/* Content container with better spacing distribution */}
+                  <div className="flex flex-col h-full justify-between">
+                    {/* Text content */}
+                    <div className="mt-6 md:mt-10">
+                      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+                        Kvaliteetsed kotid ja pakendid teie brändile
+                      </h1>
+                      <p className="text-lg md:text-xl text-gray-600 mb-6">
+                        Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
+                        e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
+                      </p>
+                    </div>
+                    
+                    {/* Buttons with improved positioning and responsiveness */}
+                    <div className="flex flex-wrap gap-3 md:gap-4 mt-auto mb-6 md:mb-10">
+                      <Button size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10" asChild>
+                        <Link to="/products">Vaata tooteid</Link>
+                      </Button>
+                      <Button variant="outline" size="lg" className="text-base md:text-xl py-5 md:py-7 px-6 md:px-10 bg-white" asChild>
+                        <Link to="/inquiry">Küsi pakkumist</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
