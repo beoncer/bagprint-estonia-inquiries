@@ -26,7 +26,7 @@ const AdminLayout: React.FC = () => {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600 mx-auto"></div>
-          <p className="mt-4">Laadin...</p>
+          <p className="mt-4">Loading...</p>
         </div>
       </div>
     );
@@ -51,25 +51,25 @@ const AdminLayout: React.FC = () => {
               <SidebarMenuItem>
                 <Link to="/admin" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname === "/admin" ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <LayoutDashboard className="h-5 w-5" />
-                  <span>Töölaud</span>
+                  <span>Dashboard</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link to="/admin/products" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/products") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <ShoppingBag className="h-5 w-5" />
-                  <span>Tooted</span>
+                  <span>Products</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link to="/admin/content" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/content") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <FileText className="h-5 w-5" />
-                  <span>Sisu</span>
+                  <span>Content</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link to="/admin/assets" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/assets") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <ImageIcon className="h-5 w-5" />
-                  <span>Meedia</span>
+                  <span>Media</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -83,7 +83,7 @@ const AdminLayout: React.FC = () => {
           <SidebarFooter>
             <div className="p-4">
               <p className="text-sm text-gray-500 mb-2">
-                Sisse logitud: {user.email}
+                Logged in as: {user.email}
               </p>
               <Button 
                 variant="outline" 
@@ -91,7 +91,7 @@ const AdminLayout: React.FC = () => {
                 onClick={() => signOut()}
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Logi välja
+                Log out
               </Button>
             </div>
           </SidebarFooter>

@@ -60,7 +60,7 @@ const SEOPage: React.FC = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Viga SEO andmete laadimisel",
+        title: "Error loading SEO data",
         description: error.message,
         variant: "destructive",
       });
@@ -73,8 +73,8 @@ const SEOPage: React.FC = () => {
     try {
       if (!formData.page) {
         toast({
-          title: "Valideerimisviga",
-          description: "Leht on kohustuslik väli",
+          title: "Validation error",
+          description: "Page is a required field",
           variant: "destructive",
         });
         return;
@@ -93,8 +93,8 @@ const SEOPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "SEO andmed lisatud",
-        description: "SEO andmed on edukalt lisatud",
+        title: "SEO data added",
+        description: "SEO data has been added successfully",
       });
 
       // Reset form and close dialog
@@ -109,7 +109,7 @@ const SEOPage: React.FC = () => {
       await fetchSEOEntries();
     } catch (error: any) {
       toast({
-        title: "Viga SEO andmete lisamisel",
+        title: "Error adding SEO data",
         description: error.message,
         variant: "destructive",
       });
@@ -120,8 +120,8 @@ const SEOPage: React.FC = () => {
     try {
       if (!selectedEntry || !formData.page) {
         toast({
-          title: "Valideerimisviga",
-          description: "Leht on kohustuslik väli",
+          title: "Validation error",
+          description: "Page is a required field",
           variant: "destructive",
         });
         return;
@@ -140,8 +140,8 @@ const SEOPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "SEO andmed uuendatud",
-        description: "SEO andmed on edukalt uuendatud",
+        title: "SEO data updated",
+        description: "SEO data has been updated successfully",
       });
 
       // Reset form and close dialog
@@ -157,7 +157,7 @@ const SEOPage: React.FC = () => {
       await fetchSEOEntries();
     } catch (error: any) {
       toast({
-        title: "Viga SEO andmete uuendamisel",
+        title: "Error updating SEO data",
         description: error.message,
         variant: "destructive",
       });
@@ -189,75 +189,75 @@ const SEOPage: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">SEO haldamine</h1>
+        <h1 className="text-3xl font-bold">SEO Management</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-red-600 hover:bg-red-700">
-              <PlusIcon className="mr-2 h-4 w-4" /> Lisa uus SEO kirje
+              <PlusIcon className="mr-2 h-4 w-4" /> Add New SEO Entry
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>
-                {selectedEntry ? "Muuda SEO andmeid" : "Lisa uus SEO kirje"}
+                {selectedEntry ? "Edit SEO Data" : "Add New SEO Entry"}
               </DialogTitle>
               <DialogDescription>
-                SEO metaandmed aitavad parandada teie veebisaidi nähtavust otsingutulemustes.
+                SEO metadata helps improve your website's visibility in search results.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <label htmlFor="page">Leht</label>
+                <label htmlFor="page">Page</label>
                 <Input
                   id="page"
                   value={formData.page}
                   onChange={(e) => setFormData({ ...formData, page: e.target.value })}
-                  placeholder="Näiteks: home, products, contact"
+                  placeholder="Example: home, products, contact"
                 />
                 <p className="text-sm text-gray-500">
-                  Sisestage lehe identifikaator (URL tee, näiteks "home" avalehekülje jaoks).
+                  Enter the page identifier (URL path, e.g., "home" for homepage).
                 </p>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="title">Tiitel</label>
+                <label htmlFor="title">Title</label>
                 <Input
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Meta pealkiri"
+                  placeholder="Meta title"
                 />
               </div>
               <div className="grid gap-2">
-                <label htmlFor="description">Kirjeldus</label>
+                <label htmlFor="description">Description</label>
                 <Textarea
                   id="description"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Meta kirjeldus"
+                  placeholder="Meta description"
                 />
                 <p className="text-sm text-gray-500">
-                  Lühike kirjeldus (150-160 tähemärki), mis kuvatakse otsingumootorite tulemustes.
+                  Short description (150-160 characters) shown in search engine results.
                 </p>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="keywords">Märksõnad</label>
+                <label htmlFor="keywords">Keywords</label>
                 <Input
                   id="keywords"
                   value={formData.keywords}
                   onChange={(e) => setFormData({ ...formData, keywords: e.target.value })}
-                  placeholder="Märksõnad, eraldatud komadega"
+                  placeholder="Keywords, separated by commas"
                 />
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={handleDialogClose}>
-                Tühista
+                Cancel
               </Button>
               <Button 
                 className="bg-red-600 hover:bg-red-700" 
                 onClick={selectedEntry ? handleUpdateSEO : handleAddSEO}
               >
-                {selectedEntry ? "Salvesta muudatused" : "Lisa SEO andmed"}
+                {selectedEntry ? "Save Changes" : "Add SEO Data"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -273,18 +273,18 @@ const SEOPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Leht</TableHead>
-                <TableHead>Tiitel</TableHead>
-                <TableHead>Kirjeldus</TableHead>
-                <TableHead>Märksõnad</TableHead>
-                <TableHead className="text-right">Tegevused</TableHead>
+                <TableHead>Page</TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Keywords</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {seoEntries.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                    SEO andmeid pole lisatud
+                    No SEO data added
                   </TableCell>
                 </TableRow>
               ) : (
@@ -300,7 +300,7 @@ const SEOPage: React.FC = () => {
                         size="sm"
                         onClick={() => handleEditClick(entry)}
                       >
-                        <Edit className="h-4 w-4 mr-1" /> Muuda
+                        <Edit className="h-4 w-4 mr-1" /> Edit
                       </Button>
                     </TableCell>
                   </TableRow>

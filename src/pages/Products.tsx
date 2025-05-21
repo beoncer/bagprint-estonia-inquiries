@@ -6,88 +6,79 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-// Sample product data - this would come from the backend in the real implementation
-const allProducts = [
-  {
-    id: "cotton1",
-    name: "Standard puuvillakott",
-    description: "Kõrgkvaliteedilised puuvillakotid. Saadaval erinevates värvides.",
-    image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop",
-    category: "cotton",
-    startingPrice: 1.50
-  },
-  {
-    id: "cotton2",
-    name: "Premium puuvillakott",
-    description: "Luksuslikud paksud puuvillakotid. Parim kvaliteet teie brändile.",
-    image: "https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=800&auto=format&fit=crop",
-    category: "cotton",
-    startingPrice: 2.20
-  },
-  {
-    id: "paper1",
-    name: "Paberkott - väike",
-    description: "Keskkonnasõbralikud väikesed paberkotid.",
-    image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
-    category: "paper",
-    startingPrice: 0.80
-  },
-  {
-    id: "paper2",
-    name: "Paberkott - suur",
-    description: "Tugevad ja keskkonnasõbralikud suured paberkotid.",
-    image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=800&auto=format&fit=crop",
-    category: "paper",
-    startingPrice: 1.10
-  },
-  {
-    id: "drawstring1",
-    name: "Paelaga kott",
-    description: "Praktilised paelaga kotid. Ideaalsed üritusteks.",
-    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
-    category: "drawstring",
-    startingPrice: 1.20
-  },
-  {
-    id: "box1",
-    name: "E-poe karp - väike",
-    description: "Kompaktsed karbid väiksemate toodete jaoks.",
-    image: "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop",
-    category: "packaging",
-    startingPrice: 0.90
-  },
-  {
-    id: "box2",
-    name: "E-poe karp - keskmine",
-    description: "Universaalsed keskmise suurusega e-poe karbid.",
-    image: "https://images.unsplash.com/photo-1589758438368-0ad531db3366?w=800&auto=format&fit=crop",
-    category: "packaging",
-    startingPrice: 1.30
-  },
-  {
-    id: "box3",
-    name: "E-poe karp - suur",
-    description: "Suured ja tugevad karbid mahukate toodete jaoks.",
-    image: "https://images.unsplash.com/photo-1575486234793-56385db1ed9f?w=800&auto=format&fit=crop",
-    category: "packaging",
-    startingPrice: 1.80
-  },
-];
-
-const categories = [
-  { id: "all", name: "Kõik tooted" },
-  { id: "cotton", name: "Puuvillakotid" },
-  { id: "paper", name: "Paberkotid" },
-  { id: "drawstring", name: "Paelaga kotid" },
-  { id: "packaging", name: "E-poe pakendid" },
-];
+interface Product {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string | null;
+  type: string;
+  startingPrice?: number;
+  pricing_without_print: Record<string, number>;
+}
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.from("products").select("*");
+      
+      if (error) {
+        console.error("Error fetching products:", error);
+        return;
+      }
+      
+      if (data) {
+        // Process the products data
+        const processedProducts = data.map(product => {
+          // Parse JSON pricing if stored as string
+          const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
+            ? JSON.parse(product.pricing_without_print)
+            : product.pricing_without_print;
+          
+          // Calculate starting price (minimum price from pricing_without_print)
+          const prices = Object.values(pricingWithoutPrint);
+          const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+          
+          // Map product category
+          let category: string;
+          switch (product.type) {
+            case "cotton_bag": category = "cotton"; break;
+            case "paper_bag": category = "paper"; break;
+            case "drawstring_bag": category = "drawstring"; break;
+            case "packaging_box": category = "packaging"; break;
+            default: category = "other";
+          }
+          
+          return {
+            ...product,
+            category,
+            startingPrice,
+            pricing_without_print: pricingWithoutPrint,
+          };
+        });
+        
+        setAllProducts(processedProducts);
+        setFilteredProducts(processedProducts);
+      }
+    } catch (err) {
+      console.error("Error processing products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   
   // Handle category filtering from URL params
   useEffect(() => {
@@ -101,6 +92,8 @@ const Products = () => {
   
   // Apply filters when category or search term changes
   useEffect(() => {
+    if (allProducts.length === 0) return;
+    
     let result = allProducts;
     
     // Apply category filter
@@ -113,12 +106,12 @@ const Products = () => {
       const searchLower = searchTerm.toLowerCase();
       result = result.filter(product => 
         product.name.toLowerCase().includes(searchLower) || 
-        product.description.toLowerCase().includes(searchLower)
+        (product.description && product.description.toLowerCase().includes(searchLower))
       );
     }
     
     setFilteredProducts(result);
-  }, [activeCategory, searchTerm]);
+  }, [activeCategory, searchTerm, allProducts]);
   
   const handleCategoryChange = (categoryId: string) => {
     if (categoryId === "all") {
@@ -136,13 +129,21 @@ const Products = () => {
     // The filtering is already handled by the useEffect
   };
 
+  const categories = [
+    { id: "all", name: "All Products" },
+    { id: "cotton", name: "Cotton Bags" },
+    { id: "paper", name: "Paper Bags" },
+    { id: "drawstring", name: "Drawstring Bags" },
+    { id: "packaging", name: "E-commerce Packaging" },
+  ];
+
   return (
     <Layout>
       <div className="bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">Meie tooted</h1>
+          <h1 className="text-3xl font-bold mb-2">Our Products</h1>
           <p className="text-gray-600 mb-8">
-            Vaata meie laia valikut kotte ja pakendeid, mille saad kohandada oma brändi jaoks.
+            Browse our wide selection of bags and packaging that you can customize for your brand.
           </p>
           
           {/* Search and Filter Section */}
@@ -166,7 +167,7 @@ const Products = () => {
                 <form onSubmit={handleSearch} className="relative">
                   <Input
                     type="text"
-                    placeholder="Otsi tooteid..."
+                    placeholder="Search products..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2"
@@ -178,20 +179,24 @@ const Products = () => {
           </div>
           
           {/* Results */}
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <>
-              <p className="mb-6">Näitan {filteredProducts.length} toodet</p>
+              <p className="mb-6">Showing {filteredProducts.length} products</p>
               <ProductGrid products={filteredProducts} />
             </>
           ) : (
             <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
-              <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või vaadake kõiki tooteid</p>
+              <h3 className="text-xl font-semibold mb-2">No products found</h3>
+              <p className="text-gray-600 mb-6">Try changing your search filter or browse all products</p>
               <Button onClick={() => {
                 setSearchTerm("");
                 handleCategoryChange("all");
               }}>
-                Näita kõiki tooteid
+                Show all products
               </Button>
             </div>
           )}

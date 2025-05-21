@@ -97,7 +97,7 @@ const ProductsPage: React.FC = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Viga toodete laadimisel",
+        title: "Error loading products",
         description: error.message,
         variant: "destructive",
       });
@@ -116,7 +116,7 @@ const ProductsPage: React.FC = () => {
       }
     } catch (error: any) {
       toast({
-        title: "Viga populaarsete toodete laadimisel",
+        title: "Error loading popular products",
         description: error.message,
         variant: "destructive",
       });
@@ -127,8 +127,8 @@ const ProductsPage: React.FC = () => {
     try {
       if (!formData.name || !formData.type) {
         toast({
-          title: "Valideerimisviga",
-          description: "Nimi ja tüüp on kohustuslikud väljad",
+          title: "Validation error",
+          description: "Name and type are required fields",
           variant: "destructive",
         });
         return;
@@ -174,8 +174,8 @@ const ProductsPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Toode lisatud",
-        description: "Toote lisamine õnnestus",
+        title: "Product added",
+        description: "Product has been added successfully",
       });
 
       // Reset form
@@ -198,7 +198,7 @@ const ProductsPage: React.FC = () => {
       await fetchProducts();
     } catch (error: any) {
       toast({
-        title: "Viga toote lisamisel",
+        title: "Error adding product",
         description: error.message,
         variant: "destructive",
       });
@@ -209,8 +209,8 @@ const ProductsPage: React.FC = () => {
     try {
       if (!selectedProduct || !formData.name || !formData.type) {
         toast({
-          title: "Valideerimisviga",
-          description: "Nimi ja tüüp on kohustuslikud väljad",
+          title: "Validation error",
+          description: "Name and type are required fields",
           variant: "destructive",
         });
         return;
@@ -260,8 +260,8 @@ const ProductsPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Toode uuendatud",
-        description: "Toote uuendamine õnnestus",
+        title: "Product updated",
+        description: "Product has been updated successfully",
       });
 
       // Reset form and close dialog
@@ -285,7 +285,7 @@ const ProductsPage: React.FC = () => {
       await fetchProducts();
     } catch (error: any) {
       toast({
-        title: "Viga toote uuendamisel",
+        title: "Error updating product",
         description: error.message,
         variant: "destructive",
       });
@@ -304,8 +304,8 @@ const ProductsPage: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Toode kustutatud",
-        description: "Toote kustutamine õnnestus",
+        title: "Product deleted",
+        description: "Product has been deleted successfully",
       });
 
       setIsDeleteDialogOpen(false);
@@ -313,7 +313,7 @@ const ProductsPage: React.FC = () => {
       await fetchProducts();
     } catch (error: any) {
       toast({
-        title: "Viga toote kustutamisel",
+        title: "Error deleting product",
         description: error.message,
         variant: "destructive",
       });
@@ -362,8 +362,8 @@ const ProductsPage: React.FC = () => {
           if (error) throw error;
           
           toast({
-            title: "Eemaldatud populaarsetest",
-            description: "Toode on eemaldatud populaarsete toodete hulgast",
+            title: "Removed from popular",
+            description: "Product has been removed from popular products",
           });
         }
       } else {
@@ -375,15 +375,15 @@ const ProductsPage: React.FC = () => {
         if (error) throw error;
         
         toast({
-          title: "Lisatud populaarsetesse",
-          description: "Toode on lisatud populaarsete toodete hulka",
+          title: "Added to popular",
+          description: "Product has been added to popular products",
         });
       }
       
       await fetchPopularProducts();
     } catch (error: any) {
       toast({
-        title: "Viga",
+        title: "Error",
         description: error.message,
         variant: "destructive",
       });
@@ -411,10 +411,10 @@ const ProductsPage: React.FC = () => {
 
   const translateProductType = (type: string) => {
     switch (type) {
-      case "cotton_bag": return "Puuvillane kott";
-      case "paper_bag": return "Paberkott";
-      case "drawstring_bag": return "Nööriga kott";
-      case "packaging_box": return "Pakendikarp";
+      case "cotton_bag": return "Cotton Bag";
+      case "paper_bag": return "Paper Bag";
+      case "drawstring_bag": return "Drawstring Bag";
+      case "packaging_box": return "Packaging Box";
       default: return type;
     }
   };
@@ -422,90 +422,90 @@ const ProductsPage: React.FC = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Tooted</h1>
+        <h1 className="text-3xl font-bold">Products</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-red-600 hover:bg-red-700">
-              <PlusIcon className="mr-2 h-4 w-4" /> Lisa uus toode
+              <PlusIcon className="mr-2 h-4 w-4" /> Add New Product
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>
-                {selectedProduct ? "Muuda toodet" : "Lisa uus toode"}
+                {selectedProduct ? "Edit Product" : "Add New Product"}
               </DialogTitle>
               <DialogDescription>
-                Täitke väljad toote {selectedProduct ? "muutmiseks" : "lisamiseks"}.
+                Fill in the fields to {selectedProduct ? "edit" : "add"} a product.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
-                <label htmlFor="type">Toote tüüp</label>
+                <label htmlFor="type">Product Type</label>
                 <Select 
                   value={formData.type} 
                   onValueChange={(value) => setFormData({ ...formData, type: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Vali toote tüüp" />
+                    <SelectValue placeholder="Select product type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="cotton_bag">Puuvillane kott</SelectItem>
-                    <SelectItem value="paper_bag">Paberkott</SelectItem>
-                    <SelectItem value="drawstring_bag">Nööriga kott</SelectItem>
-                    <SelectItem value="packaging_box">Pakendikarp</SelectItem>
+                    <SelectItem value="cotton_bag">Cotton Bag</SelectItem>
+                    <SelectItem value="paper_bag">Paper Bag</SelectItem>
+                    <SelectItem value="drawstring_bag">Drawstring Bag</SelectItem>
+                    <SelectItem value="packaging_box">Packaging Box</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="name">Toote nimi</label>
+                <label htmlFor="name">Product Name</label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Sisesta toote nimi"
+                  placeholder="Enter product name"
                 />
               </div>
               <div className="grid gap-2">
-                <label htmlFor="description">Kirjeldus</label>
+                <label htmlFor="description">Description</label>
                 <Textarea
                   id="description"
                   value={formData.description || ""}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Sisesta toote kirjeldus"
+                  placeholder="Enter product description"
                 />
               </div>
               <div className="grid gap-2">
-                <label>Hinnad ilma trükita</label>
+                <label>Prices without print</label>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label htmlFor="price-50" className="text-sm">50 tk</label>
+                    <label htmlFor="price-50" className="text-sm">50 pcs</label>
                     <Input
                       id="price-50"
                       value={priceWithout50}
                       onChange={(e) => setPriceWithout50(e.target.value)}
-                      placeholder="Hind"
+                      placeholder="Price"
                       type="number"
                       step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-100" className="text-sm">100 tk</label>
+                    <label htmlFor="price-100" className="text-sm">100 pcs</label>
                     <Input
                       id="price-100"
                       value={priceWithout100}
                       onChange={(e) => setPriceWithout100(e.target.value)}
-                      placeholder="Hind"
+                      placeholder="Price"
                       type="number"
                       step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-500" className="text-sm">500 tk</label>
+                    <label htmlFor="price-500" className="text-sm">500 pcs</label>
                     <Input
                       id="price-500"
                       value={priceWithout500}
                       onChange={(e) => setPriceWithout500(e.target.value)}
-                      placeholder="Hind"
+                      placeholder="Price"
                       type="number"
                       step="0.01"
                     />
@@ -513,37 +513,37 @@ const ProductsPage: React.FC = () => {
                 </div>
               </div>
               <div className="grid gap-2">
-                <label>Hinnad trükiga</label>
+                <label>Prices with print</label>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label htmlFor="price-print-50" className="text-sm">50 tk</label>
+                    <label htmlFor="price-print-50" className="text-sm">50 pcs</label>
                     <Input
                       id="price-print-50"
                       value={priceWith50}
                       onChange={(e) => setPriceWith50(e.target.value)}
-                      placeholder="Hind"
+                      placeholder="Price"
                       type="number"
                       step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-print-100" className="text-sm">100 tk</label>
+                    <label htmlFor="price-print-100" className="text-sm">100 pcs</label>
                     <Input
                       id="price-print-100"
                       value={priceWith100}
                       onChange={(e) => setPriceWith100(e.target.value)}
-                      placeholder="Hind"
+                      placeholder="Price"
                       type="number"
                       step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-print-500" className="text-sm">500 tk</label>
+                    <label htmlFor="price-print-500" className="text-sm">500 pcs</label>
                     <Input
                       id="price-print-500"
                       value={priceWith500}
                       onChange={(e) => setPriceWith500(e.target.value)}
-                      placeholder="Hind"
+                      placeholder="Price"
                       type="number"
                       step="0.01"
                     />
@@ -551,7 +551,7 @@ const ProductsPage: React.FC = () => {
                 </div>
               </div>
               <div className="grid gap-2">
-                <label htmlFor="image">Toote pilt</label>
+                <label htmlFor="image">Product Image</label>
                 <Input
                   id="image"
                   type="file"
@@ -560,7 +560,7 @@ const ProductsPage: React.FC = () => {
                 />
                 {selectedProduct && selectedProduct.image_url && (
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-2">Praegune pilt:</p>
+                    <p className="text-sm text-gray-500 mb-2">Current image:</p>
                     <img
                       src={selectedProduct.image_url}
                       alt={selectedProduct.name}
@@ -572,13 +572,13 @@ const ProductsPage: React.FC = () => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={handleDialogClose}>
-                Tühista
+                Cancel
               </Button>
               <Button 
                 className="bg-red-600 hover:bg-red-700" 
                 onClick={selectedProduct ? handleEditProduct : handleAddProduct}
               >
-                {selectedProduct ? "Salvesta muudatused" : "Lisa toode"}
+                {selectedProduct ? "Save Changes" : "Add Product"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -588,41 +588,17 @@ const ProductsPage: React.FC = () => {
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Kustuta toode</DialogTitle>
+              <DialogTitle>Delete Product</DialogTitle>
               <DialogDescription>
-                Kas olete kindel, et soovite toote kustutada? Seda tegevust ei saa tagasi võtta.
+                Are you sure you want to delete this product? This action cannot be undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-                Tühista
+                Cancel
               </Button>
-              <Button variant="destructive" onClick={() => {
-                /* Handle delete */
-                if (selectedProduct) {
-                  supabase.from("products")
-                    .delete()
-                    .eq("id", selectedProduct.id)
-                    .then(({ error }) => {
-                      if (error) {
-                        toast({
-                          title: "Viga toote kustutamisel",
-                          description: error.message,
-                          variant: "destructive",
-                        });
-                      } else {
-                        toast({
-                          title: "Toode kustutatud",
-                          description: "Toote kustutamine õnnestus",
-                        });
-                        setIsDeleteDialogOpen(false);
-                        setSelectedProduct(null);
-                        fetchProducts();
-                      }
-                    });
-                }
-              }}>
-                Kustuta
+              <Button variant="destructive" onClick={handleDeleteProduct}>
+                Delete
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -638,18 +614,18 @@ const ProductsPage: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nimi</TableHead>
-                <TableHead>Tüüp</TableHead>
-                <TableHead>Hinnad</TableHead>
-                <TableHead>Populaarne</TableHead>
-                <TableHead className="text-right">Tegevused</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Prices</TableHead>
+                <TableHead>Popular</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                    Tooteid pole lisatud
+                    No products added
                   </TableCell>
                 </TableRow>
               ) : (
@@ -671,21 +647,21 @@ const ProductsPage: React.FC = () => {
                     <TableCell>
                       {product.pricing_without_print && Object.keys(product.pricing_without_print).length > 0 ? (
                         <div className="text-sm">
-                          <p>Ilma trükita: {" "}
+                          <p>Without print: {" "}
                             {Object.entries(product.pricing_without_print)
-                              .map(([qty, price]) => `${qty}tk: ${price}€`)
+                              .map(([qty, price]) => `${qty}pcs: €${price}`)
                               .join(", ")}
                           </p>
                           {product.pricing_with_print && Object.keys(product.pricing_with_print).length > 0 && (
-                            <p>Trükiga: {" "}
+                            <p>With print: {" "}
                               {Object.entries(product.pricing_with_print)
-                                .map(([qty, price]) => `${qty}tk: ${price}€`)
+                                .map(([qty, price]) => `${qty}pcs: €${price}`)
                                 .join(", ")}
                             </p>
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-500">Hinnad puuduvad</span>
+                        <span className="text-gray-500">No prices available</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -706,24 +682,7 @@ const ProductsPage: React.FC = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setSelectedProduct(product);
-                            setFormData({
-                              type: product.type,
-                              name: product.name,
-                              description: product.description || "",
-                            });
-                            
-                            // Set pricing fields
-                            setPriceWithout50(product.pricing_without_print?.["50"]?.toString() || "");
-                            setPriceWithout100(product.pricing_without_print?.["100"]?.toString() || "");
-                            setPriceWithout500(product.pricing_without_print?.["500"]?.toString() || "");
-                            setPriceWith50(product.pricing_with_print?.["50"]?.toString() || "");
-                            setPriceWith100(product.pricing_with_print?.["100"]?.toString() || "");
-                            setPriceWith500(product.pricing_with_print?.["500"]?.toString() || "");
-                            
-                            setIsDialogOpen(true);
-                          }}
+                          onClick={() => handleEditClick(product)}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -731,10 +690,7 @@ const ProductsPage: React.FC = () => {
                           variant="outline"
                           size="sm"
                           className="text-red-600 hover:text-red-700"
-                          onClick={() => {
-                            setSelectedProduct(product);
-                            setIsDeleteDialogOpen(true);
-                          }}
+                          onClick={() => handleDeleteClick(product)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
