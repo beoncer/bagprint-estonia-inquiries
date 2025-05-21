@@ -210,8 +210,8 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
     
     if (data.length === 0) {
       console.log("No products found in database");
-      // If we're in development and there's no products, return fallback products
-      if (import.meta.env.MODE === 'development') {
+      // Important change: Only use fallback in development AND only if explicitly enabled
+      if (import.meta.env.MODE === 'development' && import.meta.env.VITE_USE_FALLBACK_PRODUCTS === 'true') {
         console.log("Using fallback products for development");
         return fallbackProducts;
       }
@@ -243,8 +243,8 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   } catch (err) {
     console.error("Critical error in fetchAllProducts:", err);
     
-    // In development mode, use fallback products instead of showing an empty page
-    if (import.meta.env.MODE === 'development') {
+    // Only use fallback products in development AND only if explicitly enabled
+    if (import.meta.env.MODE === 'development' && import.meta.env.VITE_USE_FALLBACK_PRODUCTS === 'true') {
       console.log("Using fallback products for development after error");
       return fallbackProducts;
     }

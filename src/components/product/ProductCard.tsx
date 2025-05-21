@@ -20,12 +20,14 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
   // Make sure ID is valid to prevent broken links
   const safeId = id || 'unknown';
   
-  // Sometimes Supabase URLs might be incomplete or need processing
+  // Process image URL if it's from Supabase
   useEffect(() => {
-    if (image && image.includes('ixotpxliaerkzjznyipi.supabase.co')) {
-      // If it's a Supabase URL, make sure it's properly formed
-      if (!image.startsWith('https://')) {
-        setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+    if (image) {
+      if (image.includes('ixotpxliaerkzjznyipi.supabase.co')) {
+        // If it's a Supabase URL, make sure it's properly formed
+        if (!image.startsWith('https://')) {
+          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+        }
       }
     }
   }, [image]);

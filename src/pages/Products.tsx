@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ProductProps } from "@/components/product/ProductCard";
 import { useToast } from "@/hooks/use-toast";
-import { fetchAllProducts, fallbackProducts } from "@/utils/productUtils";
+import { fetchAllProducts } from "@/utils/productUtils";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -38,31 +38,16 @@ const Products = () => {
       
       if (!products || products.length === 0) {
         console.log("No products returned from fetchAllProducts");
+        setLoadError("No products found. Please check back later.");
         
-        // Show a different message when in development mode
-        if (import.meta.env.MODE === 'development') {
-          setUseFallback(true);
-          setLoadError(null);
-          
-          toast({
-            title: "Using demo products",
-            description: "No products found in database. Using demo products for development."
-          });
-          
-          // Set fallback products
-          setAllProducts(fallbackProducts);
-          setFilteredProducts(fallbackProducts);
-        } else {
-          setLoadError("No products found. Please check back later.");
-          toast({
-            variant: "destructive",
-            title: "No products found",
-            description: "We couldn't find any products. Please check back later."
-          });
-          
-          setAllProducts([]);
-          setFilteredProducts([]);
-        }
+        toast({
+          variant: "destructive",
+          title: "No products found",
+          description: "We couldn't find any products. Please check back later."
+        });
+        
+        setAllProducts([]);
+        setFilteredProducts([]);
       } else {
         setLoadError(null);
         setUseFallback(false);
@@ -77,33 +62,16 @@ const Products = () => {
       }
     } catch (err) {
       console.error("Error in Products component:", err);
+      setLoadError("Failed to load products. Please try refreshing the page.");
       
-      // In development mode, use fallback products
-      if (import.meta.env.MODE === 'development') {
-        console.log("Using fallback products after error");
-        setUseFallback(true);
-        setLoadError(null);
-        
-        toast({
-          variant: "destructive",
-          title: "Database error",
-          description: "Error connecting to database. Using demo products for development."
-        });
-        
-        setAllProducts(fallbackProducts);
-        setFilteredProducts(fallbackProducts);
-      } else {
-        setLoadError("Failed to load products. Please try refreshing the page.");
-        
-        toast({
-          variant: "destructive",
-          title: "Error loading products",
-          description: "Could not load products. Please try again later."
-        });
-        
-        setAllProducts([]);
-        setFilteredProducts([]);
-      }
+      toast({
+        variant: "destructive",
+        title: "Error loading products",
+        description: "Could not load products. Please try again later."
+      });
+      
+      setAllProducts([]);
+      setFilteredProducts([]);
     } finally {
       setLoading(false);
     }
