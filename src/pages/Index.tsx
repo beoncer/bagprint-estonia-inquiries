@@ -98,47 +98,52 @@ const Index = () => {
               backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: "520px"
+              height: "auto", // Changed from fixed height to auto
+              minHeight: "520px" // Added minimum height instead
             }}
           >
             <div className="absolute inset-0 bg-white/45"></div>
-            <div className="relative z-10 h-full">
-              <div className="flex flex-col md:flex-row items-center justify-between h-full">
-                <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-6 md:py-10 px-4 md:px-6">
+            <div className="relative z-10 h-full w-full">
+              <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
+                <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
                   {/* Content container with better spacing distribution */}
                   <div className="flex flex-col h-full justify-between">
                     {/* Text content */}
-                    <div className="mt-6 md:mt-10">
-                      <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+                    <div className="mt-4 md:mt-8">
+                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
                         Kvaliteetsed kotid ja pakendid teie brändile
                       </h1>
-                      <p className="text-lg md:text-xl text-gray-600 mb-6">
+                      <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
                         Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
                         e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
                       </p>
                     </div>
                     
-                    {/* Buttons with improved styling */}
-                    <div className="flex flex-wrap gap-3 md:gap-4 mt-auto mb-6 md:mb-10">
-                      {/* Primary button with fixed styling - making sure it's visible on all devices */}
+                    {/* Buttons with improved styling and better spacing */}
+                    <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
+                      {/* Primary button with guaranteed visibility */}
                       <Button 
-                        size="lg" 
-                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-red-500 hover:bg-red-600 text-white font-medium shadow-md" 
+                        variant="default"
+                        size="xl" 
+                        className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
                         asChild
                       >
                         <Link to="/products">Vaata tooteid</Link>
                       </Button>
-                      {/* Secondary button with fixed styling and opacity */}
+                      {/* Secondary button with guaranteed visibility */}
                       <Button 
-                        variant="outline" 
-                        size="lg" 
-                        className="text-base md:text-xl h-auto py-3 px-6 md:px-8 bg-white text-primary hover:bg-gray-100 border border-gray-200 shadow-sm" 
+                        variant="white" 
+                        size="xl" 
+                        className="text-base md:text-lg border border-gray-200 shadow-sm" 
                         asChild
                       >
                         <Link to="/inquiry">Küsi pakkumist</Link>
                       </Button>
                     </div>
                   </div>
+                </div>
+                <div className="hidden md:block md:w-1/3 lg:w-1/2">
+                  {/* Optional right side content if needed */}
                 </div>
               </div>
             </div>

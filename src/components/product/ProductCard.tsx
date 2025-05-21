@@ -23,13 +23,26 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
   // Process image URL if it's from Supabase
   useEffect(() => {
     if (image) {
-      // Handle Supabase storage URLs correctly
-      if (image.includes('supabase.co') && !image.startsWith('https://')) {
-        setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+      // Handle any Supabase URL format
+      if (image.includes('supabase.co') || image.startsWith('products/')) {
+        // Handle direct storage paths
+        if (image.startsWith('products/')) {
+          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/products/${image.replace('products/', '')}`);
+        } 
+        // Handle partial URLs
+        else if (!image.startsWith('https://')) {
+          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+        } else {
+          // Already a full URL
+          setImageUrl(image);
+        }
       } else {
+        // Not a Supabase URL, use as is
         setImageUrl(image);
       }
     }
+    
+    console.log("Setting image URL:", imageUrl, "from original:", image);
   }, [image]);
   
   return (
