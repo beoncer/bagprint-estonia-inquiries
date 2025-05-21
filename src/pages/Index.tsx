@@ -46,16 +46,18 @@ const Index = () => {
       {/* Hero Section with container padding and margins - height reduced by 1/5 */}
       <section className="py-6">
         <div 
-          className="mx-4 relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden" 
-          style={{ 
+          className="container mx-auto relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
+          style={{
             backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            height: "520px" // Reduced from 650px by 1/5
+            height: "520px", // Reduced from 650px by 1/5
+            paddingLeft: '1rem',
+            paddingRight: '1rem'
           }}
         >
           <div className="absolute inset-0 bg-white/45"></div>
-          <div className="container mx-auto px-4 relative z-10 h-full">
+          <div className="relative z-10 h-full">
             <div className="flex flex-col md:flex-row items-center justify-between h-full">
               <div className="md:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-6 md:py-10">
                 <div className="mt-6 md:mt-16"> {/* Adjusted top spacing for better responsiveness */}
