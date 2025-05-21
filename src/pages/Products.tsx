@@ -37,6 +37,9 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
+      // Log to debug
+      console.log("Fetching products...");
+      
       const { data, error } = await supabase.from("products").select("*");
       
       if (error) {
@@ -44,7 +47,9 @@ const Products = () => {
         return;
       }
       
-      if (data) {
+      console.log("Raw products data:", data);
+      
+      if (data && data.length > 0) {
         // Process the products data
         const processedProducts: ProductProps[] = data.map((product: Product) => {
           // Parse pricing objects if needed
@@ -89,6 +94,10 @@ const Products = () => {
         console.log("Processed products:", processedProducts);
         setAllProducts(processedProducts);
         setFilteredProducts(processedProducts);
+      } else {
+        console.log("No products found");
+        setAllProducts([]);
+        setFilteredProducts([]);
       }
     } catch (err) {
       console.error("Error processing products:", err);

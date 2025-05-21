@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -30,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusIcon, Edit, Save, Trash2, Check } from "lucide-react";
+import { fetchPages } from "@/utils/pageUtils";
 
 interface ContentItem {
   id: string;
@@ -60,8 +60,13 @@ const ContentPage: React.FC = () => {
 
   useEffect(() => {
     fetchContentItems();
-    fetchPageOptions();
+    loadPageOptions();
   }, []);
+
+  const loadPageOptions = async () => {
+    const options = await fetchPages();
+    setPageOptions(options);
+  };
 
   const fetchContentItems = async () => {
     try {
@@ -80,46 +85,6 @@ const ContentPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchPageOptions = async () => {
-    try {
-      // Get unique pages from website_content table
-      const { data: contentPagesData, error: contentError } = await supabase
-        .from("website_content")
-        .select("page");
-      
-      // Get unique pages from seo_metadata table
-      const { data: seoPagesData, error: seoError } = await supabase
-        .from("seo_metadata")
-        .select("page");
-      
-      if (contentError) throw contentError;
-      if (seoError) throw seoError;
-      
-      // Extract page values and remove duplicates manually
-      const contentPages = contentPagesData?.map(item => item.page) || [];
-      const seoPages = seoPagesData?.map(item => item.page) || [];
-      
-      // Combine and deduplicate pages
-      const allPages = [
-        ...contentPages,
-        ...seoPages
-      ];
-      
-      // Add default pages
-      const defaultPages = ["home", "products", "contact", "about"];
-      const uniquePages = Array.from(new Set([...allPages, ...defaultPages])).sort();
-      
-      const options = uniquePages.map(page => ({
-        value: page,
-        label: page.charAt(0).toUpperCase() + page.slice(1)
-      }));
-      
-      setPageOptions(options);
-    } catch (error: any) {
-      console.error("Error fetching page options:", error);
     }
   };
 
@@ -159,7 +124,6 @@ const ContentPage: React.FC = () => {
       setIsDialogOpen(false);
       
       await fetchContentItems();
-      await fetchPageOptions();
     } catch (error: any) {
       toast({
         title: "Error adding content",
