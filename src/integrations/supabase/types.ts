@@ -9,7 +9,149 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      popular_products: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "popular_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          pricing_with_print: Json
+          pricing_without_print: Json
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          pricing_with_print?: Json
+          pricing_without_print?: Json
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          pricing_with_print?: Json
+          pricing_without_print?: Json
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      seo_metadata: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          keywords: string | null
+          page: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string | null
+          page: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          keywords?: string | null
+          page?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_assets: {
+        Row: {
+          created_at: string
+          id: string
+          type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          type: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      website_content: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          page: string
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          page: string
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          page?: string
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
