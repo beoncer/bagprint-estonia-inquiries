@@ -19,39 +19,49 @@ export interface RawProduct {
  * Safely parses JSON pricing data
  */
 export const parsePricingData = (pricingData: Json): Record<string, number> => {
-  console.log("Raw pricing data:", pricingData);
-  
-  // If it's null or undefined, return empty object
-  if (pricingData === null || pricingData === undefined) {
-    console.log("Pricing data is null or undefined, returning empty object");
-    return {};
-  }
-  
-  // If it's already an object, return it directly
-  if (typeof pricingData === 'object') {
-    console.log("Pricing data is an object");
-    return pricingData as Record<string, number>;
-  }
-  
-  // If it's a string, try to parse it
-  if (typeof pricingData === 'string') {
-    try {
-      console.log("Pricing data is a string, parsing");
-      return JSON.parse(pricingData);
-    } catch (err) {
-      console.error("Error parsing pricing data string:", err);
+  try {
+    console.log("Raw pricing data:", pricingData);
+    
+    // If it's null or undefined, return empty object
+    if (pricingData === null || pricingData === undefined) {
+      console.log("Pricing data is null or undefined, returning empty object");
       return {};
     }
+    
+    // If it's already an object, return it directly
+    if (typeof pricingData === 'object' && pricingData !== null) {
+      console.log("Pricing data is an object");
+      return pricingData as Record<string, number>;
+    }
+    
+    // If it's a string, try to parse it
+    if (typeof pricingData === 'string') {
+      try {
+        console.log("Pricing data is a string, parsing");
+        return JSON.parse(pricingData);
+      } catch (err) {
+        console.error("Error parsing pricing data string:", err);
+        return {};
+      }
+    }
+    
+    console.log("Pricing data is of unexpected type, returning empty object");
+    return {};
+  } catch (error) {
+    console.error("Error in parsePricingData:", error);
+    return {};
   }
-  
-  console.log("Pricing data is of unexpected type, returning empty object");
-  return {};
 };
 
 /**
  * Converts a product type to a category string
  */
 export const mapProductTypeToCategory = (type: string): string => {
+  if (!type) {
+    console.log("Product type is undefined or null, defaulting to 'other'");
+    return "other";
+  }
+  
   console.log("Mapping product type:", type);
   switch (type?.toLowerCase()) {
     case "cotton_bag": return "cotton";
@@ -68,19 +78,24 @@ export const mapProductTypeToCategory = (type: string): string => {
  * Gets the minimum price from pricing data
  */
 export const getStartingPrice = (pricingData: Record<string, number>): number => {
-  console.log("Getting starting price from:", pricingData);
-  if (!pricingData || Object.keys(pricingData).length === 0) {
-    console.log("No pricing data available, using default price 0");
+  try {
+    console.log("Getting starting price from:", pricingData);
+    if (!pricingData || Object.keys(pricingData).length === 0) {
+      console.log("No pricing data available, using default price 0");
+      return 0;
+    }
+    
+    // Filter out non-numeric values and convert string numbers to actual numbers
+    const priceValues = Object.values(pricingData)
+      .filter(p => p !== null && p !== undefined && !isNaN(Number(p)))
+      .map(p => Number(p));
+    
+    console.log("Valid price values:", priceValues);
+    return priceValues.length > 0 ? Math.min(...priceValues) : 0;
+  } catch (error) {
+    console.error("Error in getStartingPrice:", error);
     return 0;
   }
-  
-  // Filter out non-numeric values and convert string numbers to actual numbers
-  const priceValues = Object.values(pricingData)
-    .filter(p => !isNaN(Number(p)))
-    .map(p => Number(p));
-  
-  console.log("Valid price values:", priceValues);
-  return priceValues.length > 0 ? Math.min(...priceValues) : 0;
 };
 
 /**
@@ -91,6 +106,7 @@ export const processProductData = (product: RawProduct): ProductProps => {
     console.log("Processing product:", product);
     
     if (!product || !product.id) {
+      console.error("Invalid product data received:", product);
       throw new Error("Invalid product data");
     }
     
@@ -136,29 +152,52 @@ export const fetchAllProducts = async (): Promise<ProductProps[]> => {
   try {
     console.log("Fetching all products...");
     
+    // Use simpler query with more explicit options
     const { data, error } = await supabase
       .from("products")
       .select("*");
     
-    console.log("Supabase response:", { data, error });
+    console.log("Supabase raw response:", { data, error });
     
     if (error) {
       console.error("Error fetching products:", error);
       throw error;
     }
     
-    if (!data || data.length === 0) {
-      console.log("No products found in database");
+    if (!data) {
+      console.log("No data returned from Supabase");
+      return [];
+    }
+    
+    console.log(`Found ${data.length} products in database`);
+    
+    if (data.length === 0) {
+      console.log("Empty products array returned from Supabase");
       return [];
     }
     
     // Process the products data
-    const processedProducts = data.map((product: RawProduct) => processProductData(product));
-    console.log("Processed products:", processedProducts);
+    const processedProducts = data.map((product: RawProduct) => {
+      try {
+        return processProductData(product);
+      } catch (err) {
+        console.error(`Error processing product ${product?.id}:`, err);
+        // Return fallback product
+        return {
+          id: product?.id || "error-id",
+          name: product?.name || "Error Loading Product",
+          description: "Error processing product data",
+          image: "/placeholder.svg",
+          category: "other",
+          startingPrice: 0,
+        };
+      }
+    });
     
+    console.log(`Successfully processed ${processedProducts.length} products:`, processedProducts);
     return processedProducts;
   } catch (err) {
-    console.error("Error in fetchAllProducts:", err);
+    console.error("Critical error in fetchAllProducts:", err);
     return [];
   }
 };
