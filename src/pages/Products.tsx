@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductProps } from "@/components/product/ProductCard";
+import { Json } from "@/integrations/supabase/types";
 
 interface Product {
   id: string;
@@ -14,16 +16,16 @@ interface Product {
   description: string | null;
   image_url: string | null;
   type: string;
-  startingPrice?: number;
-  pricing_without_print: Record<string, number>;
+  pricing_without_print: Json;
+  pricing_with_print: Json;
 }
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<ProductProps[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>([]);
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
@@ -42,17 +44,19 @@ const Products = () => {
       
       if (data) {
         // Process the products data
-        const processedProducts = data.map(product => {
+        const processedProducts: ProductProps[] = data.map((product: Product) => {
           // Parse JSON pricing if stored as string
           const pricingWithoutPrint = typeof product.pricing_without_print === 'string' 
-            ? JSON.parse(product.pricing_without_print)
+            ? JSON.parse(product.pricing_without_print as string)
             : product.pricing_without_print;
           
           // Calculate starting price (minimum price from pricing_without_print)
-          const prices = Object.values(pricingWithoutPrint);
-          const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+          const priceValues = Object.values(pricingWithoutPrint as Record<string, number>);
+          const startingPrice = priceValues.length > 0 
+            ? Math.min(...priceValues) 
+            : 0;
           
-          // Map product category
+          // Map product type to category
           let category: string;
           switch (product.type) {
             case "cotton_bag": category = "cotton"; break;
@@ -63,10 +67,12 @@ const Products = () => {
           }
           
           return {
-            ...product,
+            id: product.id,
+            name: product.name,
+            description: product.description || "",
+            image: product.image_url || "/placeholder.svg", // Use placeholder if no image
             category,
             startingPrice,
-            pricing_without_print: pricingWithoutPrint,
           };
         });
         
@@ -94,7 +100,7 @@ const Products = () => {
   useEffect(() => {
     if (allProducts.length === 0) return;
     
-    let result = allProducts;
+    let result = [...allProducts];
     
     // Apply category filter
     if (activeCategory !== "all") {
@@ -106,7 +112,7 @@ const Products = () => {
       const searchLower = searchTerm.toLowerCase();
       result = result.filter(product => 
         product.name.toLowerCase().includes(searchLower) || 
-        (product.description && product.description.toLowerCase().includes(searchLower))
+        product.description.toLowerCase().includes(searchLower)
       );
     }
     
