@@ -5,77 +5,43 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { ProductProps } from "@/components/product/ProductCard";
-import { useToast } from "@/hooks/use-toast";
-import { fetchAllProducts } from "@/utils/productUtils";
+import { getProducts, Product } from "@/lib/supabase";
+
+const categories = [
+  { id: "all", name: "Kõik tooted" },
+  { id: "cotton_bag", name: "Puuvillakotid" },
+  { id: "paper_bag", name: "Paberkotid" },
+  { id: "drawstring_bag", name: "Paelaga kotid" },
+  { id: "packaging", name: "E-poe pakendid" },
+];
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [allProducts, setAllProducts] = useState<ProductProps[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<ProductProps[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [useFallback, setUseFallback] = useState(false);
-  const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
   
-  // Load products on component mount
+  // Fetch products from Supabase
   useEffect(() => {
-    console.log("Products component mounted");
-    loadProducts();
-  }, []);
-
-  const loadProducts = async () => {
-    setLoading(true);
-    setLoadError(null);
-    setUseFallback(false);
-    
-    try {
-      console.log("Starting to load products in Products.tsx");
-      const products = await fetchAllProducts();
-      console.log("Products loaded in Products.tsx:", products);
-      
-      if (!products || products.length === 0) {
-        console.log("No products returned from fetchAllProducts");
-        setLoadError("No products found. Please check back later.");
-        
-        toast({
-          variant: "destructive",
-          title: "No products found",
-          description: "We couldn't find any products. Please check back later."
-        });
-        
-        setAllProducts([]);
-        setFilteredProducts([]);
-      } else {
-        setLoadError(null);
-        setUseFallback(false);
-        
-        toast({
-          title: `${products.length} products loaded`,
-          description: "Products loaded successfully."
-        });
-        
-        setAllProducts(products);
-        setFilteredProducts(products);
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const data = await getProducts();
+        setProducts(data);
+        setFilteredProducts(data);
+      } catch (err) {
+        setError('Failed to fetch products. Please try again later.');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error in Products component:", err);
-      setLoadError("Failed to load products. Please try refreshing the page.");
-      
-      toast({
-        variant: "destructive",
-        title: "Error loading products",
-        description: "Could not load products. Please try again later."
-      });
-      
-      setAllProducts([]);
-      setFilteredProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchProducts();
+  }, []);
   
   // Handle category filtering from URL params
   useEffect(() => {
@@ -90,12 +56,7 @@ const Products = () => {
   
   // Apply filters when category or search term changes
   useEffect(() => {
-    if (!allProducts || allProducts.length === 0) return;
-    
-    console.log("Applying filters:", { activeCategory, searchTerm });
-    console.log("All products before filtering:", allProducts);
-    
-    let result = [...allProducts];
+    let result = [...products];
     
     // Apply category filter
     if (activeCategory !== "all") {
@@ -117,12 +78,11 @@ const Products = () => {
     
     console.log("Filtered products:", result);
     setFilteredProducts(result);
-  }, [activeCategory, searchTerm, allProducts]);
+  }, [activeCategory, searchTerm, products]);
   
   const handleCategoryChange = (categoryId: string) => {
     console.log("Category changed to:", categoryId);
     if (categoryId === "all") {
-      // Remove category param if "all" is selected
       searchParams.delete("category");
       setSearchParams(searchParams);
     } else {
@@ -134,27 +94,48 @@ const Products = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Search submitted with term:", searchTerm);
-    // The filtering is already handled by the useEffect
   };
   
   const handleRetry = () => {
-    console.log("Retrying product load...");
-    loadProducts();
+    window.location.reload();
   };
 
-  const categories = [
-    { id: "all", name: "Kõik tooted" },
-    { id: "cotton", name: "Puuvillakotid" },
-    { id: "paper", name: "Paberkotid" },
-    { id: "drawstring", name: "Paelaga kotid" },
-    { id: "packaging", name: "E-poe pakendid" },
-  ];
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-gray-200 h-96 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h2 className="text-2xl font-bold mb-4">Error</h2>
+          <p className="text-red-600 mb-8">{error}</p>
+          <Button onClick={handleRetry}>
+            Try Again
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div className="bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-2">Meie tooted</h1>
+          <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
           <p className="text-gray-600 mb-8">
             Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
           </p>
@@ -196,9 +177,9 @@ const Products = () => {
             <div className="flex justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
             </div>
-          ) : loadError ? (
+          ) : error ? (
             <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">{loadError}</h3>
+              <h3 className="text-xl font-semibold mb-2">{error}</h3>
               <p className="text-gray-600 mb-6">Andmete laadimisel tekkis viga. Proovige uuesti.</p>
               <Button onClick={handleRetry}>
                 Proovi uuesti
@@ -206,13 +187,6 @@ const Products = () => {
             </div>
           ) : filteredProducts.length > 0 ? (
             <>
-              {useFallback && (
-                <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <p className="text-amber-700">
-                    <strong>Arendusrežiim:</strong> Näidistoodete andmed. Ühendage Supabase andmebaasiga või lisage tooteid andmebaasi.
-                  </p>
-                </div>
-              )}
               <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
               <ProductGrid products={filteredProducts} />
             </>

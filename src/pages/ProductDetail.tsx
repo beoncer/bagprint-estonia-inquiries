@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -6,131 +5,37 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Sample product data - this would come from the backend in the real implementation
-const products = [
-  {
-    id: "cotton1",
-    name: "Standard puuvillakott",
-    description: "Kõrgkvaliteedilised puuvillakotid, mis on vastupidavad ja keskkonnasõbralikud. Need kotid sobivad ideaalselt igapäevaseks kasutamiseks, üritusteks või ettevõtte kingitusteks. Saadaval erinevates värvides.",
-    images: [
-      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1624024690655-7ed9f4f7b0f1?w=800&auto=format&fit=crop"
-    ],
-    category: "cotton",
-    specifications: {
-      material: "100% puuvill",
-      size: "38 x 42 cm",
-      weight: "140g/m²",
-      handleLength: "70 cm",
-      printArea: "A4 (21 x 29,7 cm)",
-      colors: ["Valge", "Must", "Naturaalne", "Sinine", "Punane"]
-    },
-    pricing: {
-      withoutPrint: [
-        { quantity: 50, price: 1.90 },
-        { quantity: 100, price: 1.80 },
-        { quantity: 200, price: 1.70 },
-        { quantity: 500, price: 1.60 },
-        { quantity: 1000, price: 1.50 }
-      ],
-      withPrint: [
-        { quantity: 50, price: 2.90 },
-        { quantity: 100, price: 2.70 },
-        { quantity: 200, price: 2.50 },
-        { quantity: 500, price: 2.30 },
-        { quantity: 1000, price: 2.10 }
-      ],
-      colorSurcharge: [
-        { colors: 0, surcharge: 0 },
-        { colors: 1, surcharge: 0.3 },
-        { colors: 2, surcharge: 0.5 },
-        { colors: 3, surcharge: 0.7 },
-        { colors: 4, surcharge: 0.9 },
-        { colors: 5, surcharge: 1.1 },
-        { colors: 6, surcharge: 1.3 },
-        { colors: 7, surcharge: 1.5 },
-        { colors: 8, surcharge: 1.7 }
-      ]
-    }
-  },
-  {
-    id: "paper1",
-    name: "Paberkott - väike",
-    description: "Keskkonnasõbralikud väikesed paberkotid, mis on valmistatud kvaliteetsest paberist. Sobivad ideaalselt väiksemate toodete jaoks, kingituste pakkimiseks või ürituste meeneteks.",
-    images: [
-      "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=800&auto=format&fit=crop"
-    ],
-    category: "paper",
-    specifications: {
-      material: "Kraftpaber",
-      size: "22 x 18 x 8 cm",
-      paperWeight: "100g/m²",
-      handleType: "Keeratud paber",
-      printArea: "15 x 10 cm",
-      colors: ["Pruun", "Valge"]
-    },
-    pricing: {
-      withoutPrint: [
-        { quantity: 50, price: 1.20 },
-        { quantity: 100, price: 1.10 },
-        { quantity: 200, price: 1.00 },
-        { quantity: 500, price: 0.90 },
-        { quantity: 1000, price: 0.80 }
-      ],
-      withPrint: [
-        { quantity: 50, price: 2.20 },
-        { quantity: 100, price: 2.00 },
-        { quantity: 200, price: 1.80 },
-        { quantity: 500, price: 1.60 },
-        { quantity: 1000, price: 1.40 }
-      ],
-      colorSurcharge: [
-        { colors: 0, surcharge: 0 },
-        { colors: 1, surcharge: 0.3 },
-        { colors: 2, surcharge: 0.5 },
-        { colors: 3, surcharge: 0.7 },
-        { colors: 4, surcharge: 0.9 },
-        { colors: 5, surcharge: 1.1 },
-        { colors: 6, surcharge: 1.3 },
-        { colors: 7, surcharge: 1.5 },
-        { colors: 8, surcharge: 1.7 }
-      ]
-    }
-  }
-];
+import { getProductBySlug, Product } from "@/lib/supabase";
 
 const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<any>(null);
+  const { slug } = useParams<{ slug: string }>();
+  const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
   // Calculator state
-  const [quantity, setQuantity] = useState<number>(100);
+  const [quantity, setQuantity] = useState<number>(50);
   const [printColors, setPrintColors] = useState<number>(0);
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
   const [pricePerItem, setPricePerItem] = useState<number>(0);
   
   useEffect(() => {
-    // Simulate API call to get product details
-    const fetchProduct = () => {
+    const fetchProduct = async () => {
       setLoading(true);
-      // Find the product by ID
-      const foundProduct = products.find(p => p.id === id);
-      
-      if (foundProduct) {
-        setProduct(foundProduct);
-        setSelectedImage(foundProduct.images[0]);
+      try {
+        if (slug) {
+          const prod = await getProductBySlug(slug);
+          setProduct(prod);
+          setSelectedImage(prod.image);
+        }
+      } catch (e) {
+        setProduct(null);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
     };
-    
     fetchProduct();
-  }, [id]);
+  }, [slug]);
   
   useEffect(() => {
     if (product) {
@@ -140,30 +45,9 @@ const ProductDetail = () => {
   
   const calculatePrice = (qty: number, colors: number) => {
     if (!product) return;
-    
-    let basePrice = 0;
-    let pricingList = printColors > 0 ? product.pricing.withPrint : product.pricing.withoutPrint;
-    
-    // Find the appropriate price bracket based on quantity
-    for (let i = 0; i < pricingList.length; i++) {
-      if (qty <= pricingList[i].quantity || i === pricingList.length - 1) {
-        basePrice = pricingList[i].price;
-        break;
-      }
-    }
-    
-    // Add color surcharge if applicable
-    let colorPrice = 0;
-    if (colors > 0 && product.pricing.colorSurcharge) {
-      const colorSurcharge = product.pricing.colorSurcharge.find(c => c.colors === colors);
-      if (colorSurcharge) {
-        colorPrice = colorSurcharge.surcharge;
-      }
-    }
-    
-    const totalPricePerItem = basePrice + colorPrice;
-    setPricePerItem(totalPricePerItem);
-    setCalculatedPrice(totalPricePerItem * qty);
+    let basePrice = product.startingPrice || 0;
+    setPricePerItem(basePrice);
+    setCalculatedPrice(basePrice * qty);
   };
   
   if (loading) {
@@ -220,33 +104,19 @@ const ProductDetail = () => {
           <div>
             <div className="mb-4 aspect-square overflow-hidden rounded-lg">
               <img 
-                src={selectedImage} 
+                src={selectedImage || product.image} 
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
-            </div>
-            <div className="grid grid-cols-4 gap-3">
-              {product.images.map((image: string, index: number) => (
-                <div 
-                  key={index}
-                  className={`aspect-square overflow-hidden rounded-lg border-2 cursor-pointer
-                    ${selectedImage === image ? 'border-primary' : 'border-transparent'}`}
-                  onClick={() => setSelectedImage(image)}
-                >
-                  <img 
-                    src={image} 
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
             </div>
           </div>
           
           {/* Product Info and Calculator */}
           <div>
             <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            <p className="text-gray-700 mb-6">{product.description}</p>
+            <p className="text-gray-700 mb-2">{product.description}</p>
+            <p className="text-gray-500 mb-2">Kategooria: {product.category}</p>
+            <p className="text-primary font-medium mb-6">Alates {product.startingPrice !== undefined ? product.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}</p>
             
             {/* Price Calculator */}
             <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
@@ -313,6 +183,7 @@ const ProductDetail = () => {
         </div>
         
         {/* Product Specifications */}
+        {/*
         <div className="mt-16">
           <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -333,7 +204,6 @@ const ProductDetail = () => {
                 </tbody>
               </table>
             </div>
-            
             <div>
               <h4 className="font-medium mb-2">Saadaval värvid:</h4>
               <div className="flex flex-wrap gap-2">
@@ -346,6 +216,7 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+        */}
       </div>
     </Layout>
   );

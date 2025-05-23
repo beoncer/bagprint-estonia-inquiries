@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShoppingBag, FileText, ImageIcon, Search } from "lucide-react";
 

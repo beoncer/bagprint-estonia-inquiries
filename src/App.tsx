@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,10 +12,9 @@ import ProductDetail from "./pages/ProductDetail";
 import Contact from "./pages/Contact";
 import Inquiry from "./pages/Inquiry";
 import NotFound from "./pages/NotFound";
-
-// Admin Pages
-import AdminLayout from "./components/admin/AdminLayout";
+// Admin imports
 import AdminLogin from "./pages/admin/Login";
+import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProducts from "./pages/admin/Products";
 import AdminContent from "./pages/admin/Content";
@@ -32,30 +30,34 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetail />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/inquiry" element={<Inquiry />} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<AdminDashboard />} />
-              <Route path="products" element={<AdminProducts />} />
-              <Route path="content" element={<AdminContent />} />
-              <Route path="assets" element={<AdminAssets />} />
-              <Route path="seo" element={<AdminSEO />} />
-              <Route path="manual" element={<AdminManual />} />
-            </Route>
-            
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:slug" element={<ProductDetail />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/inquiry" element={<Inquiry />} />
+
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={
+            <AuthProvider>
+              <AdminLogin />
+            </AuthProvider>
+          } />
+          <Route path="/admin" element={
+            <AuthProvider>
+              <AdminLayout />
+            </AuthProvider>
+          }>
+            <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="content" element={<AdminContent />} />
+            <Route path="assets" element={<AdminAssets />} />
+            <Route path="seo" element={<AdminSEO />} />
+            <Route path="manual" element={<AdminManual />} />
+          </Route>
+
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

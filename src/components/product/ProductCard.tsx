@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,10 +9,11 @@ export interface ProductProps {
   description: string;
   image: string;
   category: string;
-  startingPrice: number;
+  startingPrice?: number;
+  slug: string;
 }
 
-const ProductCard = ({ id, name, description, image, startingPrice }: ProductProps) => {
+const ProductCard = ({ id, name, description, image, startingPrice, slug }: ProductProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(image);
   
@@ -59,15 +59,21 @@ const ProductCard = ({ id, name, description, image, startingPrice }: ProductPro
         />
       </div>
       <CardContent className="p-4 flex-grow">
-        <h3 className="text-lg font-semibold mb-2">{name || 'Unnamed Product'}</h3>
-        <p className="text-gray-600 text-sm line-clamp-3">{description || 'No description available'}</p>
-        <p className="text-primary font-medium mt-2">
-          Alates {(startingPrice || 0).toFixed(2)} €
-        </p>
+        <h3 className="text-lg font-semibold mb-2">{name}</h3>
+        <p className="text-gray-600 text-sm line-clamp-3">{description}</p>
+        {startingPrice !== undefined ? (
+          <p className="text-primary font-medium mt-2">
+            Alates {startingPrice.toFixed(2)} €
+          </p>
+        ) : (
+          <p className="text-gray-400 font-medium mt-2">
+            Hind puudub
+          </p>
+        )}
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
         <Button variant="outline" asChild>
-          <Link to={`/products/${safeId}`}>Vaata lähemalt</Link>
+          <Link to={`/products/${slug}`}>Vaata lähemalt</Link>
         </Button>
         <Button asChild>
           <Link to={`/inquiry?product=${safeId}`}>Küsi pakkumist</Link>

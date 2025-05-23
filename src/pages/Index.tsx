@@ -1,91 +1,31 @@
-
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
-import { ProductProps } from "@/components/product/ProductCard";
-import { useToast } from "@/hooks/use-toast";
-import { fetchPopularProducts } from "@/utils/productUtils";
-import { Json } from "@/integrations/supabase/types";
-
-interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  image_url: string | null;
-  type: string;
-  pricing_without_print: Json;
-  pricing_with_print: Json;
-}
+import { getPopularProducts, Product } from "@/lib/supabase";
 
 const Index = () => {
-  const [featuredProducts, setFeaturedProducts] = useState<ProductProps[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("Index component mounted");
-    loadPopularProducts();
+    const fetchFeaturedProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await getPopularProducts();
+        setFeaturedProducts(products);
+      } catch (err) {
+        setError('Failed to fetch featured products');
+        console.error('Error fetching featured products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
   }, []);
-
-  const loadPopularProducts = async () => {
-    setLoading(true);
-    try {
-      console.log("Starting to load popular products in Index.tsx");
-      const products = await fetchPopularProducts();
-      console.log("Popular products loaded in Index.tsx:", products);
-      setFeaturedProducts(products);
-    } catch (err) {
-      console.error("Error in Index component:", err);
-      toast({
-        variant: "destructive",
-        title: "Error loading featured products",
-        description: "Could not load featured products. Using fallback products instead."
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // If no popular products are fetched, use this fallback data
-  const fallbackProducts = [
-    {
-      id: "cotton1",
-      name: "Standard puuvillakott",
-      description: "Kõrgkvaliteedilised puuvillakotid. Saadaval erinevates värvides.",
-      image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800&auto=format&fit=crop",
-      category: "cotton",
-      startingPrice: 1.50
-    },
-    {
-      id: "paper1",
-      name: "Paberkott - väike",
-      description: "Keskkonnasõbralikud väikesed paberkotid.",
-      image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
-      category: "paper",
-      startingPrice: 0.80
-    },
-    {
-      id: "drawstring1",
-      name: "Paelaga kott",
-      description: "Praktilised paelaga kotid. Ideaalsed üritusteks.",
-      image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
-      category: "drawstring",
-      startingPrice: 1.20
-    },
-    {
-      id: "bag1",
-      name: "Sussikott",
-      description: "Kvaliteetsed ja vastupidavad sussikotid.",
-      image: "https://images.unsplash.com/photo-1607344645866-009c320c5ab8?w=800&auto=format&fit=crop",
-      category: "shoebag",
-      startingPrice: 1.40
-    }
-  ];
-
-  // Use real data if available, otherwise use fallback
-  const productsToShow = featuredProducts.length > 0 ? featuredProducts : fallbackProducts;
 
   return (
     <Layout>
@@ -267,18 +207,22 @@ const Index = () => {
         <div className="container mx-auto px-2">
           <h2 className="text-3xl font-bold text-left mb-12">Populaarsed tooted</h2>
           {loading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
+            <div className="animate-pulse">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="bg-gray-200 h-96 rounded"></div>
+                ))}
+              </div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-10">
+              <p className="text-red-600 mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
             </div>
           ) : (
-            <>
-              <ProductGrid products={productsToShow} />
-              {featuredProducts.length === 0 && (
-                <p className="text-center text-gray-500 mt-4">
-                  Kasutame praegu näidistooteid. Tegelikud tooted kuvatakse kohe, kui need on saadaval.
-                </p>
-              )}
-            </>
+            <ProductGrid products={featuredProducts} />
           )}
         </div>
       </section>

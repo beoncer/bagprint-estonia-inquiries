@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,7 +29,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusIcon, Trash2, Edit, Star, StarOff } from "lucide-react";
-import { Json } from "@/integrations/supabase/types";
 
 interface Product {
   id: string;
