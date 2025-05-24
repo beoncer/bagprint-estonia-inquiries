@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
 interface TopBarContent {
-  tagline: string | null;
+  leftText: string | null;
+  middleText: string | null;
   phone: string | null;
   email: string | null;
   workingHours: string | null;
@@ -15,12 +16,13 @@ const fetchTopBarContent = async (): Promise<TopBarContent> => {
     .from("website_content")
     .select("key, value")
     .eq("page", "global")
-    .in("key", ["topbar_tagline", "topbar_phone", "topbar_email", "topbar_opening_hours"]);
+    .in("key", ["topbar_left_text", "topbar_middle_text", "topbar_phone", "topbar_email", "topbar_opening_hours"]);
 
   if (error) throw error;
 
   const content = {
-    tagline: null,
+    leftText: null,
+    middleText: null,
     phone: null,
     email: null,
     workingHours: null
@@ -28,8 +30,11 @@ const fetchTopBarContent = async (): Promise<TopBarContent> => {
 
   data?.forEach(item => {
     switch (item.key) {
-      case "topbar_tagline":
-        content.tagline = item.value;
+      case "topbar_left_text":
+        content.leftText = item.value;
+        break;
+      case "topbar_middle_text":
+        content.middleText = item.value;
         break;
       case "topbar_phone":
         content.phone = item.value;
@@ -61,6 +66,9 @@ const TopBar = () => {
             <div className="hidden md:block">
               <div className="animate-pulse bg-gray-200 h-4 w-64 rounded"></div>
             </div>
+            <div className="hidden md:block">
+              <div className="animate-pulse bg-gray-200 h-4 w-48 rounded"></div>
+            </div>
             <div className="flex items-center justify-end w-full md:w-auto space-x-4">
               <div className="animate-pulse bg-gray-200 h-4 w-32 rounded"></div>
               <div className="animate-pulse bg-gray-200 h-4 w-40 rounded"></div>
@@ -78,9 +86,14 @@ const TopBar = () => {
     <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
       <div className="container mx-auto px-2">
         <div className="flex justify-between items-center text-sm">
-          {/* Left side - now contains the dynamic tagline */}
+          {/* Left side text */}
           <div className="hidden md:block">
-            <span>{topBarContent?.tagline || "Kvaliteetsed kotid ja pakendid teie brändile"}</span>
+            <span>{topBarContent?.leftText || "Kvaliteetsed kotid ja pakendid teie brändile"}</span>
+          </div>
+          
+          {/* Middle text */}
+          <div className="hidden md:block">
+            <span>{topBarContent?.middleText || ""}</span>
           </div>
           
           {/* Right side - contact information and opening hours */}
