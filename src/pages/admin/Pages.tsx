@@ -21,10 +21,14 @@ const PagesAdmin: React.FC = () => {
   const [pages, setPages] = useState<PageOption[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>("");
   const [pageContent, setPageContent] = useState<PageContent[]>([]);
-  const [newContent, setNewContent] = useState({
+  const [newContent, setNewContent] = useState<{
+    section: string;
+    content: string;
+    content_type: 'text' | 'html' | 'json';
+  }>({
     section: "",
     content: "",
-    content_type: "text" as const
+    content_type: "text"
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
