@@ -8,29 +8,43 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { fetchPages, PageOption } from "@/utils/pageUtils";
+import { supabase } from "@/lib/supabase";
+import { Edit, Trash2, ExternalLink } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface PageContent {
   id: string;
+  key: string;
+  value: string;
   page: string;
-  section: string;
-  content: string;
-  content_type: 'text' | 'html' | 'json';
+  link?: string;
 }
 
 const PagesAdmin: React.FC = () => {
   const [pages, setPages] = useState<PageOption[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>("");
   const [pageContent, setPageContent] = useState<PageContent[]>([]);
+  const [allContent, setAllContent] = useState<PageContent[]>([]);
   const [newContent, setNewContent] = useState<{
-    section: string;
-    content: string;
+    key: string;
+    value: string;
+    link: string;
     content_type: 'text' | 'html' | 'json';
   }>({
-    section: "",
-    content: "",
+    key: "",
+    value: "",
+    link: "",
     content_type: "text"
   });
   const [loading, setLoading] = useState(false);
+  const [contentLoading, setContentLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,14 +65,54 @@ const PagesAdmin: React.FC = () => {
       }
     };
 
+    const loadAllContent = async () => {
+      try {
+        setContentLoading(true);
+        const { data, error } = await supabase
+          .from('website_content')
+          .select('*')
+          .order('page', { ascending: true })
+          .order('key', { ascending: true });
+
+        if (error) throw error;
+
+        const contentData = (data || []).map(item => ({
+          id: item.id,
+          key: item.key,
+          value: item.value || '',
+          page: item.page,
+          link: item.link || undefined
+        }));
+
+        setAllContent(contentData);
+      } catch (error) {
+        console.error("Error loading content:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load content from database",
+          variant: "destructive",
+        });
+      } finally {
+        setContentLoading(false);
+      }
+    };
+
     loadPages();
+    loadAllContent();
   }, [toast]);
 
+  useEffect(() => {
+    if (selectedPage && allContent.length > 0) {
+      const filteredContent = allContent.filter(content => content.page === selectedPage);
+      setPageContent(filteredContent);
+    }
+  }, [selectedPage, allContent]);
+
   const handleSaveContent = async () => {
-    if (!selectedPage || !newContent.section || !newContent.content) {
+    if (!selectedPage || !newContent.key || !newContent.value) {
       toast({
         title: "Error",
-        description: "Please fill in all fields",
+        description: "Please fill in page, key, and value fields",
         variant: "destructive",
       });
       return;
@@ -66,12 +120,22 @@ const PagesAdmin: React.FC = () => {
 
     setLoading(true);
     try {
-      // Here you would typically save to Supabase
-      // For now, we'll just simulate the save
-      console.log("Saving content:", {
+      const insertData: any = {
         page: selectedPage,
-        ...newContent
-      });
+        key: newContent.key,
+        value: newContent.value
+      };
+
+      if (newContent.link) {
+        insertData.link = newContent.link;
+      }
+
+      const { data, error } = await supabase
+        .from('website_content')
+        .insert(insertData)
+        .select();
+
+      if (error) throw error;
 
       toast({
         title: "Success",
@@ -80,10 +144,29 @@ const PagesAdmin: React.FC = () => {
 
       // Reset form
       setNewContent({
-        section: "",
-        content: "",
+        key: "",
+        value: "",
+        link: "",
         content_type: "text"
       });
+
+      // Refresh content
+      const { data: refreshData, error: refreshError } = await supabase
+        .from('website_content')
+        .select('*')
+        .order('page', { ascending: true })
+        .order('key', { ascending: true });
+
+      if (!refreshError && refreshData) {
+        const contentData = refreshData.map(item => ({
+          id: item.id,
+          key: item.key,
+          value: item.value || '',
+          page: item.page,
+          link: item.link || undefined
+        }));
+        setAllContent(contentData);
+      }
     } catch (error) {
       console.error("Error saving content:", error);
       toast({
@@ -93,6 +176,47 @@ const PagesAdmin: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteContent = async (contentId: string) => {
+    try {
+      const { error } = await supabase
+        .from('website_content')
+        .delete()
+        .eq('id', contentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Content deleted successfully",
+      });
+
+      // Refresh content
+      const { data: refreshData, error: refreshError } = await supabase
+        .from('website_content')
+        .select('*')
+        .order('page', { ascending: true })
+        .order('key', { ascending: true });
+
+      if (!refreshError && refreshData) {
+        const contentData = refreshData.map(item => ({
+          id: item.id,
+          key: item.key,
+          value: item.value || '',
+          page: item.page,
+          link: item.link || undefined
+        }));
+        setAllContent(contentData);
+      }
+    } catch (error) {
+      console.error("Error deleting content:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete content",
+        variant: "destructive",
+      });
     }
   };
 
@@ -109,9 +233,9 @@ const PagesAdmin: React.FC = () => {
         {/* Add/Edit Content Form */}
         <Card>
           <CardHeader>
-            <CardTitle>Add/Edit Page Content</CardTitle>
+            <CardTitle>Add New Page Content</CardTitle>
             <CardDescription>
-              Create or modify content for specific pages
+              Create new content for specific pages
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -132,42 +256,33 @@ const PagesAdmin: React.FC = () => {
             </div>
 
             <div>
-              <Label htmlFor="section">Section/Element ID</Label>
+              <Label htmlFor="content-key">Content Key</Label>
               <Input
-                id="section"
+                id="content-key"
                 placeholder="e.g., hero-title, footer-text, etc."
-                value={newContent.section}
-                onChange={(e) => setNewContent(prev => ({ ...prev, section: e.target.value }))}
+                value={newContent.key}
+                onChange={(e) => setNewContent(prev => ({ ...prev, key: e.target.value }))}
               />
             </div>
 
             <div>
-              <Label htmlFor="content-type">Content Type</Label>
-              <Select 
-                value={newContent.content_type} 
-                onValueChange={(value: 'text' | 'html' | 'json') => 
-                  setNewContent(prev => ({ ...prev, content_type: value }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="text">Plain Text</SelectItem>
-                  <SelectItem value="html">HTML</SelectItem>
-                  <SelectItem value="json">JSON</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="content-value">Content Value</Label>
+              <Textarea
+                id="content-value"
+                placeholder="Enter your content here..."
+                rows={4}
+                value={newContent.value}
+                onChange={(e) => setNewContent(prev => ({ ...prev, value: e.target.value }))}
+              />
             </div>
 
             <div>
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                placeholder="Enter your content here..."
-                rows={6}
-                value={newContent.content}
-                onChange={(e) => setNewContent(prev => ({ ...prev, content: e.target.value }))}
+              <Label htmlFor="content-link">Link (Optional)</Label>
+              <Input
+                id="content-link"
+                placeholder="e.g., /contact, https://example.com"
+                value={newContent.link}
+                onChange={(e) => setNewContent(prev => ({ ...prev, link: e.target.value }))}
               />
             </div>
 
@@ -190,19 +305,63 @@ const PagesAdmin: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {selectedPage ? (
+            {contentLoading ? (
+              <div className="flex justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            ) : selectedPage ? (
               <div className="space-y-4">
-                <p className="text-sm text-gray-500">
-                  This section will show existing content for the selected page.
-                  Content management functionality will be integrated with Supabase.
-                </p>
-                
-                {/* Placeholder for existing content */}
-                <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
-                  <p className="text-gray-500">
-                    No existing content found for this page.
-                  </p>
-                </div>
+                {pageContent.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Key</TableHead>
+                        <TableHead>Value</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pageContent.map((content) => (
+                        <TableRow key={content.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {content.key}
+                              {content.link && (
+                                <ExternalLink className="h-3 w-3 text-gray-400" />
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="max-w-xs">
+                            <div className="truncate" title={content.value}>
+                              {content.value}
+                            </div>
+                            {content.link && (
+                              <div className="text-xs text-gray-500 truncate" title={content.link}>
+                                Link: {content.link}
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteContent(content.id)}
+                              className="text-red-600 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
+                    <p className="text-gray-500">
+                      No content found for this page.
+                    </p>
+                  </div>
+                )}
               </div>
             ) : (
               <p className="text-gray-500">Please select a page to manage its content.</p>
@@ -210,6 +369,81 @@ const PagesAdmin: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* All Content Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle>All Website Content</CardTitle>
+          <CardDescription>
+            Overview of all content across all pages
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {contentLoading ? (
+            <div className="flex justify-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Page</TableHead>
+                  <TableHead>Key</TableHead>
+                  <TableHead>Value</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {allContent.length > 0 ? (
+                  allContent.map((content) => (
+                    <TableRow key={content.id}>
+                      <TableCell>
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          {content.page}
+                        </span>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {content.key}
+                          {content.link && (
+                            <ExternalLink className="h-3 w-3 text-gray-400" />
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="max-w-md">
+                        <div className="truncate" title={content.value}>
+                          {content.value}
+                        </div>
+                        {content.link && (
+                          <div className="text-xs text-gray-500 truncate" title={content.link}>
+                            Link: {content.link}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteContent(content.id)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                      No content found in database
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
