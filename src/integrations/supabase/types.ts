@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      pages: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          parent_id: string | null
+          slug: string
+          sort_order: number | null
+          updated_at: string | null
+          url_en: string
+          url_et: string
+          visible: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          parent_id?: string | null
+          slug: string
+          sort_order?: number | null
+          updated_at?: string | null
+          url_en: string
+          url_et: string
+          visible?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          parent_id?: string | null
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string | null
+          url_en?: string
+          url_et?: string
+          visible?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pages_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       popular_products: {
         Row: {
           created_at: string
@@ -44,6 +91,7 @@ export type Database = {
           name: string
           pricing_with_print: Json
           pricing_without_print: Json
+          slug: string | null
           type: string
           updated_at: string
         }
@@ -55,6 +103,7 @@ export type Database = {
           name: string
           pricing_with_print?: Json
           pricing_without_print?: Json
+          slug?: string | null
           type: string
           updated_at?: string
         }
@@ -66,6 +115,7 @@ export type Database = {
           name?: string
           pricing_with_print?: Json
           pricing_without_print?: Json
+          slug?: string | null
           type?: string
           updated_at?: string
         }
@@ -130,6 +180,7 @@ export type Database = {
           created_at: string
           id: string
           key: string
+          link: string | null
           page: string
           updated_at: string
           value: string | null
@@ -138,6 +189,7 @@ export type Database = {
           created_at?: string
           id?: string
           key: string
+          link?: string | null
           page: string
           updated_at?: string
           value?: string | null
@@ -146,6 +198,7 @@ export type Database = {
           created_at?: string
           id?: string
           key?: string
+          link?: string | null
           page?: string
           updated_at?: string
           value?: string | null
