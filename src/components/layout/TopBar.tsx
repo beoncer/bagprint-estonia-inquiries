@@ -15,7 +15,7 @@ const fetchTopBarContent = async (): Promise<TopBarContent> => {
     .from("website_content")
     .select("key, value")
     .eq("page", "global")
-    .in("key", ["topbar_tagline", "topbar_phone", "topbar_email", "topbar_working_hours"]);
+    .in("key", ["topbar_tagline", "topbar_phone", "topbar_email", "topbar_opening_hours"]);
 
   if (error) throw error;
 
@@ -37,7 +37,7 @@ const fetchTopBarContent = async (): Promise<TopBarContent> => {
       case "topbar_email":
         content.email = item.value;
         break;
-      case "topbar_working_hours":
+      case "topbar_opening_hours":
         content.workingHours = item.value;
         break;
     }
