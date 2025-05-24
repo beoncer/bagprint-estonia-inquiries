@@ -3,12 +3,104 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
-import { getPopularProducts, Product } from "@/lib/supabase";
+import { getPopularProducts, Product, supabase } from "@/lib/supabase";
+import { useQuery } from "@tanstack/react-query";
+import { CheckCircle, DollarSign, Users } from "lucide-react";
+
+interface HeroContent {
+  title: string | null;
+  description: string | null;
+  button1: { value: string | null; link: string | null };
+  button2: { value: string | null; link: string | null };
+}
+
+const fetchHeroContent = async (): Promise<HeroContent> => {
+  const { data, error } = await supabase
+    .from("website_content")
+    .select("key, value, link")
+    .eq("page", "home")
+    .in("key", ["homepage_title", "homepage_hero_description", "homepage_hero_button1", "homepage_hero_button2"]);
+
+  if (error) throw error;
+
+  const content = {
+    title: null,
+    description: null,
+    button1: { value: null, link: null },
+    button2: { value: null, link: null }
+  };
+
+  data?.forEach(item => {
+    switch (item.key) {
+      case "homepage_title":
+        content.title = item.value;
+        break;
+      case "homepage_hero_description":
+        content.description = item.value;
+        break;
+      case "homepage_hero_button1":
+        content.button1 = { value: item.value, link: item.link };
+        break;
+      case "homepage_hero_button2":
+        content.button2 = { value: item.value, link: item.link };
+        break;
+    }
+  });
+
+  return content;
+};
+
+const ICON_MAP: Record<string, JSX.Element> = {
+  check: <CheckCircle className="h-12 w-12 text-primary" />,
+  dollar: <DollarSign className="h-12 w-12 text-primary" />,
+  users: <Users className="h-12 w-12 text-primary" />,
+};
+
+const fetchWhyChooseUsContent = async () => {
+  const { data, error } = await supabase
+    .from("website_content")
+    .select("key, value")
+    .like("key", "why_choose_us_%");
+  if (error) throw error;
+  return data;
+};
+
+const parseWhyChooseUs = (data: any[]) => {
+  const title = data.find((item) => item.key === "why_choose_us_title")?.value || "Miks valida meid";
+  // Find all card indexes
+  const indexes = Array.from(new Set(
+    data
+      .map((item) => item.key.match(/^why_choose_us_(\d+)_/))
+      .filter(Boolean)
+      .map((m) => m![1])
+  ));
+  const cards = indexes.map((idx) => {
+    const icon = data.find((item) => item.key === `why_choose_us_${idx}_icon`)?.value || "check";
+    const cardTitle = data.find((item) => item.key === `why_choose_us_${idx}_title`)?.value || "";
+    const text = data.find((item) => item.key === `why_choose_us_${idx}_text`)?.value || "";
+    return { icon, title: cardTitle, text };
+  });
+  return { title, cards };
+};
 
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Use React Query for hero content
+  const { data: heroContent, isLoading: isHeroLoading } = useQuery({
+    queryKey: ['heroContent'],
+    queryFn: fetchHeroContent,
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+  });
+
+  const whyChooseUsQuery = useQuery({
+    queryKey: ["whyChooseUsContent"],
+    queryFn: fetchWhyChooseUsContent,
+    staleTime: 1000 * 60 * 5,
+  });
+  const whyChooseUs = whyChooseUsQuery.data ? parseWhyChooseUs(whyChooseUsQuery.data) : { title: "Miks valida meid", cards: [] };
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -38,48 +130,60 @@ const Index = () => {
               backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: "auto", // Changed from fixed height to auto
-              minHeight: "520px" // Added minimum height instead
+              height: "auto",
+              minHeight: "520px"
             }}
           >
             <div className="absolute inset-0 bg-white/45"></div>
             <div className="relative z-10 h-full w-full">
               <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
                 <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
-                  {/* Content container with better spacing distribution */}
                   <div className="flex flex-col h-full justify-between">
-                    {/* Text content */}
-                    <div className="mt-4 md:mt-8">
-                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-                        Kvaliteetsed kotid ja pakendid teie brändile
-                      </h1>
-                      <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
-                        Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja 
-                        e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga.
-                      </p>
-                    </div>
-                    
-                    {/* Buttons with improved styling and better spacing */}
-                    <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
-                      {/* Primary button with guaranteed visibility */}
-                      <Button 
-                        variant="default"
-                        size="xl" 
-                        className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
-                        asChild
-                      >
-                        <Link to="/products">Vaata tooteid</Link>
-                      </Button>
-                      {/* Secondary button with guaranteed visibility */}
-                      <Button 
-                        variant="white" 
-                        size="xl" 
-                        className="text-base md:text-lg border border-gray-200 shadow-sm" 
-                        asChild
-                      >
-                        <Link to="/inquiry">Küsi pakkumist</Link>
-                      </Button>
-                    </div>
+                    {isHeroLoading ? (
+                      <div className="animate-pulse space-y-4">
+                        <div className="h-12 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-200 rounded w-full"></div>
+                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                        <div className="flex gap-4 mt-6">
+                          <div className="h-10 bg-gray-200 rounded w-32"></div>
+                          <div className="h-10 bg-gray-200 rounded w-32"></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mt-4 md:mt-8">
+                          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+                            {heroContent?.title || "Kvaliteetsed kotid ja pakendid teie brändile"}
+                          </h1>
+                          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
+                            {heroContent?.description || "Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga."}
+                          </p>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
+                          <Button 
+                            variant="default"
+                            size="xl" 
+                            className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
+                            asChild
+                          >
+                            <Link to={heroContent?.button1?.link || "/tooted"}>
+                              {heroContent?.button1?.value || "Vaata tooteid"}
+                            </Link>
+                          </Button>
+                          <Button 
+                            variant="white" 
+                            size="xl" 
+                            className="text-base md:text-lg border border-gray-200 shadow-sm" 
+                            asChild
+                          >
+                            <Link to={heroContent?.button2?.link || "/paring"}>
+                              {heroContent?.button2?.value || "Küsi pakkumist"}
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="hidden md:block md:w-1/3 lg:w-1/2">
@@ -94,45 +198,28 @@ const Index = () => {
       {/* Why Choose Us Section */}
       <section className="py-12">
         <div className="container mx-auto px-2">
-          <h2 className="text-3xl font-bold text-left mb-12">Miks valida meid</h2>
-          
+          <h2 className="text-3xl font-bold text-left mb-12">{whyChooseUs.title}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-primary mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Kõrge kvaliteet</h3>
-              <p className="text-gray-600">
-                Kasutame ainult kvaliteetseid materjale, et tagada meie toodete vastupidavus ja esteetiline välimus.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-primary mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Konkurentsivõimelised hinnad</h3>
-              <p className="text-gray-600">
-                Pakume parimaid hindu, säilitades samal ajal toote kõrge kvaliteedi ja klienditeeninduse.
-              </p>
-            </div>
-            
-            <div className="bg-white p-6 rounded-lg shadow-sm">
-              <div className="text-primary mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Personaalne teenindus</h3>
-              <p className="text-gray-600">
-                Iga klient on meile oluline. Pakume personaalset lähenemist ja professionaalset nõustamist.
-              </p>
-            </div>
+            {whyChooseUsQuery.isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-lg shadow-sm animate-pulse">
+                  <div className="h-12 w-12 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-6 w-1/2 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 w-full bg-gray-200 rounded mb-1"></div>
+                  <div className="h-4 w-5/6 bg-gray-200 rounded"></div>
+                </div>
+              ))
+            ) : whyChooseUs.cards.length > 0 ? (
+              whyChooseUs.cards.map((card, i) => (
+                <div key={i} className="bg-white p-6 rounded-lg shadow-sm">
+                  <div className="text-primary mb-4">
+                    {ICON_MAP[card.icon] || <CheckCircle className="h-12 w-12 text-primary" />}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
+                  <p className="text-gray-600">{card.text}</p>
+                </div>
+              ))
+            ) : null}
           </div>
         </div>
       </section>
