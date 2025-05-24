@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,22 @@ const categories = [
   { id: "packaging", name: "E-poe pakendid" },
 ];
 
+const categoryPathMap: Record<string, string> = {
+  "/riidest-kotid": "cotton_bag",
+  "/paberkotid": "paper_bag",
+  "/nooriga-kotid": "drawstring_bag",
+  "/sussikotid": "shoebag",
+  "/tooted": "all",
+};
+
+const categoryPrettyUrlMap: Record<string, string> = {
+  all: "/tooted",
+  cotton_bag: "/riidest-kotid",
+  paper_bag: "/paberkotid",
+  drawstring_bag: "/nooriga-kotid",
+  shoebag: "/sussikotid",
+};
+
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
@@ -23,6 +39,7 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
   
   // Fetch products from Supabase
   useEffect(() => {
@@ -45,14 +62,15 @@ const Products = () => {
   
   // Handle category filtering from URL params
   useEffect(() => {
-    const categoryFromUrl = searchParams.get("category");
-    if (categoryFromUrl) {
-      console.log("Category from URL:", categoryFromUrl);
-      setActiveCategory(categoryFromUrl);
-    } else {
-      setActiveCategory("all");
+    const path = location.pathname;
+    let categoryFromPath = categoryPathMap[path];
+    if (!categoryFromPath) {
+      // fallback to query param logic
+      const categoryFromUrl = searchParams.get("category");
+      categoryFromPath = categoryFromUrl || "all";
     }
-  }, [searchParams]);
+    setActiveCategory(categoryFromPath);
+  }, [location.pathname, searchParams]);
   
   // Apply filters when category or search term changes
   useEffect(() => {
@@ -146,13 +164,16 @@ const Products = () => {
               {/* Category Filter */}
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
-                  <Button
+                  <Link
                     key={category.id}
-                    variant={activeCategory === category.id ? "default" : "outline"}
-                    onClick={() => handleCategoryChange(category.id)}
+                    to={categoryPrettyUrlMap[category.id] || "/tooted"}
                   >
-                    {category.name}
-                  </Button>
+                    <Button
+                      variant={activeCategory === category.id ? "default" : "outline"}
+                    >
+                      {category.name}
+                    </Button>
+                  </Link>
                 ))}
               </div>
               
