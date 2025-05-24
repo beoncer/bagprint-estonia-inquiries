@@ -20,7 +20,7 @@ const fetchPages = async (): Promise<Page[]> => {
     .from('pages')
     .select('id, name, url_et, visible, sort_order')
     .eq('visible', true)
-    .order('sort_order', { ascending: true, nullsLast: true });
+    .order('sort_order', { ascending: true });
 
   if (error) throw error;
   return data || [];
