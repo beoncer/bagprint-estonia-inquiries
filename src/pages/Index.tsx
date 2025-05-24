@@ -240,7 +240,7 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">Riidest kotid</h3>
               <Button variant="link" asChild>
-                <Link to="/products?category=cotton">Vaata tooteid</Link>
+                <Link to="/riidest-kotid">Vaata tooteid</Link>
               </Button>
             </div>
             
@@ -254,7 +254,7 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">Paberkotid</h3>
               <Button variant="link" asChild>
-                <Link to="/products?category=paper">Vaata tooteid</Link>
+                <Link to="/paberkotid">Vaata tooteid</Link>
               </Button>
             </div>
             
@@ -268,7 +268,7 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">Nööriga kotid</h3>
               <Button variant="link" asChild>
-                <Link to="/products?category=drawstring">Vaata tooteid</Link>
+                <Link to="/nooriga-kotid">Vaata tooteid</Link>
               </Button>
             </div>
             
@@ -282,7 +282,7 @@ const Index = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">Sussikotid</h3>
               <Button variant="link" asChild>
-                <Link to="/products?category=shoebag">Vaata tooteid</Link>
+                <Link to="/sussikotid">Vaata tooteid</Link>
               </Button>
             </div>
           </div>
