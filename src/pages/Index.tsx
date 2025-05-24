@@ -15,13 +15,19 @@ interface HeroContent {
 }
 
 const fetchHeroContent = async (): Promise<HeroContent> => {
+  console.log('Fetching hero content...');
   const { data, error } = await supabase
     .from("website_content")
     .select("key, value, link")
     .eq("page", "home")
     .in("key", ["homepage_title", "homepage_hero_description", "homepage_hero_button1", "homepage_hero_button2"]);
 
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching hero content:', error);
+    throw error;
+  }
+
+  console.log('Hero content data:', data);
 
   const content = {
     title: null,
@@ -31,6 +37,7 @@ const fetchHeroContent = async (): Promise<HeroContent> => {
   };
 
   data?.forEach(item => {
+    console.log('Processing item:', item);
     switch (item.key) {
       case "homepage_title":
         content.title = item.value;
@@ -47,6 +54,7 @@ const fetchHeroContent = async (): Promise<HeroContent> => {
     }
   });
 
+  console.log('Final hero content:', content);
   return content;
 };
 
@@ -89,11 +97,15 @@ const Index = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Use React Query for hero content
-  const { data: heroContent, isLoading: isHeroLoading } = useQuery({
+  const { data: heroContent, isLoading: isHeroLoading, error: heroError } = useQuery({
     queryKey: ['heroContent'],
     queryFn: fetchHeroContent,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
+
+  console.log('Hero content from query:', heroContent);
+  console.log('Hero loading state:', isHeroLoading);
+  console.log('Hero error:', heroError);
 
   const whyChooseUsQuery = useQuery({
     queryKey: ["whyChooseUsContent"],
