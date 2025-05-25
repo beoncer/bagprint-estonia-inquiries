@@ -136,4 +136,23 @@ export async function getPopularProducts() {
     startingPrice: extractStartingPrice(item.pricing_without_print),
     slug: item.slug,
   })) as Product[];
-} 
+}
+
+export async function getSiteContent() {
+  try {
+    const { data, error } = await supabase
+      .from('site_content')
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Error fetching site content:', error);
+      throw error;
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Unexpected error in getSiteContent:', err);
+    throw err;
+  }
+}

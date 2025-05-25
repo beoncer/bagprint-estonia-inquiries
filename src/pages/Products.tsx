@@ -5,8 +5,9 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Phone, Mail, ChevronDown, Camera, Shield, Smile, Briefcase, Gift, Truck } from "lucide-react";
-import { getProducts, Product } from "@/lib/supabase";
+import { getProducts, Product, getSiteContent } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useQuery } from "@tanstack/react-query";
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -31,33 +32,6 @@ const categoryPrettyUrlMap: Record<string, string> = {
   drawstring_bag: "/nooriga-kotid",
   shoebag: "/sussikotid",
 };
-
-const productCategories = [
-  {
-    id: "cotton_bag",
-    name: "Riidest kotid",
-    image: "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
-    link: "/riidest-kotid"
-  },
-  {
-    id: "paper_bag", 
-    name: "Paberkotid",
-    image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
-    link: "/paberkotid"
-  },
-  {
-    id: "drawstring_bag",
-    name: "Nööriga kotid", 
-    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
-    link: "/nooriga-kotid"
-  },
-  {
-    id: "shoebag",
-    name: "Sussikotid",
-    image: "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
-    link: "/sussikotid"
-  }
-];
 
 const blogArticles = [
   {
@@ -217,6 +191,44 @@ const Products = () => {
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   
+  // Fetch site content for dynamic product categories
+  const { data: siteContent } = useQuery({
+    queryKey: ['site-content'],
+    queryFn: getSiteContent,
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+  });
+
+  // Create dynamic product categories from site content
+  const productCategories = [
+    {
+      id: "cotton_bag",
+      name: "Riidest kotid",
+      image: siteContent?.product_category_1_image || "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
+      link: "/riidest-kotid"
+    },
+    {
+      id: "paper_bag", 
+      name: "Paberkotid",
+      image: siteContent?.product_category_2_image || "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+      link: "/paberkotid"
+    },
+    {
+      id: "drawstring_bag",
+      name: "Nööriga kotid", 
+      image: siteContent?.product_category_3_image || "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+      link: "/nooriga-kotid"
+    },
+    {
+      id: "shoebag",
+      name: "Sussikotid",
+      image: siteContent?.product_category_4_image || "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
+      link: "/sussikotid"
+    }
+  ];
+
+  console.log('Site content:', siteContent);
+  console.log('Product categories with dynamic images:', productCategories);
+  
   // Fetch products from Supabase
   useEffect(() => {
     const fetchProducts = async () => {
@@ -347,6 +359,11 @@ const Products = () => {
                         src={category.image}
                         alt={category.name}
                         className="w-full h-full object-cover transition-all group-hover:scale-105"
+                        onError={(e) => {
+                          console.log(`Image error for category ${category.id}, image URL:`, category.image);
+                          // Fallback to default image on error
+                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop";
+                        }}
                       />
                     </div>
                     <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
