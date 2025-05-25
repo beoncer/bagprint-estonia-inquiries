@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co'
@@ -143,41 +142,34 @@ export async function getSiteContent() {
   try {
     console.log('Attempting to fetch site content from Supabase...');
     
-    // Try to fetch from website_content table first (more flexible structure)
     const { data: contentData, error: contentError } = await supabase
       .from('website_content')
       .select('*');
 
-    if (!contentError && contentData) {
+    if (contentError) {
+      console.error('Error fetching website_content:', contentError);
+      return {};
+    }
+
+    if (contentData && contentData.length > 0) {
       console.log('Fetched website_content data:', contentData);
       
       // Convert array to object for easier access
       const contentObj: any = {};
       contentData.forEach((item: any) => {
+        // Use value if it exists, otherwise use link (for URLs)
         contentObj[item.key] = item.value || item.link;
       });
       
       console.log('Converted content object:', contentObj);
+      console.log('Product category 3 image specifically:', contentObj.product_category_3_image);
       return contentObj;
     }
 
-    // Fallback to site_content table if it exists
-    const { data, error } = await supabase
-      .from('site_content')
-      .select('*')
-      .single();
-
-    if (error) {
-      console.error('Error fetching site content:', error);
-      console.log('Returning empty object as fallback');
-      return {};
-    }
-
-    console.log('Fetched site_content data:', data);
-    return data;
+    console.log('No data found in website_content, returning empty object');
+    return {};
   } catch (err) {
     console.error('Unexpected error in getSiteContent:', err);
-    console.log('Returning empty object as fallback');
     return {};
   }
 }
