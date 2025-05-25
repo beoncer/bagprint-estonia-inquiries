@@ -192,49 +192,73 @@ const Products = () => {
   const location = useLocation();
   
   // Fetch site content for dynamic product categories
-  const { data: siteContent } = useQuery({
+  const { data: siteContent, isLoading: siteContentLoading, error: siteContentError } = useQuery({
     queryKey: ['site-content'],
     queryFn: getSiteContent,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  console.log('Raw siteContent from query:', siteContent);
-  console.log('Product category 3 image from siteContent:', siteContent?.product_category_3_image);
+  console.log('Site content query - Loading:', siteContentLoading, 'Error:', siteContentError, 'Data:', siteContent);
 
-  // Create dynamic product categories from site content
-  const productCategories = [
+  // Create dynamic product categories from site content - only when data is available
+  const productCategories = siteContent ? [
     {
       id: "cotton_bag",
       name: "Riidest kotid",
-      image: siteContent?.product_category_1_image || "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
+      image: siteContent.product_category_1_image || "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
       link: "/riidest-kotid"
     },
     {
       id: "paper_bag", 
       name: "Paberkotid",
-      image: siteContent?.product_category_2_image || "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+      image: siteContent.product_category_2_image || "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
       link: "/paberkotid"
     },
     {
       id: "drawstring_bag",
       name: "Nööriga kotid", 
-      image: siteContent?.product_category_3_image || "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+      image: siteContent.product_category_3_image || "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
       link: "/nooriga-kotid"
     },
     {
       id: "shoebag",
       name: "Sussikotid",
-      image: siteContent?.product_category_4_image || "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
+      image: siteContent.product_category_4_image || "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
+      link: "/sussikotid"
+    }
+  ] : [
+    // Fallback categories while loading
+    {
+      id: "cotton_bag",
+      name: "Riidest kotid",
+      image: "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
+      link: "/riidest-kotid"
+    },
+    {
+      id: "paper_bag", 
+      name: "Paberkotid",
+      image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+      link: "/paberkotid"
+    },
+    {
+      id: "drawstring_bag",
+      name: "Nööriga kotid", 
+      image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+      link: "/nooriga-kotid"
+    },
+    {
+      id: "shoebag",
+      name: "Sussikotid",
+      image: "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
       link: "/sussikotid"
     }
   ];
 
-  console.log('Product categories with resolved images:', productCategories.map(cat => ({
+  console.log('Final product categories:', productCategories.map(cat => ({
     id: cat.id,
     name: cat.name,
     image: cat.image,
-    isFromSupabase: cat.image && !cat.image.includes('unsplash.com'),
-    rawValue: cat.id === 'drawstring_bag' ? siteContent?.product_category_3_image : null
+    isFromSupabase: cat.image && !cat.image.includes('unsplash.com')
   })));
   
   // Fetch products from Supabase
