@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -29,6 +29,7 @@ const fetchPages = async (): Promise<Page[]> => {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const location = useLocation();
 
   const { data: pages = [], isLoading } = useQuery({
     queryKey: ['pages'],
@@ -40,12 +41,29 @@ const Navbar = () => {
     setIsOpen(!isOpen);
   };
 
+  // Ensure URLs are absolute paths
+  const getAbsolutePath = (url: string) => {
+    if (url.startsWith('/')) {
+      return url;
+    }
+    return `/${url}`;
+  };
+
+  const handleLinkClick = (url: string) => {
+    console.log('Navbar link clicked:', url, 'Current location:', location.pathname);
+    setIsOpen(false);
+  };
+
   return (
     <nav className="w-full z-50">
       <div className="container mx-auto px-2 py-4">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex justify-between items-center">
-            <Link to="/" className="text-4xl font-bold text-primary">
+            <Link 
+              to="/" 
+              className="text-4xl font-bold text-primary"
+              onClick={() => handleLinkClick('/')}
+            >
               Leatex
             </Link>
 
@@ -58,18 +76,25 @@ const Navbar = () => {
                   ))}
                 </div>
               ) : (
-                pages.map((page) => (
-                  <Link 
-                    key={page.id}
-                    to={page.url_et} 
-                    className="text-gray-800 font-medium hover:text-primary transition-colors"
-                  >
-                    {page.name}
-                  </Link>
-                ))
+                pages.map((page) => {
+                  const absolutePath = getAbsolutePath(page.url_et);
+                  return (
+                    <Link 
+                      key={page.id}
+                      to={absolutePath}
+                      className="text-gray-800 font-medium hover:text-primary transition-colors"
+                      onClick={() => handleLinkClick(absolutePath)}
+                    >
+                      {page.name}
+                    </Link>
+                  );
+                })
               )}
               <Button asChild>
-                <Link to="/paring">
+                <Link 
+                  to="/paring"
+                  onClick={() => handleLinkClick('/paring')}
+                >
                   Küsi pakkumist
                 </Link>
               </Button>
@@ -97,21 +122,24 @@ const Navbar = () => {
                     ))}
                   </div>
                 ) : (
-                  pages.map((page) => (
-                    <Link 
-                      key={page.id}
-                      to={page.url_et}
-                      className="py-2 hover:text-primary transition-colors px-4"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {page.name}
-                    </Link>
-                  ))
+                  pages.map((page) => {
+                    const absolutePath = getAbsolutePath(page.url_et);
+                    return (
+                      <Link 
+                        key={page.id}
+                        to={absolutePath}
+                        className="py-2 hover:text-primary transition-colors px-4"
+                        onClick={() => handleLinkClick(absolutePath)}
+                      >
+                        {page.name}
+                      </Link>
+                    );
+                  })
                 )}
                 <Button asChild className="w-full mt-2">
                   <Link 
                     to="/paring" 
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => handleLinkClick('/paring')}
                   >
                     Küsi pakkumist
                   </Link>

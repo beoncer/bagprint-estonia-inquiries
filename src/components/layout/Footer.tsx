@@ -1,8 +1,14 @@
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Phone, Mail, MapPin } from "lucide-react";
 
 const Footer = () => {
+  const location = useLocation();
+
+  const handleLinkClick = (url: string) => {
+    console.log('Footer link clicked:', url, 'Current location:', location.pathname);
+  };
+
   return (
     <footer className="bg-gray-900 text-white py-12">
       <div className="container mx-auto px-4">
@@ -23,27 +29,47 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4">Kiirlingid</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/')}
+                >
                   Avaleht
                 </Link>
               </li>
               <li>
-                <Link to="/tooted" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/tooted" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/tooted')}
+                >
                   Tooted
                 </Link>
               </li>
               <li>
-                <Link to="/riidest-kotid" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/riidest-kotid" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/riidest-kotid')}
+                >
                   Riidest kotid
                 </Link>
               </li>
               <li>
-                <Link to="/paberkotid" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/paberkotid" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/paberkotid')}
+                >
                   Paberkotid
                 </Link>
               </li>
               <li>
-                <Link to="/kontakt" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/kontakt" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/kontakt')}
+                >
                   Kontakt
                 </Link>
               </li>
@@ -55,22 +81,38 @@ const Footer = () => {
             <h4 className="text-lg font-semibold mb-4">Tootekategooriad</h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/riidest-kotid" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/riidest-kotid" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/riidest-kotid')}
+                >
                   Puuvillakotid
                 </Link>
               </li>
               <li>
-                <Link to="/paberkotid" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/paberkotid" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/paberkotid')}
+                >
                   Paberkotid
                 </Link>
               </li>
               <li>
-                <Link to="/nooriga-kotid" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/nooriga-kotid" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/nooriga-kotid')}
+                >
                   Paelaga kotid
                 </Link>
               </li>
               <li>
-                <Link to="/sussikotid" className="text-gray-400 hover:text-white transition-colors">
+                <Link 
+                  to="/sussikotid" 
+                  className="text-gray-400 hover:text-white transition-colors"
+                  onClick={() => handleLinkClick('/sussikotid')}
+                >
                   Sussikotid
                 </Link>
               </li>
