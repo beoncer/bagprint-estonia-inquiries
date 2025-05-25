@@ -31,6 +31,57 @@ const categoryPrettyUrlMap: Record<string, string> = {
   shoebag: "/sussikotid",
 };
 
+const productCategories = [
+  {
+    id: "cotton_bag",
+    name: "Riidest kotid",
+    image: "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
+    link: "/riidest-kotid"
+  },
+  {
+    id: "paper_bag", 
+    name: "Paberkotid",
+    image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+    link: "/paberkotid"
+  },
+  {
+    id: "drawstring_bag",
+    name: "Nööriga kotid", 
+    image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+    link: "/nooriga-kotid"
+  },
+  {
+    id: "shoebag",
+    name: "Sussikotid",
+    image: "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
+    link: "/sussikotid"
+  }
+];
+
+const blogArticles = [
+  {
+    id: 1,
+    title: "Kuidas valida õiget kotti oma brändile",
+    excerpt: "Praktilised nõuanded sobiva koti valimiseks, mis esindab teie brändi parimatel võimalikult.",
+    image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&auto=format&fit=crop",
+    readTime: "5 min"
+  },
+  {
+    id: 2,
+    title: "Ökoloogilised pakendilahendused",
+    excerpt: "Miks on oluline valida keskkonnasõbralikke pakendeid ja kuidas see mõjutab teie brändi mainet.",
+    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&auto=format&fit=crop",
+    readTime: "3 min"
+  },
+  {
+    id: 3,
+    title: "Trükikvaliteedi saladused",
+    excerpt: "Millised on parimad praktikad kvaliteetse logo ja disaini trükkimiseks kottidele.",
+    image: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&auto=format&fit=crop",
+    readTime: "4 min"
+  }
+];
+
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
@@ -157,6 +208,58 @@ const Products = () => {
           <p className="text-gray-600 mb-8">
             Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
           </p>
+
+          {/* Product Categories Section */}
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {productCategories.map((category) => (
+                <Link key={category.id} to={category.link} className="text-center group">
+                  <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                    <img 
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-all group-hover:scale-105"
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                    {category.name}
+                  </h3>
+                  <Button variant="link" className="p-0">
+                    Vaata tooteid
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Blog Articles Section */}
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {blogArticles.map((article) => (
+                <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">{article.readTime} lugemist</span>
+                      <Button variant="link" size="sm" className="p-0">
+                        Loe edasi
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
           
           {/* Search and Filter Section */}
           <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
