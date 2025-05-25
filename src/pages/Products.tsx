@@ -1,12 +1,12 @@
-
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Phone, Mail, ChevronDown } from "lucide-react";
 import { getProducts, Product } from "@/lib/supabase";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -82,6 +82,97 @@ const blogArticles = [
     readTime: "4 min"
   }
 ];
+
+const categoryFAQs = {
+  cotton_bag: [
+    {
+      question: "Millised on puuvillakottide peamised eelised?",
+      answer: "Puuvillakotid on keskkonnasõbralikud, vastupidavad ja korduvkasutatavad. Need sobivad hästi igapäevaseks kasutamiseks ja on ideaalsed brändi reklaamimiseks."
+    },
+    {
+      question: "Kas puuvillakotte saab pesta?",
+      answer: "Jah, puuvillakotte saab pesta masinpesu või käsitsi. Soovitame kasutada külma vett ja õrna pesuvahendi, et säilitada koti kvaliteet ja trükk."
+    },
+    {
+      question: "Millised trükimeetodid sobivad puuvillakottidele?",
+      answer: "Puuvillakottidele sobivad hästi siittrükk, termotransfer ja brodeeritus. Valime parima meetodi sõltuvalt disainist ja kogusest."
+    },
+    {
+      question: "Kui kaua kestab puuvillakottide tellimine?",
+      answer: "Tavaline tarneaeg on 7-14 tööpäeva, sõltuvalt kogusest ja trüki keerukusest. Kiireloomuliste tellimuste puhul võime pakkuda kiiremat täitmist."
+    },
+    {
+      question: "Mis on minimaalne tellimiskogus?",
+      answer: "Minimaalne tellimiskogus sõltub toote tüübist ja trükimeetodist. Tavaliselt alates 50 tükist, kuid võime arutada ka väiksemaid koguseid."
+    }
+  ],
+  paper_bag: [
+    {
+      question: "Millised paberkotid on kõige vastupidavamad?",
+      answer: "Kraft-paberkotid on kõige vastupidavamad ja sobivad hästi raskete esemete kandmiseks. Need on valmistatud kvaliteetsest paksust paberist."
+    },
+    {
+      question: "Kas paberkotid on keskkonnasõbralikud?",
+      answer: "Jah, meie paberkotid on valmistatud taaskasutatud materjalist ja on täielikult lagunevad. Need on suurepärane keskkonnasõbralik alternatiiv plastikkottidele."
+    },
+    {
+      question: "Millised trükimeetodid sobivad paberkottidele?",
+      answer: "Paberkottidele sobivad fleksotükk, digitaaltrükk ja tempel. Valime parima meetodi sõltuvalt koti tüübist ja disainist."
+    },
+    {
+      question: "Kas paberkotte saab personaliseerida?",
+      answer: "Jah, pakume täielikku personaliseerimist - logod, tekstid, värvid ja isegi erikujulised aknad. Saame luua unikaalse disaini teie brändile."
+    },
+    {
+      question: "Millised on paberkottide hoiutingimused?",
+      answer: "Paberkotte tuleks hoida kuivas kohas, kaitstuna niiskuse eest. Õige hoiustamise korral säilivad need pikka aega oma kvaliteeti."
+    }
+  ],
+  drawstring_bag: [
+    {
+      question: "Milleks sobivad nööriga kotid kõige paremini?",
+      answer: "Nööriga kotid sobivad suurepäraselt spordivahendite, jalanõude, rõivaste ja väikeste esemete hoiustamiseks. Need on mugavad seljakotina kandmiseks."
+    },
+    {
+      question: "Millised materjalid on saadaval?",
+      answer: "Pakume nööriga kotte erinevatest materjalidest: puuvill, polüester, nonwoven ja jute. Iga materjal omab erinevaid omadusi ja hinda."
+    },
+    {
+      question: "Kas nöörid on reguleeritavad?",
+      answer: "Jah, enamik meie nööriga kotte on varustatud reguleeritavate nööridega, mis muudab kandmise mugavamaks ja võimaldab kohandada seljarihma pikkust."
+    },
+    {
+      question: "Millised on trükivõimalused nööriga kottidel?",
+      answer: "Pakume siittrükki, termotransferit ja brodeeritust. Trükiala sõltub koti suurusest, kuid tavaliselt saab trükkida nii ees- kui tagaküljele."
+    },
+    {
+      question: "Kas nööriga kotid sobivad lastele?",
+      answer: "Jah, nööriga kotid on suurepärane valik lastele - need on kerged, ohutud ja lihtsad kasutada. Saadaval erinevates värvides ja suurustes."
+    }
+  ],
+  shoebag: [
+    {
+      question: "Milleks on sussikotid mõeldud?",
+      answer: "Sussikotid on spetsiaalselt mõeldud jalanõude hoiustamiseks ja transportimiseks. Need kaitsevad teisi esemeid mustuse eest ja hoiavad sussid eraldi."
+    },
+    {
+      question: "Millised suurused on saadaval?",
+      answer: "Pakume erinevaid suurusi alates laste jalanõudest kuni suure mehe sussideni. Saadaval ka eritellimusel vastavalt teie vajadustele."
+    },
+    {
+      question: "Kas sussikotid on hingavad?",
+      answer: "Jah, meie sussikotid on valmistatud hingavatest materjalidest, mis võimaldavad õhuringlust ja takistavad ebameeldiva lõhna tekkimist."
+    },
+    {
+      question: "Kas sussikotte saab pesta?",
+      answer: "Enamikku sussikotte saab pesta masinpesu või käsitsi. Soovitame kontrollida pesujuhendit igal kindlal koti tüübil."
+    },
+    {
+      question: "Millised on personaliseerimise võimalused?",
+      answer: "Saame trükkida logosid, nimesid või muid tekste. Sussikotid sobivad hästi spordiklubidele, hotellidele ja isikliku kasutuse jaoks."
+    }
+  ]
+};
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -270,21 +361,27 @@ const Products = () => {
   }
 
   // Show filtered products for category pages
+  const categoryTitle = {
+    cotton_bag: "Riidest kotid",
+    paper_bag: "Paberkotid", 
+    drawstring_bag: "Nööriga kotid",
+    shoebag: "Sussikotid"
+  }[activeCategory] || "Tooted";
+
+  const categoryDescription = {
+    cotton_bag: "riidest kottide",
+    paper_bag: "paberkottide",
+    drawstring_bag: "nööriga kottide", 
+    shoebag: "sussikottide"
+  }[activeCategory] || "toodete";
+
   return (
     <Layout>
       <div className="bg-gray-50 py-10">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-4">
-            {activeCategory === "cotton_bag" && "Riidest kotid"}
-            {activeCategory === "paper_bag" && "Paberkotid"}
-            {activeCategory === "drawstring_bag" && "Nööriga kotid"}
-            {activeCategory === "shoebag" && "Sussikotid"}
-          </h1>
+          <h1 className="text-3xl font-bold mb-4">{categoryTitle}</h1>
           <p className="text-gray-600 mb-8">
-            Vaata meie {activeCategory === "cotton_bag" && "riidest kottide"}
-            {activeCategory === "paper_bag" && "paberkottide"}
-            {activeCategory === "drawstring_bag" && "nööriga kottide"}
-            {activeCategory === "shoebag" && "sussikottide"} valikut.
+            Vaata meie {categoryDescription} valikut.
           </p>
           
           {/* Search */}
@@ -321,6 +418,53 @@ const Products = () => {
               </Button>
             </div>
           )}
+
+          {/* Need Help Section */}
+          <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
+            <h2 className="text-3xl font-bold mb-4">Küsimusi?</h2>
+            <h3 className="text-2xl font-medium mb-8">Aitame teid rõõmuga!</h3>
+            
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-3 rounded-full">
+                  <Phone className="h-6 w-6" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xl font-semibold">+372 5919 7172</div>
+                  <div className="text-sm opacity-90">Ootame kõnet tööpäeviti 9.00-17.00</div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-3 rounded-full">
+                  <Mail className="h-6 w-6" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xl font-semibold">Vajad abi?</div>
+                  <div className="text-sm opacity-90">Võtke meiega ühendust e-posti teel</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FAQ Section */}
+          <section className="mt-16 mb-16">
+            <h2 className="text-2xl font-bold mb-8">Tellimisprotsess</h2>
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <Accordion type="single" collapsible className="w-full">
+                {categoryFAQs[activeCategory as keyof typeof categoryFAQs]?.map((faq, index) => (
+                  <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-b-0">
+                    <AccordionTrigger className="text-left hover:no-underline py-4">
+                      <span className="font-medium">{faq.question}</span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-4 text-gray-600">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </section>
         </div>
       </div>
     </Layout>
