@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -56,7 +55,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full z-50">
-      <div className="container mx-auto px-2 py-4">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-4">
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <Link 

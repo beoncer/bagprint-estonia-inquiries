@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Phone, Mail, MapPin } from "lucide-react";
 
@@ -11,7 +10,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-gray-900 text-white py-12">
-      <div className="container mx-auto px-4">
+      <div className="w-full px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>

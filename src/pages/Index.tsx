@@ -166,7 +166,7 @@ const Index = () => {
     <Layout>
       {/* Hero Section */}
       <section className="py-6">
-        <div className="container mx-auto px-2">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div 
             className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
             style={{
@@ -240,7 +240,7 @@ const Index = () => {
 
       {/* Why Choose Us Section */}
       <section className="py-12">
-        <div className="container mx-auto px-2">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <h2 className="text-3xl font-bold text-left mb-12">{whyChooseUs.title}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {whyChooseUsQuery.isLoading ? (
@@ -269,7 +269,7 @@ const Index = () => {
 
       {/* Updated Categories Section */}
       <section className="py-16">
-        <div className="container mx-auto px-2">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <h2 className="text-3xl font-bold text-left mb-10">{categoriesTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {categories.map((cat, idx) => (
@@ -293,7 +293,7 @@ const Index = () => {
 
       {/* Featured Products Section */}
       <section className="bg-gray-50 py-16">
-        <div className="container mx-auto px-2">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <h2 className="text-3xl font-bold text-left mb-12">Populaarsed tooted</h2>
           {loading ? (
             <div className="animate-pulse">
@@ -318,7 +318,7 @@ const Index = () => {
 
       {/* CTA Section */}
       <section className="bg-primary py-16">
-        <div className="container mx-auto px-2 text-center">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Valmis alustama?
           </h2>

@@ -341,7 +341,7 @@ const Products = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-16">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -358,7 +358,7 @@ const Products = () => {
   if (error) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
           <h2 className="text-2xl font-bold mb-4">Error</h2>
           <p className="text-red-600 mb-8">{error}</p>
           <Button onClick={handleRetry}>
@@ -374,7 +374,7 @@ const Products = () => {
     return (
       <Layout>
         <div className="bg-gray-50 py-10">
-          <div className="container mx-auto px-4">
+          <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
             <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
             <p className="text-gray-600 mb-8">
               Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
@@ -490,7 +490,7 @@ const Products = () => {
   return (
     <Layout>
       <div className="bg-gray-50 py-10">
-        <div className="container mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <h1 className="text-3xl font-bold mb-4">{categoryTitle}</h1>
           <p className="text-gray-600 mb-8">
             Vaata meie {categoryDescription} valikut.

@@ -53,7 +53,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-16">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -75,7 +75,7 @@ const ProductDetail = () => {
   if (!product) {
     return (
       <Layout>
-        <div className="container mx-auto px-4 py-16 text-center">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
           <h2 className="text-2xl font-bold mb-4">Toodet ei leitud</h2>
           <p className="mb-8">Kahjuks ei leidnud me otsitud toodet. Proovige vaadata teisi tooteid.</p>
           <Button asChild>
@@ -88,7 +88,7 @@ const ProductDetail = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-10">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
         {/* Breadcrumbs */}
         <div className="text-sm text-gray-500 mb-6">
           <Link to="/" className="hover:text-primary">Avaleht</Link>

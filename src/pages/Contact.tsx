@@ -1,4 +1,3 @@
-
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { 
@@ -71,7 +70,7 @@ const Contact = () => {
   return (
     <Layout>
       <div className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold mb-2">Võta meiega ühendust</h1>
             <p className="text-gray-600 mb-10">

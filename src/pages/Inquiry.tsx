@@ -1,4 +1,3 @@
-
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import InquiryForm from "@/components/ui/InquiryForm";
@@ -10,7 +9,7 @@ const Inquiry = () => {
   return (
     <Layout>
       <div className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
+        <div className="w-full px-4">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-3xl font-bold mb-2">Küsi pakkumist</h1>
             <p className="text-gray-600 mb-10">

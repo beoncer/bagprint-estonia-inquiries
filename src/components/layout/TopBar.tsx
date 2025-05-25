@@ -1,4 +1,3 @@
-
 import { Phone, Mail } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -61,7 +60,7 @@ const TopBar = () => {
   if (isLoading) {
     return (
       <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
-        <div className="container mx-auto px-2">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div className="flex justify-between items-center text-sm">
             <div className="hidden md:block">
               <div className="animate-pulse bg-gray-200 h-4 w-64 rounded"></div>
@@ -84,7 +83,7 @@ const TopBar = () => {
 
   return (
     <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
-      <div className="container mx-auto px-2">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
         <div className="flex justify-between items-center text-sm">
           {/* Left side text */}
           <div className="hidden md:block">
