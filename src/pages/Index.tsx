@@ -85,10 +85,38 @@ const parseWhyChooseUs = (data: any[]) => {
   return { title, cards };
 };
 
+// Add this helper to parse categories from website_content
+const parseProductCategories = (data: any[]) => {
+  const categories = [];
+  for (let i = 1; i <= 4; i++) {
+    categories.push({
+      name: data.find((item) => item.key === `product_category_${i}_name`)?.value || '',
+      image: data.find((item) => item.key === `product_category_${i}_image`)?.value || '',
+      link: data.find((item) => item.key === `product_category_${i}_link`)?.value || '#',
+      button: data.find((item) => item.key === `product_category_${i}_button`)?.value || 'Vaata tooteid',
+    });
+  }
+  return categories;
+};
+
+// Add this fetch function
+const fetchProductCategoriesContent = async () => {
+  const { data, error } = await supabase
+    .from('website_content')
+    .select('key, value')
+    .eq('page', 'home')
+    .or('key.ilike.product_category_1_%,key.ilike.product_category_2_%,key.ilike.product_category_3_%,key.ilike.product_category_4_%,key.eq.product_categories_title');
+  if (error) throw error;
+  return data;
+};
+
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // Add state for categories
+  const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesTitle, setCategoriesTitle] = useState<string>('Meie tooted');
 
   // Use React Query for hero content
   const { data: heroContent, isLoading: isHeroLoading, error: heroError } = useQuery({
@@ -123,6 +151,15 @@ const Index = () => {
     };
 
     fetchFeaturedProducts();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      const data = await fetchProductCategoriesContent();
+      setCategories(parseProductCategories(data));
+      const title = data.find((item: any) => item.key === 'product_categories_title')?.value;
+      if (title) setCategoriesTitle(title);
+    })();
   }, []);
 
   return (
@@ -233,64 +270,23 @@ const Index = () => {
       {/* Updated Categories Section */}
       <section className="py-16">
         <div className="container mx-auto px-2">
-          <h2 className="text-3xl font-bold text-left mb-10">Meie tooted</h2>
-          
+          <h2 className="text-3xl font-bold text-left mb-10">{categoriesTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                <img 
-                  src="https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop"
-                  alt="Riidest kotid"
-                  className="w-full h-full object-cover transition-all hover:scale-105"
-                />
+            {categories.map((cat, idx) => (
+              <div className="text-center" key={idx}>
+                <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                  <img
+                    src={cat.image || '/placeholder.svg'}
+                    alt={cat.name}
+                    className="w-full h-full object-cover transition-all hover:scale-105"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{cat.name}</h3>
+                <Button variant="link" asChild>
+                  <Link to={cat.link || '#'}>{cat.button}</Link>
+                </Button>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Riidest kotid</h3>
-              <Button variant="link" asChild>
-                <Link to="/riidest-kotid">Vaata tooteid</Link>
-              </Button>
-            </div>
-            
-            <div className="text-center">
-              <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                <img 
-                  src="https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop" 
-                  alt="Paberkotid"
-                  className="w-full h-full object-cover transition-all hover:scale-105"
-                />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Paberkotid</h3>
-              <Button variant="link" asChild>
-                <Link to="/paberkotid">Vaata tooteid</Link>
-              </Button>
-            </div>
-            
-            <div className="text-center">
-              <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                <img 
-                  src="https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop" 
-                  alt="Nööriga kotid"
-                  className="w-full h-full object-cover transition-all hover:scale-105"
-                />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Nööriga kotid</h3>
-              <Button variant="link" asChild>
-                <Link to="/nooriga-kotid">Vaata tooteid</Link>
-              </Button>
-            </div>
-            
-            <div className="text-center">
-              <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                <img 
-                  src="https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop" 
-                  alt="Sussikotid"
-                  className="w-full h-full object-cover transition-all hover:scale-105"
-                />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Sussikotid</h3>
-              <Button variant="link" asChild>
-                <Link to="/sussikotid">Vaata tooteid</Link>
-              </Button>
-            </div>
+            ))}
           </div>
         </div>
       </section>
