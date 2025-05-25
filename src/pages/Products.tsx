@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Phone, Mail, ChevronDown } from "lucide-react";
+import { Search, Phone, Mail, ChevronDown, Camera, Shield, Smile, Briefcase, Gift, Truck } from "lucide-react";
 import { getProducts, Product } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
@@ -174,6 +174,39 @@ const categoryFAQs = {
   ]
 };
 
+const guarantees = [
+  {
+    icon: Camera,
+    title: "Garanteerime parima hinna",
+    description: "Konkurentsivõimeline hinnapoliitika ja parimad pakkumised turul"
+  },
+  {
+    icon: Shield,
+    title: "Garanteerime hea kvaliteedi", 
+    description: "Kasutame ainult kvaliteetseid materjale ja kontrollitud tootmisprotsesse"
+  },
+  {
+    icon: Smile,
+    title: "Garanteerime rahulolu",
+    description: "Tagame klientide rahulolu ja professionaalse teeninduse"
+  },
+  {
+    icon: Briefcase,
+    title: "Garanteerime personaalse teeninduse",
+    description: "Individuaalne lähenemine ja personaalne nõustamine igale kliendile"
+  },
+  {
+    icon: Gift,
+    title: "Garanteerime näidised",
+    description: "Pakume tootenäidiseid, et saaksite kvaliteedis veenduda"
+  },
+  {
+    icon: Truck,
+    title: "Garanteerime õigeaegse kohaletoimetamise",
+    description: "Täpsed tarneajad ja usaldusväärne logistika"
+  }
+];
+
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
@@ -327,6 +360,38 @@ const Products = () => {
               </div>
             </section>
 
+            {/* Guarantees Section */}
+            <section className="mb-16">
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
+                  <p className="text-gray-600 max-w-4xl mx-auto">
+                    Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {guarantees.map((guarantee, index) => (
+                    <div key={index} className="flex items-start gap-4">
+                      <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                        <guarantee.icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                        <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-center mt-8">
+                  <Button variant="outline" size="lg">
+                    Täpsemalt Garantiidest
+                  </Button>
+                </div>
+              </div>
+            </section>
+
             {/* Blog Articles Section */}
             <section className="mb-16">
               <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
@@ -418,6 +483,38 @@ const Products = () => {
               </Button>
             </div>
           )}
+
+          {/* Guarantees Section */}
+          <section className="mt-16 mb-16">
+            <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
+                <p className="text-gray-600 max-w-4xl mx-auto">
+                  Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {guarantees.map((guarantee, index) => (
+                  <div key={index} className="flex items-start gap-4">
+                    <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                      <guarantee.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                      <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-8">
+                <Button variant="outline" size="lg">
+                  Täpsemalt Garantiidest
+                </Button>
+              </div>
+            </div>
+          </section>
 
           {/* Need Help Section */}
           <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
