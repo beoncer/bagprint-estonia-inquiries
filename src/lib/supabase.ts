@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co'
@@ -140,6 +141,27 @@ export async function getPopularProducts() {
 
 export async function getSiteContent() {
   try {
+    console.log('Attempting to fetch site content from Supabase...');
+    
+    // Try to fetch from website_content table first (more flexible structure)
+    const { data: contentData, error: contentError } = await supabase
+      .from('website_content')
+      .select('*');
+
+    if (!contentError && contentData) {
+      console.log('Fetched website_content data:', contentData);
+      
+      // Convert array to object for easier access
+      const contentObj: any = {};
+      contentData.forEach((item: any) => {
+        contentObj[item.key] = item.value || item.link;
+      });
+      
+      console.log('Converted content object:', contentObj);
+      return contentObj;
+    }
+
+    // Fallback to site_content table if it exists
     const { data, error } = await supabase
       .from('site_content')
       .select('*')
@@ -147,12 +169,15 @@ export async function getSiteContent() {
 
     if (error) {
       console.error('Error fetching site content:', error);
-      throw error;
+      console.log('Returning empty object as fallback');
+      return {};
     }
 
+    console.log('Fetched site_content data:', data);
     return data;
   } catch (err) {
     console.error('Unexpected error in getSiteContent:', err);
-    throw err;
+    console.log('Returning empty object as fallback');
+    return {};
   }
 }
