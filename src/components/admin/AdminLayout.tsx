@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, Outlet, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
@@ -58,6 +57,12 @@ const AdminLayout: React.FC = () => {
                 <Link to="/admin/products" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/products") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <ShoppingBag className="h-5 w-5" />
                   <span>Products</span>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/pages" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/pages") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <FileText className="h-5 w-5" />
+                  <span>Pages</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>

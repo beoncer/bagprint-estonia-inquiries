@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
-import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -340,199 +339,76 @@ const Products = () => {
 
   if (loading) {
     return (
-      <Layout>
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-200 h-96 rounded"></div>
-              ))}
-            </div>
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-gray-200 h-96 rounded"></div>
+            ))}
           </div>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Layout>
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Error</h2>
-          <p className="text-red-600 mb-8">{error}</p>
-          <Button onClick={handleRetry}>
-            Try Again
-          </Button>
-        </div>
-      </Layout>
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
+        <h2 className="text-2xl font-bold mb-4">Error</h2>
+        <p className="text-red-600 mb-8">{error}</p>
+        <Button onClick={handleRetry}>
+          Try Again
+        </Button>
+      </div>
     );
   }
 
   // Show category listing only for /tooted page
   if (location.pathname === "/tooted") {
     return (
-      <Layout>
-        <div className="bg-gray-50 py-10">
-          <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-            <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
-            <p className="text-gray-600 mb-8">
-              Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
-            </p>
-
-            {/* Product Categories Section */}
-            <section className="mb-16">
-              <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {productCategories.map((category) => (
-                  <Link key={category.id} to={category.link} className="text-center group">
-                    <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                      <img 
-                        src={category.image}
-                        alt={category.name}
-                        className="w-full h-full object-cover transition-all group-hover:scale-105"
-                        onError={(e) => {
-                          console.log(`Image error for category ${category.id}`);
-                          console.log(`Failed image URL: ${category.image}`);
-                          console.log('Falling back to default image');
-                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop";
-                        }}
-                        onLoad={() => {
-                          console.log(`Image loaded successfully for category ${category.id}: ${category.image}`);
-                        }}
-                      />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                      {category.name}
-                    </h3>
-                    <Button variant="link" className="p-0">
-                      Vaata tooteid
-                    </Button>
-                  </Link>
-                ))}
-              </div>
-            </section>
-
-            {/* Guarantees Section */}
-            <section className="mb-16">
-              <div className="bg-white rounded-lg shadow-sm p-8">
-                <div className="text-center mb-10">
-                  <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
-                  <p className="text-gray-600 max-w-4xl mx-auto">
-                    Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {guarantees.map((guarantee, index) => (
-                    <div key={index} className="flex items-start gap-4">
-                      <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                        <guarantee.icon className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
-                        <p className="text-gray-600 text-sm">{guarantee.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
-
-            {/* Blog Articles Section */}
-            <section className="mb-16">
-              <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {blogArticles.map((article) => (
-                  <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="h-48 overflow-hidden">
-                      <img 
-                        src={article.image}
-                        alt={article.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">{article.readTime} lugemist</span>
-                        <Button variant="link" size="sm" className="p-0">
-                          Loe edasi
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
-  // Show filtered products for category pages
-  const categoryTitle = {
-    cotton_bag: "Riidest kotid",
-    paper_bag: "Paberkotid", 
-    drawstring_bag: "Nööriga kotid",
-    shoebag: "Sussikotid"
-  }[activeCategory] || "Tooted";
-
-  const categoryDescription = {
-    cotton_bag: "riidest kottide",
-    paper_bag: "paberkottide",
-    drawstring_bag: "nööriga kottide", 
-    shoebag: "sussikottide"
-  }[activeCategory] || "toodete";
-
-  return (
-    <Layout>
       <div className="bg-gray-50 py-10">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <h1 className="text-3xl font-bold mb-4">{categoryTitle}</h1>
+          <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
           <p className="text-gray-600 mb-8">
-            Vaata meie {categoryDescription} valikut.
+            Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
           </p>
-          
-          {/* Search */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
-            <div className="w-full md:w-auto">
-              <form onSubmit={handleSearch} className="relative">
-                <Input
-                  type="text"
-                  placeholder="Otsi tooteid..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              </form>
+
+          {/* Product Categories Section */}
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {productCategories.map((category) => (
+                <Link key={category.id} to={category.link} className="text-center group">
+                  <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                    <img 
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-all group-hover:scale-105"
+                      onError={(e) => {
+                        console.log(`Image error for category ${category.id}`);
+                        console.log(`Failed image URL: ${category.image}`);
+                        console.log('Falling back to default image');
+                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop";
+                      }}
+                      onLoad={() => {
+                        console.log(`Image loaded successfully for category ${category.id}: ${category.image}`);
+                      }}
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                    {category.name}
+                  </h3>
+                  <Button variant="link" className="p-0">
+                    Vaata tooteid
+                  </Button>
+                </Link>
+              ))}
             </div>
-          </div>
-          
-          {/* Results */}
-          {filteredProducts.length > 0 ? (
-            <>
-              <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
-              <ProductGrid products={filteredProducts} />
-            </>
-          ) : (
-            <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
-              <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
-              <Button onClick={() => {
-                setSearchTerm("");
-                handleCategoryChange("all");
-              }}>
-                Näita kõiki tooteid
-              </Button>
-            </div>
-          )}
+          </section>
 
           {/* Guarantees Section */}
-          <section className="mt-16 mb-16">
+          <section className="mb-16">
             <div className="bg-white rounded-lg shadow-sm p-8">
               <div className="text-center mb-10">
                 <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
@@ -557,55 +433,170 @@ const Products = () => {
             </div>
           </section>
 
-          {/* Need Help Section */}
-          <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
-            <h2 className="text-3xl font-bold mb-4">Küsimusi?</h2>
-            <h3 className="text-2xl font-medium mb-8">Aitame teid rõõmuga!</h3>
-            
-            <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-3 rounded-full">
-                  <Phone className="h-6 w-6" />
+          {/* Blog Articles Section */}
+          <section className="mb-16">
+            <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {blogArticles.map((article) => (
+                <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">{article.readTime} lugemist</span>
+                      <Button variant="link" size="sm" className="p-0">
+                        Loe edasi
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <div className="text-xl font-semibold">+372 5919 7172</div>
-                  <div className="text-sm opacity-90">Ootame kõnet tööpäeviti 9.00-17.00</div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="bg-white/20 p-3 rounded-full">
-                  <Mail className="h-6 w-6" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xl font-semibold">Vajad abi?</div>
-                  <div className="text-sm opacity-90">Võtke meiega ühendust e-posti teel</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section className="mt-16 mb-16">
-            <h2 className="text-2xl font-bold mb-8">Tellimisprotsess</h2>
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <Accordion type="single" collapsible className="w-full">
-                {categoryFAQs[activeCategory as keyof typeof categoryFAQs]?.map((faq, index) => (
-                  <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-b-0">
-                    <AccordionTrigger className="text-left hover:no-underline py-4">
-                      <span className="font-medium">{faq.question}</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-4 text-gray-600">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              ))}
             </div>
           </section>
         </div>
       </div>
-    </Layout>
+    );
+  }
+
+  // Show filtered products for category pages
+  const categoryTitle = {
+    cotton_bag: "Riidest kotid",
+    paper_bag: "Paberkotid", 
+    drawstring_bag: "Nööriga kotid",
+    shoebag: "Sussikotid"
+  }[activeCategory] || "Tooted";
+
+  const categoryDescription = {
+    cotton_bag: "riidest kottide",
+    paper_bag: "paberkottide",
+    drawstring_bag: "nööriga kottide", 
+    shoebag: "sussikottide"
+  }[activeCategory] || "toodete";
+
+  return (
+    <div className="bg-gray-50 py-10">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+        <h1 className="text-3xl font-bold mb-4">{categoryTitle}</h1>
+        <p className="text-gray-600 mb-8">
+          Vaata meie {categoryDescription} valikut.
+        </p>
+        
+        {/* Search */}
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
+          <div className="w-full md:w-auto">
+            <form onSubmit={handleSearch} className="relative">
+              <Input
+                type="text"
+                placeholder="Otsi tooteid..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2"
+              />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            </form>
+          </div>
+        </div>
+        
+        {/* Results */}
+        {filteredProducts.length > 0 ? (
+          <>
+            <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
+            <ProductGrid products={filteredProducts} />
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
+            <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
+            <Button onClick={() => {
+              setSearchTerm("");
+              handleCategoryChange("all");
+            }}>
+              Näita kõiki tooteid
+            </Button>
+          </div>
+        )}
+
+        {/* Guarantees Section */}
+        <section className="mt-16 mb-16">
+          <div className="bg-white rounded-lg shadow-sm p-8">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
+              <p className="text-gray-600 max-w-4xl mx-auto">
+                Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {guarantees.map((guarantee, index) => (
+                <div key={index} className="flex items-start gap-4">
+                  <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                    <guarantee.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                    <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Need Help Section */}
+        <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
+          <h2 className="text-3xl font-bold mb-4">Küsimusi?</h2>
+          <h3 className="text-2xl font-medium mb-8">Aitame teid rõõmuga!</h3>
+          
+          <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-full">
+                <Phone className="h-6 w-6" />
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-semibold">+372 5919 7172</div>
+                <div className="text-sm opacity-90">Ootame kõnet tööpäeviti 9.00-17.00</div>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className="bg-white/20 p-3 rounded-full">
+                <Mail className="h-6 w-6" />
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-semibold">Vajad abi?</div>
+                <div className="text-sm opacity-90">Võtke meiega ühendust e-posti teel</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="mt-16 mb-16">
+          <h2 className="text-2xl font-bold mb-8">Tellimisprotsess</h2>
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <Accordion type="single" collapsible className="w-full">
+              {categoryFAQs[activeCategory as keyof typeof categoryFAQs]?.map((faq, index) => (
+                <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-b-0">
+                  <AccordionTrigger className="text-left hover:no-underline py-4">
+                    <span className="font-medium">{faq.question}</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-4 text-gray-600">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      </div>
+    </div>
   );
 };
 

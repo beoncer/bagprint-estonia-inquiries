@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -52,173 +51,167 @@ const ProductDetail = () => {
   
   if (loading) {
     return (
-      <Layout>
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <div className="bg-gray-200 h-96 rounded"></div>
-              <div>
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3 mb-6"></div>
-                <div className="h-10 bg-gray-200 rounded w-1/3 mb-4"></div>
-              </div>
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="bg-gray-200 h-96 rounded"></div>
+            <div>
+              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-6"></div>
+              <div className="h-10 bg-gray-200 rounded w-1/3 mb-4"></div>
             </div>
           </div>
         </div>
-      </Layout>
+      </div>
     );
   }
   
   if (!product) {
     return (
-      <Layout>
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
-          <h2 className="text-2xl font-bold mb-4">Toodet ei leitud</h2>
-          <p className="mb-8">Kahjuks ei leidnud me otsitud toodet. Proovige vaadata teisi tooteid.</p>
-          <Button asChild>
-            <Link to="/products">Tagasi toodete juurde</Link>
-          </Button>
-        </div>
-      </Layout>
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
+        <h2 className="text-2xl font-bold mb-4">Toodet ei leitud</h2>
+        <p className="mb-8">Kahjuks ei leidnud me otsitud toodet. Proovige vaadata teisi tooteid.</p>
+        <Button asChild>
+          <Link to="/products">Tagasi toodete juurde</Link>
+        </Button>
+      </div>
     );
   }
 
   return (
-    <Layout>
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
-        {/* Breadcrumbs */}
-        <div className="text-sm text-gray-500 mb-6">
-          <Link to="/" className="hover:text-primary">Avaleht</Link>
-          <span className="mx-2">/</span>
-          <Link to="/products" className="hover:text-primary">Tooted</Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900">{product.name}</span>
+    <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
+      {/* Breadcrumbs */}
+      <div className="text-sm text-gray-500 mb-6">
+        <Link to="/" className="hover:text-primary">Avaleht</Link>
+        <span className="mx-2">/</span>
+        <Link to="/products" className="hover:text-primary">Tooted</Link>
+        <span className="mx-2">/</span>
+        <span className="text-gray-900">{product.name}</span>
+      </div>
+      
+      {/* Product Details */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* Product Images */}
+        <div>
+          <div className="mb-4 aspect-square overflow-hidden rounded-lg">
+            <img 
+              src={selectedImage || product.image} 
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
         </div>
         
-        {/* Product Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Product Images */}
-          <div>
-            <div className="mb-4 aspect-square overflow-hidden rounded-lg">
-              <img 
-                src={selectedImage || product.image} 
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
+        {/* Product Info and Calculator */}
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
+          <p className="text-gray-700 mb-2">{product.description}</p>
+          <p className="text-gray-500 mb-2">Kategooria: {product.category}</p>
+          <p className="text-primary font-medium mb-6">Alates {product.startingPrice !== undefined ? product.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}</p>
+          
+          {/* Price Calculator */}
+          <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
+            <h3 className="text-xl font-semibold mb-4">Arvuta hind</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="quantity" className="mb-2 block">Kogus</Label>
+                <Input 
+                  id="quantity" 
+                  type="number" 
+                  min="50" 
+                  value={quantity} 
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="print-colors" className="mb-2 block">Trüki värvid</Label>
+                <Select 
+                  value={printColors.toString()} 
+                  onValueChange={(value) => setPrintColors(Number(value))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Vali värvide arv" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Ilma trükita</SelectItem>
+                    <SelectItem value="1">1 värv</SelectItem>
+                    <SelectItem value="2">2 värvi</SelectItem>
+                    <SelectItem value="3">3 värvi</SelectItem>
+                    <SelectItem value="4">4 värvi</SelectItem>
+                    <SelectItem value="5">5 värvi</SelectItem>
+                    <SelectItem value="6">6 värvi</SelectItem>
+                    <SelectItem value="7">7 värvi</SelectItem>
+                    <SelectItem value="8">8 värvi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="border-t pt-4 mt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span>Hind/tk:</span>
+                  <span className="font-medium">{pricePerItem.toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-medium">Kokku:</span>
+                  <span className="text-xl font-bold text-primary">{calculatedPrice.toFixed(2)} €</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">* Hinnad on indikatiivsed ja ei sisalda käibemaksu</p>
+              </div>
             </div>
           </div>
           
-          {/* Product Info and Calculator */}
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-            <p className="text-gray-700 mb-2">{product.description}</p>
-            <p className="text-gray-500 mb-2">Kategooria: {product.category}</p>
-            <p className="text-primary font-medium mb-6">Alates {product.startingPrice !== undefined ? product.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}</p>
-            
-            {/* Price Calculator */}
-            <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
-              <h3 className="text-xl font-semibold mb-4">Arvuta hind</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="quantity" className="mb-2 block">Kogus</Label>
-                  <Input 
-                    id="quantity" 
-                    type="number" 
-                    min="50" 
-                    value={quantity} 
-                    onChange={(e) => setQuantity(Number(e.target.value))}
-                    className="w-full"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="print-colors" className="mb-2 block">Trüki värvid</Label>
-                  <Select 
-                    value={printColors.toString()} 
-                    onValueChange={(value) => setPrintColors(Number(value))}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Vali värvide arv" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="0">Ilma trükita</SelectItem>
-                      <SelectItem value="1">1 värv</SelectItem>
-                      <SelectItem value="2">2 värvi</SelectItem>
-                      <SelectItem value="3">3 värvi</SelectItem>
-                      <SelectItem value="4">4 värvi</SelectItem>
-                      <SelectItem value="5">5 värvi</SelectItem>
-                      <SelectItem value="6">6 värvi</SelectItem>
-                      <SelectItem value="7">7 värvi</SelectItem>
-                      <SelectItem value="8">8 värvi</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="border-t pt-4 mt-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span>Hind/tk:</span>
-                    <span className="font-medium">{pricePerItem.toFixed(2)} €</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">Kokku:</span>
-                    <span className="text-xl font-bold text-primary">{calculatedPrice.toFixed(2)} €</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">* Hinnad on indikatiivsed ja ei sisalda käibemaksu</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-6">
-              <Button size="lg" className="w-full md:w-auto" asChild>
-                <Link to={`/inquiry?product=${product.id}&quantity=${quantity}&colors=${printColors}`}>
-                  Küsi pakkumist
-                </Link>
-              </Button>
-            </div>
+          <div className="space-y-6">
+            <Button size="lg" className="w-full md:w-auto" asChild>
+              <Link to={`/inquiry?product=${product.id}&quantity=${quantity}&colors=${printColors}`}>
+                Küsi pakkumist
+              </Link>
+            </Button>
           </div>
         </div>
-        
-        {/* Product Specifications */}
-        {/*
-        <div className="mt-16">
-          <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <table className="w-full">
-                <tbody>
-                  {Object.entries(product.specifications).map(([key, value]) => {
-                    if (key !== 'colors') {
-                      return (
-                        <tr key={key} className="border-b">
-                          <td className="py-3 font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                          <td className="py-3">{value as string}</td>
-                        </tr>
-                      );
-                    }
-                    return null;
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <div>
-              <h4 className="font-medium mb-2">Saadaval värvid:</h4>
-              <div className="flex flex-wrap gap-2">
-                {product.specifications.colors.map((color: string) => (
-                  <span key={color} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                    {color}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        */}
       </div>
-    </Layout>
+      
+      {/* Product Specifications */}
+      {/*
+      <div className="mt-16">
+        <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <table className="w-full">
+              <tbody>
+                {Object.entries(product.specifications).map(([key, value]) => {
+                  if (key !== 'colors') {
+                    return (
+                      <tr key={key} className="border-b">
+                        <td className="py-3 font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                        <td className="py-3">{value as string}</td>
+                      </tr>
+                    );
+                  }
+                  return null;
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h4 className="font-medium mb-2">Saadaval värvid:</h4>
+            <div className="flex flex-wrap gap-2">
+              {product.specifications.colors.map((color: string) => (
+                <span key={color} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
+                  {color}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      */}
+    </div>
   );
 };
 

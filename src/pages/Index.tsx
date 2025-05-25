@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import Layout from "@/components/layout/Layout";
 import ProductGrid from "@/components/product/ProductGrid";
 import { getPopularProducts, Product, supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
@@ -110,6 +109,30 @@ const fetchProductCategoriesContent = async () => {
   return data;
 };
 
+// Add fetchCtaContent function after fetchProductCategoriesContent
+const fetchCtaContent = async () => {
+  const { data, error } = await supabase
+    .from("website_content")
+    .select("key, value, link")
+    .eq("page", "home")
+    .in("key", ["cta_title", "cta_description", "cta_button_text", "cta_button_link"]);
+  if (error) throw error;
+  const content = {
+    cta_title: "Valmis alustama?",
+    cta_description: "Võta meiega ühendust ja leiame just teile sobiva lahenduse.",
+    cta_button_text: "Küsi pakkumist",
+    cta_button_link: "/inquiry"
+  };
+  data?.forEach(item => {
+    if (item.key === "cta_button_link") {
+      content.cta_button_link = item.value || item.link || "/inquiry";
+    } else {
+      content[item.key] = item.value;
+    }
+  });
+  return content;
+};
+
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,6 +140,13 @@ const Index = () => {
   // Add state for categories
   const [categories, setCategories] = useState<any[]>([]);
   const [categoriesTitle, setCategoriesTitle] = useState<string>('Meie tooted');
+  // Add CTA content state
+  const [ctaContent, setCtaContent] = useState({
+    cta_title: "Valmis alustama?",
+    cta_description: "Võta meiega ühendust ja leiame just teile sobiva lahenduse.",
+    cta_button_text: "Küsi pakkumist",
+    cta_button_link: "/inquiry"
+  });
 
   // Use React Query for hero content
   const { data: heroContent, isLoading: isHeroLoading, error: heroError } = useQuery({
@@ -162,8 +192,12 @@ const Index = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    fetchCtaContent().then(setCtaContent);
+  }, []);
+
   return (
-    <Layout>
+    <>
       {/* Hero Section */}
       <section className="py-6">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
@@ -320,17 +354,19 @@ const Index = () => {
       <section className="bg-primary py-16">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
-            Valmis alustama?
+            {ctaContent.cta_title}
           </h2>
           <p className="text-white text-lg mb-8 max-w-2xl mx-auto">
-            Võta meiega ühendust ja leiame just teile sobiva lahenduse.
+            {ctaContent.cta_description}
           </p>
           <Button variant="secondary" size="lg" asChild>
-            <Link to="/inquiry">Küsi pakkumist</Link>
+            <Link to={ctaContent.cta_button_link || "/inquiry"}>
+              {ctaContent.cta_button_text}
+            </Link>
           </Button>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

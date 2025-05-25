@@ -57,11 +57,8 @@ const ContentPage: React.FC = () => {
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
-
-  useEffect(() => {
-    fetchContentItems();
-    loadPageOptions();
-  }, []);
+  const [pageFilter, setPageFilter] = useState<string>("all");
+  const [contentKeyOptions, setContentKeyOptions] = useState<string[]>([]);
 
   const loadPageOptions = async () => {
     const options = await fetchPages();
@@ -85,6 +82,17 @@ const ContentPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchContentKeyOptions = async () => {
+    const { data, error } = await supabase
+      .from("website_content")
+      .select("key")
+      .order("key", { ascending: true });
+    if (!error && data) {
+      const uniqueKeys = Array.from(new Set(data.map((item: any) => item.key)));
+      setContentKeyOptions(uniqueKeys);
     }
   };
 
@@ -270,10 +278,45 @@ const ContentPage: React.FC = () => {
     });
   };
 
+  // Filtered content items by page
+  const filteredContentItems = pageFilter === "all"
+    ? contentItems
+    : contentItems.filter((item) => item.page === pageFilter);
+
+  // Get unique page values for filter dropdown
+  const uniquePages = Array.from(new Set(contentItems.map((item) => item.page)));
+
+  useEffect(() => {
+    fetchContentItems();
+    loadPageOptions();
+    fetchContentKeyOptions();
+  }, []);
+
+  useEffect(() => {
+    if (isDialogOpen && !formData.key && contentKeyOptions.length > 0) {
+      setFormData((prev) => ({ ...prev, key: contentKeyOptions[0] }));
+    }
+    // eslint-disable-next-line
+  }, [isDialogOpen, contentKeyOptions]);
+
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold">Website Content</h1>
+        <div className="flex items-center gap-2">
+          <label htmlFor="page-filter" className="text-sm font-medium">Filter by page:</label>
+          <Select value={pageFilter} onValueChange={setPageFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="All pages" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All pages</SelectItem>
+              {uniquePages.map((page) => (
+                <SelectItem key={page} value={page}>{page}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-red-600 hover:bg-red-700">
@@ -292,11 +335,27 @@ const ContentPage: React.FC = () => {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <label htmlFor="key">Content Key</label>
+                <Select
+                  value={formData.key || ""}
+                  onValueChange={(value) => setFormData({ ...formData, key: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select or type a key" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {contentKeyOptions
+                      .filter(key => typeof key === "string" && key.trim() !== "")
+                      .map((key) => (
+                        <SelectItem key={key} value={key}>{key}</SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
                 <Input
                   id="key"
                   value={formData.key}
                   onChange={(e) => setFormData({ ...formData, key: e.target.value })}
                   placeholder="Example: homepage_title"
+                  className="mt-2"
                 />
                 <p className="text-sm text-gray-500">
                   The key is a unique identifier used to display content on the page.
@@ -385,14 +444,14 @@ const ContentPage: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {contentItems.length === 0 ? (
+              {filteredContentItems.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-6 text-gray-500">
                     No content items added
                   </TableCell>
                 </TableRow>
               ) : (
-                contentItems.map((item) => (
+                filteredContentItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.key}</TableCell>
                     <TableCell>{item.page}</TableCell>
