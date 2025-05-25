@@ -383,12 +383,6 @@ const Products = () => {
                     </div>
                   ))}
                 </div>
-
-                <div className="text-center mt-8">
-                  <Button variant="outline" size="lg">
-                    Täpsemalt Garantiidest
-                  </Button>
-                </div>
               </div>
             </section>
 
@@ -506,12 +500,6 @@ const Products = () => {
                     </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="text-center mt-8">
-                <Button variant="outline" size="lg">
-                  Täpsemalt Garantiidest
-                </Button>
               </div>
             </div>
           </section>

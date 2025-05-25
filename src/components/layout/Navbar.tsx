@@ -69,7 +69,7 @@ const Navbar = () => {
                 ))
               )}
               <Button asChild>
-                <Link to="/inquiry">
+                <Link to="/paring">
                   Küsi pakkumist
                 </Link>
               </Button>
@@ -110,7 +110,7 @@ const Navbar = () => {
                 )}
                 <Button asChild className="w-full mt-2">
                   <Link 
-                    to="/inquiry" 
+                    to="/paring" 
                     onClick={() => setIsOpen(false)}
                   >
                     Küsi pakkumist
