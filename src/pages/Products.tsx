@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -200,116 +201,110 @@ const Products = () => {
     );
   }
 
-  return (
-    <Layout>
-      <div className="bg-gray-50 py-10">
-        <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
-          <p className="text-gray-600 mb-8">
-            Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
-          </p>
+  // Show category listing only for /tooted page
+  if (location.pathname === "/tooted") {
+    return (
+      <Layout>
+        <div className="bg-gray-50 py-10">
+          <div className="container mx-auto px-4">
+            <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
+            <p className="text-gray-600 mb-8">
+              Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
+            </p>
 
-          {/* Product Categories Section */}
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {productCategories.map((category) => (
-                <Link key={category.id} to={category.link} className="text-center group">
-                  <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                    <img 
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover transition-all group-hover:scale-105"
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {category.name}
-                  </h3>
-                  <Button variant="link" className="p-0">
-                    Vaata tooteid
-                  </Button>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Blog Articles Section */}
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {blogArticles.map((article) => (
-                <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-48 overflow-hidden">
-                    <img 
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">{article.readTime} lugemist</span>
-                      <Button variant="link" size="sm" className="p-0">
-                        Loe edasi
-                      </Button>
+            {/* Product Categories Section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {productCategories.map((category) => (
+                  <Link key={category.id} to={category.link} className="text-center group">
+                    <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                      <img 
+                        src={category.image}
+                        alt={category.name}
+                        className="w-full h-full object-cover transition-all group-hover:scale-105"
+                      />
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-          
-          {/* Search and Filter Section */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
-            <div className="flex flex-col md:flex-row justify-between gap-6">
-              {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Link
-                    key={category.id}
-                    to={categoryPrettyUrlMap[category.id] || "/tooted"}
-                  >
-                    <Button
-                      variant={activeCategory === category.id ? "default" : "outline"}
-                    >
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
                       {category.name}
+                    </h3>
+                    <Button variant="link" className="p-0">
+                      Vaata tooteid
                     </Button>
                   </Link>
                 ))}
               </div>
-              
-              {/* Search */}
-              <div className="w-full md:w-auto">
-                <form onSubmit={handleSearch} className="relative">
-                  <Input
-                    type="text"
-                    placeholder="Otsi tooteid..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 pr-4 py-2"
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                </form>
+            </section>
+
+            {/* Blog Articles Section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {blogArticles.map((article) => (
+                  <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="h-48 overflow-hidden">
+                      <img 
+                        src={article.image}
+                        alt={article.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">{article.readTime} lugemist</span>
+                        <Button variant="link" size="sm" className="p-0">
+                          Loe edasi
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </section>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Show filtered products for category pages
+  return (
+    <Layout>
+      <div className="bg-gray-50 py-10">
+        <div className="container mx-auto px-4">
+          <h1 className="text-3xl font-bold mb-4">
+            {activeCategory === "cotton_bag" && "Riidest kotid"}
+            {activeCategory === "paper_bag" && "Paberkotid"}
+            {activeCategory === "drawstring_bag" && "Nööriga kotid"}
+            {activeCategory === "shoebag" && "Sussikotid"}
+          </h1>
+          <p className="text-gray-600 mb-8">
+            Vaata meie {activeCategory === "cotton_bag" && "riidest kottide"}
+            {activeCategory === "paper_bag" && "paberkottide"}
+            {activeCategory === "drawstring_bag" && "nööriga kottide"}
+            {activeCategory === "shoebag" && "sussikottide"} valikut.
+          </p>
+          
+          {/* Search */}
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
+            <div className="w-full md:w-auto">
+              <form onSubmit={handleSearch} className="relative">
+                <Input
+                  type="text"
+                  placeholder="Otsi tooteid..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              </form>
             </div>
           </div>
           
           {/* Results */}
-          {loading ? (
-            <div className="flex justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-red-600"></div>
-            </div>
-          ) : error ? (
-            <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">{error}</h3>
-              <p className="text-gray-600 mb-6">Andmete laadimisel tekkis viga. Proovige uuesti.</p>
-              <Button onClick={handleRetry}>
-                Proovi uuesti
-              </Button>
-            </div>
-          ) : filteredProducts.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             <>
               <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
               <ProductGrid products={filteredProducts} />
