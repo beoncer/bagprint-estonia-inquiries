@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -68,82 +67,52 @@ const Contact = () => {
   };
   
   return (
-    <Layout>
-      <div className="bg-gray-50 py-16">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2">Võta meiega ühendust</h1>
-            <p className="text-gray-600 mb-10">
-              Kui sul on küsimusi meie toodete, hindade või muu kohta, 
-              siis võta meiega ühendust ja aitame sind parima meelega.
-            </p>
+    <div className="bg-gray-50 py-16">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2">Võta meiega ühendust</h1>
+          <p className="text-gray-600 mb-10">
+            Kui sul on küsimusi meie toodete, hindade või muu kohta, 
+            siis võta meiega ühendust ja aitame sind parima meelega.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold mb-2">E-post</h3>
+                <p className="text-gray-600">info@bagprint.ee</p>
+              </CardContent>
+            </Card>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">E-post</h3>
-                  <p className="text-gray-600">info@bagprint.ee</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">Telefon</h3>
-                  <p className="text-gray-600">+372 123 4567</p>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold mb-2">Aadress</h3>
-                  <p className="text-gray-600">Kaupmehe 10, Tallinn</p>
-                </CardContent>
-              </Card>
-            </div>
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold mb-2">Telefon</h3>
+                <p className="text-gray-600">+372 123 4567</p>
+              </CardContent>
+            </Card>
             
-            <div className="bg-white p-8 rounded-lg shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Saada meile sõnum</h2>
-              
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nimi *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Teie nimi" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>E-post *</FormLabel>
-                          <FormControl>
-                            <Input placeholder="teie@email.ee" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold mb-2">Aadress</h3>
+                <p className="text-gray-600">Kaupmehe 10, Tallinn</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="bg-white p-8 rounded-lg shadow-sm">
+            <h2 className="text-2xl font-bold mb-6">Saada meile sõnum</h2>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="phone"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Telefon *</FormLabel>
+                        <FormLabel>Nimi *</FormLabel>
                         <FormControl>
-                          <Input placeholder="+372 ..." {...field} />
+                          <Input placeholder="Teie nimi" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -152,28 +121,56 @@ const Contact = () => {
 
                   <FormField
                     control={form.control}
-                    name="message"
+                    name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Sõnum *</FormLabel>
+                        <FormLabel>E-post *</FormLabel>
                         <FormControl>
-                          <Textarea 
-                            placeholder="Kuidas saame teid aidata?"
-                            className="min-h-[150px]"
-                            {...field} 
-                          />
+                          <Input placeholder="teie@email.ee" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                </div>
 
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Saadan..." : "Saada sõnum"}
-                  </Button>
-                </form>
-              </Form>
-            </div>
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefon *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+372 ..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sõnum *</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Kuidas saame teid aidata?"
+                          className="min-h-[150px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Saadan..." : "Saada sõnum"}
+                </Button>
+              </form>
+            </Form>
           </div>
         </div>
       </div>
@@ -191,7 +188,7 @@ const Contact = () => {
           title="bagprint.ee location"
         />
       </div>
-    </Layout>
+    </div>
   );
 };
 
