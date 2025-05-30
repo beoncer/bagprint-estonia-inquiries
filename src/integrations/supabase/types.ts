@@ -18,7 +18,6 @@ export type Database = {
           slug: string
           sort_order: number | null
           updated_at: string | null
-          url_en: string
           url_et: string
           visible: boolean | null
         }
@@ -30,7 +29,6 @@ export type Database = {
           slug: string
           sort_order?: number | null
           updated_at?: string | null
-          url_en: string
           url_et: string
           visible?: boolean | null
         }
@@ -42,7 +40,6 @@ export type Database = {
           slug?: string
           sort_order?: number | null
           updated_at?: string | null
-          url_en?: string
           url_et?: string
           visible?: boolean | null
         }

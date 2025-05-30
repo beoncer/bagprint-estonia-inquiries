@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,7 @@ import Contact from "./pages/Contact";
 import Inquiry from "./pages/Inquiry";
 import NotFound from "./pages/NotFound";
 import Meist from "./pages/Meist";
+import Portfolio from "./pages/Portfolio";
 // Admin imports
 import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -45,6 +47,7 @@ const App = () => (
             <Route path="/kontakt" element={<Contact />} />
             <Route path="/paring" element={<Inquiry />} />
             <Route path="/meist" element={<Meist />} />
+            <Route path="/portfoolio" element={<Portfolio />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           {/* Admin Routes */}

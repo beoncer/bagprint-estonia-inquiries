@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { Phone, Mail, MapPin } from "lucide-react";
 
@@ -47,20 +48,20 @@ const Footer = () => {
               </li>
               <li>
                 <Link 
-                  to="/riidest-kotid" 
+                  to="/portfoolio" 
                   className="text-gray-400 hover:text-white transition-colors"
-                  onClick={() => handleLinkClick('/riidest-kotid')}
+                  onClick={() => handleLinkClick('/portfoolio')}
                 >
-                  Riidest kotid
+                  Portfoolio
                 </Link>
               </li>
               <li>
                 <Link 
-                  to="/paberkotid" 
+                  to="/meist" 
                   className="text-gray-400 hover:text-white transition-colors"
-                  onClick={() => handleLinkClick('/paberkotid')}
+                  onClick={() => handleLinkClick('/meist')}
                 >
-                  Paberkotid
+                  Meist
                 </Link>
               </li>
               <li>
