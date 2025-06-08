@@ -97,6 +97,9 @@ const Navbar = () => {
                   Küsi pakkumist
                 </Link>
               </Button>
+              <Link to="/portfoolio" className="text-gray-300 hover:text-white transition-colors">
+                Tehtud tööd
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -143,6 +146,9 @@ const Navbar = () => {
                     Küsi pakkumist
                   </Link>
                 </Button>
+                <Link to="/portfoolio" className="py-2 hover:text-primary transition-colors px-4">
+                  Tehtud tööd
+                </Link>
               </div>
             </div>
           )}

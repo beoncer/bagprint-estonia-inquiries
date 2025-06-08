@@ -1,75 +1,52 @@
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-// Mock portfolio data - in a real app, this would come from Supabase
-const portfolioItems = [
-  {
-    id: 1,
-    title: "Restoran Noa puuvillakotid",
-    category: "riidest-kotid",
-    image: "/placeholder.svg",
-    description: "Elegantsed puuvillakotid restoranile Noa, mis rõhutavad brändi kvaliteeti ja stiili.",
-    tags: ["Puuvill", "Logo trükk", "Premium"],
-  },
-  {
-    id: 2,
-    title: "IT-ettevõtte paberkotid",
-    category: "paberkotid",
-    image: "/placeholder.svg",
-    description: "Minimalistlikud paberkotid IT-ettevõttele konverentside ja ürituste jaoks.",
-    tags: ["Kraft paber", "Minimalism", "Öko"],
-  },
-  {
-    id: 3,
-    title: "Spordiklubi paelaga kotid",
-    category: "nooriga-kotid",
-    image: "/placeholder.svg",
-    description: "Praktilised paelaga kotid spordiklubile, mis sobivad igapäevaseks kasutamiseks.",
-    tags: ["Sport", "Värviline", "Praktiline"],
-  },
-  {
-    id: 4,
-    title: "Hotelli sussikotid",
-    category: "sussikotid",
-    image: "/placeholder.svg",
-    description: "Luksuslikud sussikotid hotellile, mis pakuvad külalistele mugavust.",
-    tags: ["Hotell", "Premium", "Mugav"],
-  },
-  {
-    id: 5,
-    title: "Raamatupoodi kotid",
-    category: "riidest-kotid",
-    image: "/placeholder.svg",
-    description: "Tugevad puuvillakotid raamatupoe klientidele, mis kannavad raskeid raamatuid.",
-    tags: ["Tugev", "Raamatud", "Vastupidav"],
-  },
-  {
-    id: 6,
-    title: "Kohviku paberkotid",
-    category: "paberkotid",
-    image: "/placeholder.svg",
-    description: "Sõbralikud paberkotid kohvikule, mis rõhutavad kohaliku äri tähtsust.",
-    tags: ["Kohvik", "Kohalik", "Sõbralik"],
-  },
-];
-
-const categories = [
-  { id: "all", name: "Kõik projektid", slug: "all" },
-  { id: "riidest-kotid", name: "Riidest kotid", slug: "riidest-kotid" },
-  { id: "paberkotid", name: "Paberkotid", slug: "paberkotid" },
-  { id: "nooriga-kotid", name: "Paelaga kotid", slug: "nooriga-kotid" },
-  { id: "sussikotid", name: "Sussikotid", slug: "sussikotid" },
-];
+interface PortfolioItem {
+  id: string;
+  title: string;
+  category: string;
+  image_url: string;
+  description: string;
+  tags: string; // comma separated
+}
 
 const Portfolio: React.FC = () => {
+  const [items, setItems] = useState<PortfolioItem[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
-  const filteredItems = portfolioItems.filter(item => 
-    activeFilter === "all" || item.category === activeFilter
+  useEffect(() => {
+    const fetchItems = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("portfolio")
+        .select("id, title, category, image_url, description, tags")
+        .eq("visible", true)
+        .order("order", { ascending: true });
+      if (!error && data) setItems(data);
+      setLoading(false);
+    };
+    fetchItems();
+  }, []);
+
+  // Get unique categories from data
+  const categories = [
+    { id: "all", name: "Kõik projektid", slug: "all" },
+    ...Array.from(
+      new Map(
+        items.map((item) => [item.category, { id: item.category, name: item.category, slug: item.category }])
+      ).values()
+    ),
+  ];
+
+  const filteredItems = items.filter(
+    (item) => activeFilter === "all" || item.category === activeFilter
   );
 
   return (
@@ -104,48 +81,43 @@ const Portfolio: React.FC = () => {
             {/* Portfolio Grid */}
             <div className="mt-12">
               <TabsContent value={activeFilter} className="m-0">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {filteredItems.map((item) => (
-                    <Card key={item.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
-                      </div>
-                      
-                      <CardContent className="p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="text-gray-600 mb-4 leading-relaxed">
-                          {item.description}
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {item.tags.map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
-                            >
-                              {tag}
-                            </Badge>
-                          ))}
+                {loading ? (
+                  <div className="text-center py-12 text-gray-400">Laadimine...</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredItems.map((item) => (
+                      <Card key={item.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                        <div className="relative overflow-hidden cursor-zoom-in" onClick={() => setZoomedImage(item.image_url || "/placeholder.svg") }>
+                          <img
+                            src={item.image_url || "/placeholder.svg"}
+                            alt={item.title}
+                            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
                         </div>
-                        
-                        <Button
-                          variant="outline"
-                          className="w-full border-primary text-primary hover:bg-primary hover:text-white transition-colors"
-                        >
-                          Vaata detaile
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        <CardContent className="p-6">
+                          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                            {item.title}
+                          </h3>
+                          <p className="text-gray-600 mb-4 leading-relaxed">
+                            {item.description}
+                          </p>
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {item.tags && item.tags.split(",").map((tag) => (
+                              <Badge
+                                key={tag.trim()}
+                                variant="secondary"
+                                className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
+                              >
+                                {tag.trim()}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
             </div>
           </Tabs>
@@ -157,7 +129,6 @@ const Portfolio: React.FC = () => {
             <h2 className="text-3xl font-bold text-gray-900 mb-4">Meie saavutused</h2>
             <p className="text-lg text-gray-600">Numbrid, mis räägivad meie kogemusest</p>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="text-4xl font-bold text-primary mb-2">150+</div>
@@ -190,6 +161,15 @@ const Portfolio: React.FC = () => {
             Küsi pakkumist
           </Button>
         </div>
+
+        {/* Image Zoom Modal */}
+        <Dialog open={!!zoomedImage} onOpenChange={() => setZoomedImage(null)}>
+          <DialogContent className="max-w-2xl flex flex-col items-center">
+            {zoomedImage && (
+              <img src={zoomedImage} alt="Zoomed" className="w-full h-auto rounded-lg" />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
