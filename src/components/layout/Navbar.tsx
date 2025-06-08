@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
@@ -29,12 +29,26 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
+  const [navbarLogoUrl, setNavbarLogoUrl] = useState<string>("");
 
   const { data: pages = [], isLoading } = useQuery({
     queryKey: ['pages'],
     queryFn: fetchPages,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
+
+  useEffect(() => {
+    const fetchNavbarLogo = async () => {
+      const { data, error } = await supabase
+        .from("website_content")
+        .select("value")
+        .eq("page", "global")
+        .eq("key", "navbar_logo_url")
+        .single();
+      if (!error && data) setNavbarLogoUrl(data.value);
+    };
+    fetchNavbarLogo();
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -60,10 +74,14 @@ const Navbar = () => {
           <div className="flex justify-between items-center">
             <Link 
               to="/" 
-              className="text-4xl font-bold text-primary"
+              className="text-4xl font-bold text-primary flex items-center gap-2"
               onClick={() => handleLinkClick('/')}
             >
-              Leatex
+              {navbarLogoUrl ? (
+                <img src={navbarLogoUrl} alt="Leatex logo" className="h-10 w-auto max-w-[180px] object-contain" />
+              ) : (
+                "Leatex"
+              )}
             </Link>
 
             {/* Desktop Navigation */}

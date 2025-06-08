@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PlusIcon, Trash2, Image } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Asset {
   id: string;
@@ -40,9 +41,36 @@ const AssetsPage: React.FC = () => {
   const [assetType, setAssetType] = useState("banner");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [currentLogoUrl, setCurrentLogoUrl] = useState<string>("");
+  const [currentBannerUrl, setCurrentBannerUrl] = useState<string>("");
+  const [currentNavbarLogoUrl, setCurrentNavbarLogoUrl] = useState<string>("");
 
   useEffect(() => {
     fetchAssets();
+    // Fetch current logo, navbar logo, and banner URLs
+    const fetchCurrent = async () => {
+      const { data: logoData } = await supabase
+        .from("footer_content")
+        .select("value")
+        .eq("key", "logo_image_url")
+        .single();
+      setCurrentLogoUrl(logoData?.value || "");
+      const { data: navbarLogoData } = await supabase
+        .from("website_content")
+        .select("value")
+        .eq("page", "global")
+        .eq("key", "navbar_logo_url")
+        .single();
+      setCurrentNavbarLogoUrl(navbarLogoData?.value || "");
+      const { data: bannerData } = await supabase
+        .from("website_content")
+        .select("value")
+        .eq("page", "homepage")
+        .eq("key", "homepage_banner_url")
+        .single();
+      setCurrentBannerUrl(bannerData?.value || "");
+    };
+    fetchCurrent();
   }, []);
 
   const fetchAssets = async () => {
@@ -202,6 +230,77 @@ const AssetsPage: React.FC = () => {
     }
   };
 
+  const handleSetAsLogo = async (url: string) => {
+    try {
+      const { data, error } = await supabase.from("footer_content").upsert([
+        {
+          section: "logo",
+          key: "logo_image_url",
+          value: url,
+          visible: true,
+          order: 0,
+        }
+      ], { onConflict: "section,key,order" });
+      if (error) {
+        console.error("Error updating logo:", error);
+        toast({ title: "Error updating logo", description: error.message, variant: "destructive" });
+        return;
+      }
+      console.log("Logo upserted:", data);
+      setCurrentLogoUrl(url);
+      toast({ title: "Logo updated!" });
+    } catch (err: any) {
+      console.error("Unexpected error updating logo:", err);
+      toast({ title: "Error updating logo", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleSetAsBanner = async (url: string) => {
+    try {
+      const { data, error } = await supabase.from("website_content").upsert([
+        {
+          page: "homepage",
+          key: "homepage_banner_url",
+          value: url
+        }
+      ], { onConflict: "page,key" });
+      if (error) {
+        console.error("Error updating banner:", error);
+        toast({ title: "Error updating banner", description: error.message, variant: "destructive" });
+        return;
+      }
+      console.log("Banner upserted:", data);
+      setCurrentBannerUrl(url);
+      toast({ title: "Banner updated!" });
+    } catch (err: any) {
+      console.error("Unexpected error updating banner:", err);
+      toast({ title: "Error updating banner", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleSetAsNavbarLogo = async (url: string) => {
+    try {
+      const { data, error } = await supabase.from("website_content").upsert([
+        {
+          page: "global",
+          key: "navbar_logo_url",
+          value: url
+        }
+      ], { onConflict: "page,key" });
+      if (error) {
+        console.error("Error updating navbar logo:", error);
+        toast({ title: "Error updating navbar logo", description: error.message, variant: "destructive" });
+        return;
+      }
+      console.log("Navbar logo upserted:", data);
+      setCurrentNavbarLogoUrl(url);
+      toast({ title: "Navbar logo updated!" });
+    } catch (err: any) {
+      console.error("Unexpected error updating navbar logo:", err);
+      toast({ title: "Error updating navbar logo", description: err.message, variant: "destructive" });
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -331,6 +430,7 @@ const AssetsPage: React.FC = () => {
                             src={asset.url}
                             alt={`Asset ${asset.id}`}
                             className="w-full h-full object-contain"
+                            style={{ border: asset.url === currentLogoUrl ? '2px solid #e11d48' : asset.url === currentBannerUrl ? '2px solid #2563eb' : undefined }}
                           />
                         ) : (
                           <Image className="w-6 h-6 text-gray-400" />
@@ -350,7 +450,33 @@ const AssetsPage: React.FC = () => {
                     <TableCell>
                       {new Date(asset.created_at).toLocaleDateString()}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right flex flex-col gap-2 items-end">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button size="sm" variant={asset.url === currentLogoUrl ? "default" : "outline"} onClick={() => handleSetAsLogo(asset.url)}>
+                              Set as Footer Logo
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Footer: 200x60px</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button size="sm" variant={asset.url === currentNavbarLogoUrl ? "default" : "outline"} onClick={() => handleSetAsNavbarLogo(asset.url)}>
+                              Set as Navbar Logo
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Navbar: 200x60px</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button size="sm" variant={asset.url === currentBannerUrl ? "default" : "outline"} onClick={() => handleSetAsBanner(asset.url)}>
+                              Set as Banner
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Banner: 1920x400px</TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                       <Button
                         variant="outline"
                         size="sm"
