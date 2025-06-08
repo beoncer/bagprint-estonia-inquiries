@@ -86,6 +86,14 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
+            {getValue("logo", "logo_image_url") ? (
+              <img
+                src={getValue("logo", "logo_image_url")}
+                alt={getValue("logo", "logo_text") || "Leatex"}
+                className="mb-4 max-h-16 w-auto"
+                style={{ maxWidth: 200 }}
+              />
+            ) : null}
             <h3 className="text-xl font-bold mb-4">{getValue("logo", "logo_text") || "Leatex"}</h3>
             <p className="text-gray-400 mb-4">
               {getValue("logo", "logo_description") || "Kvaliteetsed kotid ja pakendid kohandatud trükiga."}

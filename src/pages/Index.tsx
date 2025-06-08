@@ -133,6 +133,18 @@ const fetchCtaContent = async () => {
   return content;
 };
 
+// Add a fetch for the homepage banner URL
+const fetchBannerUrl = async () => {
+  const { data, error } = await supabase
+    .from("website_content")
+    .select("value")
+    .eq("page", "homepage")
+    .eq("key", "homepage_banner_url")
+    .single();
+  if (error) return "";
+  return data?.value || "";
+};
+
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -153,6 +165,12 @@ const Index = () => {
     queryKey: ['heroContent'],
     queryFn: fetchHeroContent,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+  });
+
+  const { data: bannerUrl } = useQuery({
+    queryKey: ["homepageBannerUrl"],
+    queryFn: fetchBannerUrl,
+    staleTime: 1000 * 60 * 5,
   });
 
   console.log('Hero content from query:', heroContent);
@@ -204,7 +222,7 @@ const Index = () => {
           <div 
             className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
             style={{
-              backgroundImage: "url('/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png')",
+              backgroundImage: `url('${bannerUrl || "/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png"}')`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               height: "auto",
