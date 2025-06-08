@@ -95,6 +95,12 @@ const AdminLayout: React.FC = () => {
                   <span>Portfolio</span>
                 </Link>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/footer" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/footer") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <LayoutDashboard className="h-5 w-5" />
+                  <span>Footer</span>
+                </Link>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>
