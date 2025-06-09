@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import Inquiry from "./pages/Inquiry";
 import NotFound from "./pages/NotFound";
 import Meist from "./pages/Meist";
 import Portfolio from "./pages/Portfolio";
+import Blog from "./pages/Blog";
 // Admin imports
 import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -27,6 +29,7 @@ import PagesAdmin from "./pages/admin/Pages";
 import MainLayout from "./components/layout/MainLayout";
 import PortfolioAdmin from "./pages/admin/Portfolio";
 import FooterAdmin from "./pages/admin/Footer";
+import BlogAdmin from "./pages/admin/Blog";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +52,7 @@ const App = () => (
             <Route path="/paring" element={<Inquiry />} />
             <Route path="/meist" element={<Meist />} />
             <Route path="/portfoolio" element={<Portfolio />} />
+            <Route path="/blogi" element={<Blog />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           {/* Admin Routes */}
@@ -71,6 +75,7 @@ const App = () => (
             <Route path="pages" element={<PagesAdmin />} />
             <Route path="portfolio" element={<PortfolioAdmin />} />
             <Route path="footer" element={<FooterAdmin />} />
+            <Route path="blog" element={<BlogAdmin />} />
           </Route>
         </Routes>
       </BrowserRouter>

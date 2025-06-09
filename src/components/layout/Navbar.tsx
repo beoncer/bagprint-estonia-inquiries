@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,12 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  // Hardcoded navigation items that should always appear
+  const staticNavItems = [
+    { name: "Blogi", url: "/blogi" },
+    { name: "Tehtud tööd", url: "/portfoolio" }
+  ];
+
   return (
     <nav className="w-full z-50">
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-4">
@@ -93,19 +100,31 @@ const Navbar = () => {
                   ))}
                 </div>
               ) : (
-                pages.map((page) => {
-                  const absolutePath = getAbsolutePath(page.url_et);
-                  return (
-                    <Link 
-                      key={page.id}
-                      to={absolutePath}
+                <>
+                  {pages.map((page) => {
+                    const absolutePath = getAbsolutePath(page.url_et);
+                    return (
+                      <Link 
+                        key={page.id}
+                        to={absolutePath}
+                        className="text-gray-800 font-medium hover:text-primary transition-colors"
+                        onClick={() => handleLinkClick(absolutePath)}
+                      >
+                        {page.name}
+                      </Link>
+                    );
+                  })}
+                  {staticNavItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.url}
                       className="text-gray-800 font-medium hover:text-primary transition-colors"
-                      onClick={() => handleLinkClick(absolutePath)}
+                      onClick={() => handleLinkClick(item.url)}
                     >
-                      {page.name}
+                      {item.name}
                     </Link>
-                  );
-                })
+                  ))}
+                </>
               )}
               <Button asChild>
                 <Link 
@@ -115,9 +134,6 @@ const Navbar = () => {
                   Küsi pakkumist
                 </Link>
               </Button>
-              <Link to="/portfoolio" className="text-gray-300 hover:text-white transition-colors">
-                Tehtud tööd
-              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -142,19 +158,31 @@ const Navbar = () => {
                     ))}
                   </div>
                 ) : (
-                  pages.map((page) => {
-                    const absolutePath = getAbsolutePath(page.url_et);
-                    return (
-                      <Link 
-                        key={page.id}
-                        to={absolutePath}
+                  <>
+                    {pages.map((page) => {
+                      const absolutePath = getAbsolutePath(page.url_et);
+                      return (
+                        <Link 
+                          key={page.id}
+                          to={absolutePath}
+                          className="py-2 hover:text-primary transition-colors px-4"
+                          onClick={() => handleLinkClick(absolutePath)}
+                        >
+                          {page.name}
+                        </Link>
+                      );
+                    })}
+                    {staticNavItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.url}
                         className="py-2 hover:text-primary transition-colors px-4"
-                        onClick={() => handleLinkClick(absolutePath)}
+                        onClick={() => handleLinkClick(item.url)}
                       >
-                        {page.name}
+                        {item.name}
                       </Link>
-                    );
-                  })
+                    ))}
+                  </>
                 )}
                 <Button asChild className="w-full mt-2">
                   <Link 
@@ -164,9 +192,6 @@ const Navbar = () => {
                     Küsi pakkumist
                   </Link>
                 </Button>
-                <Link to="/portfoolio" className="py-2 hover:text-primary transition-colors px-4">
-                  Tehtud tööd
-                </Link>
               </div>
             </div>
           )}

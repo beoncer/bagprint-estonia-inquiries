@@ -9,6 +9,102 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      blog_posts: {
+        Row: {
+          content: string
+          created_at: string | null
+          excerpt: string
+          id: string
+          image_url: string | null
+          read_time: string | null
+          slug: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          excerpt: string
+          id?: string
+          image_url?: string | null
+          read_time?: string | null
+          slug?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          excerpt?: string
+          id?: string
+          image_url?: string | null
+          read_time?: string | null
+          slug?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      featured_blog_posts: {
+        Row: {
+          created_at: string | null
+          excerpt: string
+          id: string
+          image_url: string | null
+          read_time: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          excerpt: string
+          id?: string
+          image_url?: string | null
+          read_time?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          excerpt?: string
+          id?: string
+          image_url?: string | null
+          read_time?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      footer_content: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          order: number | null
+          section: string
+          value: string
+          visible: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          order?: number | null
+          section: string
+          value: string
+          visible?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          order?: number | null
+          section?: string
+          value?: string
+          visible?: boolean | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           created_at: string | null
@@ -78,6 +174,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      portfolio: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          order: number | null
+          tags: string | null
+          title: string
+          visible: boolean | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          order?: number | null
+          tags?: string | null
+          title: string
+          visible?: boolean | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          order?: number | null
+          tags?: string | null
+          title?: string
+          visible?: boolean | null
+        }
+        Relationships: []
       }
       products: {
         Row: {
