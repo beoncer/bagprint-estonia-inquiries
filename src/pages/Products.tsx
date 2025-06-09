@@ -7,6 +7,7 @@ import { Search, Phone, Mail, ChevronDown, Camera, Shield, Smile, Briefcase, Gif
 import { getProducts, Product, getSiteContent } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -180,6 +181,16 @@ const guarantees = [
   }
 ];
 
+// Add interface for featured blog posts
+interface FeaturedBlogPost {
+  id: string;
+  title: string;
+  excerpt: string;
+  image_url: string;
+  read_time: string;
+  created_at: string;
+}
+
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
@@ -196,6 +207,32 @@ const Products = () => {
     queryFn: getSiteContent,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
+
+  // Fetch featured blog posts
+  const { data: featuredBlogPosts, isLoading: featuredBlogLoading } = useQuery({
+    queryKey: ['featured-blog-posts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('featured_blog_posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data as FeaturedBlogPost[];
+    },
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+  });
+
+  // Get dynamic content for /tooted page
+  const tootedPageContent = siteContent ? {
+    heading: siteContent.tooted_page_heading || "Meie tooted",
+    description: siteContent.tooted_page_description || "Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.",
+    blog_section_title: siteContent.tooted_blog_section_title || "Kasulikud artiklid"
+  } : {
+    heading: "Meie tooted",
+    description: "Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.",
+    blog_section_title: "Kasulikud artiklid"
+  };
 
   console.log('Site content query - Loading:', siteContentLoading, 'Error:', siteContentError, 'Data:', siteContent);
 
@@ -369,9 +406,9 @@ const Products = () => {
     return (
       <div className="bg-gray-50 py-10">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <h1 className="text-3xl font-bold mb-4">Meie tooted</h1>
+          <h1 className="text-3xl font-bold mb-4">{tootedPageContent.heading}</h1>
           <p className="text-gray-600 mb-8">
-            Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.
+            {tootedPageContent.description}
           </p>
 
           {/* Product Categories Section */}
@@ -435,29 +472,35 @@ const Products = () => {
 
           {/* Blog Articles Section */}
           <section className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">Kasulikud artiklid</h2>
+            <h2 className="text-2xl font-bold mb-8">{tootedPageContent.blog_section_title}</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {blogArticles.map((article) => (
-                <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-48 overflow-hidden">
-                    <img 
-                      src={article.image}
-                      alt={article.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">{article.readTime} lugemist</span>
-                      <Button variant="link" size="sm" className="p-0">
-                        Loe edasi
-                      </Button>
+              {featuredBlogPosts && featuredBlogPosts.length > 0 ? (
+                featuredBlogPosts.map((article) => (
+                  <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                    <div className="h-48 overflow-hidden">
+                      <img 
+                        src={article.image_url}
+                        alt={article.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
+                      <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">{article.read_time} lugemist</span>
+                        <Button variant="link" size="sm" className="p-0">
+                          Loe edasi
+                        </Button>
+                      </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-12">
+                  <p className="text-gray-500">Blogi artikleid pole veel lisatud.</p>
                 </div>
-              ))}
+              )}
             </div>
           </section>
         </div>
