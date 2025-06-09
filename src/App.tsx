@@ -16,6 +16,7 @@ import NotFound from "./pages/NotFound";
 import Meist from "./pages/Meist";
 import Portfolio from "./pages/Portfolio";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 // Admin imports
 import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/meist" element={<Meist />} />
             <Route path="/portfoolio" element={<Portfolio />} />
             <Route path="/blogi" element={<Blog />} />
+            <Route path="/blogi/:slug" element={<BlogPost />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           {/* Admin Routes */}

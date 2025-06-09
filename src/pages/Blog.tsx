@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Calendar, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface BlogPost {
   id: string;
@@ -121,13 +122,15 @@ const Blog = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post) => (
                 <article key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-48 overflow-hidden">
-                    <img 
-                      src={post.image_url}
-                      alt={post.title}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
+                  <Link to={`/blogi/${post.slug}`} className="block">
+                    <div className="h-48 overflow-hidden">
+                      <img 
+                        src={post.image_url}
+                        alt={post.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  </Link>
                   <div className="p-6">
                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                       <div className="flex items-center gap-1">
@@ -139,13 +142,17 @@ const Blog = () => {
                         <span>{post.read_time} lugemist</span>
                       </div>
                     </div>
-                    <h2 className="text-xl font-semibold mb-3 hover:text-primary transition-colors">
-                      {post.title}
-                    </h2>
+                    <Link to={`/blogi/${post.slug}`}>
+                      <h2 className="text-xl font-semibold mb-3 hover:text-primary transition-colors">
+                        {post.title}
+                      </h2>
+                    </Link>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
-                    <Button variant="link" size="sm" className="p-0 text-primary hover:text-primary/80">
-                      Loe edasi →
-                    </Button>
+                    <Link to={`/blogi/${post.slug}`}>
+                      <Button variant="link" size="sm" className="p-0 text-primary hover:text-primary/80">
+                        Loe edasi →
+                      </Button>
+                    </Link>
                   </div>
                 </article>
               ))}
