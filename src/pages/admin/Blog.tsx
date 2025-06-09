@@ -4,16 +4,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Star, StarOff, Image } from "lucide-react";
+import ImageUpload from "@/components/admin/ImageUpload";
+import RichTextEditor from "@/components/admin/RichTextEditor";
 
 interface BlogPost {
   id: string;
@@ -255,7 +254,7 @@ const BlogAdmin = () => {
               </DialogDescription>
             </DialogHeader>
             
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="title">Title</Label>
@@ -279,36 +278,28 @@ const BlogAdmin = () => {
 
               <div>
                 <Label htmlFor="excerpt">Excerpt</Label>
-                <Textarea
-                  id="excerpt"
+                <RichTextEditor
                   value={formData.excerpt}
-                  onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                  onChange={(value) => setFormData(prev => ({ ...prev, excerpt: value }))}
+                  placeholder="Write a brief excerpt..."
                   rows={3}
-                  required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="content">Content (Markdown supported)</Label>
-                <Textarea
-                  id="content"
-                  value={formData.content}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                  rows={10}
-                  required
-                />
-              </div>
+              <RichTextEditor
+                label="Content"
+                value={formData.content}
+                onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+                placeholder="Write your blog post content here..."
+                rows={12}
+              />
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="image_url">Image URL</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
+                <ImageUpload
+                  label="Featured Image"
+                  currentImageUrl={formData.image_url}
+                  onImageUploaded={(url) => setFormData(prev => ({ ...prev, image_url: url }))}
+                />
                 <div>
                   <Label htmlFor="read_time">Read Time</Label>
                   <Input
