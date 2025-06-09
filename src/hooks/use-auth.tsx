@@ -33,10 +33,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             title: "Tere tulemast!",
             description: "Olete edukalt sisse logitud.",
           });
-          // Using setTimeout to avoid potential deadlocks
-          setTimeout(() => {
-            navigate("/admin");
-          }, 0);
+          // Only redirect if on login/register page
+          if (window.location.pathname === "/admin/login" || window.location.pathname === "/admin/register") {
+            setTimeout(() => {
+              navigate("/admin");
+            }, 0);
+          }
         } else if (event === "SIGNED_OUT") {
           toast({
             title: "Välja logitud",
