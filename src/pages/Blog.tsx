@@ -61,7 +61,7 @@ const Blog = () => {
     });
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="bg-gray-50 py-10">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
