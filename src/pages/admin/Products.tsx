@@ -38,6 +38,7 @@ interface Product {
   image_url: string | null;
   pricing_without_print: Record<string, number>;
   pricing_with_print: Record<string, number>;
+  slug?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -61,6 +62,7 @@ const ProductsPage: React.FC = () => {
     description: "",
     pricing_without_print: {},
     pricing_with_print: {},
+    slug: "",
   });
   const [priceWithout50, setPriceWithout50] = useState("");
   const [priceWithout100, setPriceWithout100] = useState("");
@@ -166,6 +168,7 @@ const ProductsPage: React.FC = () => {
         image_url: imageUrl || null,
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: pricingWithPrint,
+        slug: formData.slug || null,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -183,6 +186,7 @@ const ProductsPage: React.FC = () => {
         description: "",
         pricing_without_print: {},
         pricing_with_print: {},
+        slug: "",
       });
       setPriceWithout50("");
       setPriceWithout100("");
@@ -248,6 +252,7 @@ const ProductsPage: React.FC = () => {
         image_url: imageUrl,
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: pricingWithPrint,
+        slug: formData.slug || null,
       };
 
       const { error } = await supabase
@@ -269,6 +274,7 @@ const ProductsPage: React.FC = () => {
         description: "",
         pricing_without_print: {},
         pricing_with_print: {},
+        slug: "",
       });
       setPriceWithout50("");
       setPriceWithout100("");
@@ -324,6 +330,7 @@ const ProductsPage: React.FC = () => {
       type: product.type,
       name: product.name,
       description: product.description || "",
+      slug: product.slug || "",
     });
     
     // Set pricing fields
@@ -397,6 +404,7 @@ const ProductsPage: React.FC = () => {
       description: "",
       pricing_without_print: {},
       pricing_with_print: {},
+      slug: "",
     });
     setPriceWithout50("");
     setPriceWithout100("");
@@ -566,6 +574,16 @@ const ProductsPage: React.FC = () => {
                     />
                   </div>
                 )}
+              </div>
+              <div className="grid gap-2">
+                <label htmlFor="slug">Product URL Slug</label>
+                <Input
+                  id="slug"
+                  value={formData.slug || ""}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="e.g. premium-cotton-tote-bag"
+                />
+                <span className="text-xs text-gray-500">This will be used in the product URL: /tooted/&lt;slug&gt;</span>
               </div>
             </div>
             <DialogFooter>

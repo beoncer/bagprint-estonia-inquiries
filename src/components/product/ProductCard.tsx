@@ -73,7 +73,7 @@ const ProductCard = ({ id, name, description, image, startingPrice, slug }: Prod
       </CardContent>
       <CardFooter className="p-4 pt-0 flex justify-between">
         <Button variant="outline" asChild>
-          <Link to={`/products/${slug}`}>Vaata lähemalt</Link>
+          <Link to={`/tooted/${slug}`}>Vaata lähemalt</Link>
         </Button>
         <Button asChild>
           <Link to={`/inquiry?product=${safeId}`}>Küsi pakkumist</Link>

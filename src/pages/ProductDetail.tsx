@@ -75,7 +75,7 @@ const ProductDetail = () => {
         <h2 className="text-2xl font-bold mb-4">Toodet ei leitud</h2>
         <p className="mb-8">Kahjuks ei leidnud me otsitud toodet. Proovige vaadata teisi tooteid.</p>
         <Button asChild>
-          <Link to="/products">Tagasi toodete juurde</Link>
+          <Link to="/tooted">Tagasi toodete juurde</Link>
         </Button>
       </div>
     );
@@ -87,7 +87,7 @@ const ProductDetail = () => {
       <div className="text-sm text-gray-500 mb-6">
         <Link to="/" className="hover:text-primary">Avaleht</Link>
         <span className="mx-2">/</span>
-        <Link to="/products" className="hover:text-primary">Tooted</Link>
+        <Link to="/tooted" className="hover:text-primary">Tooted</Link>
         <span className="mx-2">/</span>
         <span className="text-gray-900">{product.name}</span>
       </div>
