@@ -148,38 +148,7 @@ const categoryFAQs = {
   ]
 };
 
-const guarantees = [
-  {
-    icon: Camera,
-    title: "Garanteerime parima hinna",
-    description: "Konkurentsivõimeline hinnapoliitika ja parimad pakkumised turul"
-  },
-  {
-    icon: Shield,
-    title: "Garanteerime hea kvaliteedi", 
-    description: "Kasutame ainult kvaliteetseid materjale ja kontrollitud tootmisprotsesse"
-  },
-  {
-    icon: Smile,
-    title: "Garanteerime rahulolu",
-    description: "Tagame klientide rahulolu ja professionaalse teeninduse"
-  },
-  {
-    icon: Briefcase,
-    title: "Garanteerime personaalse teeninduse",
-    description: "Individuaalne lähenemine ja personaalne nõustamine igale kliendile"
-  },
-  {
-    icon: Gift,
-    title: "Garanteerime näidised",
-    description: "Pakume tootenäidiseid, et saaksite kvaliteedis veenduda"
-  },
-  {
-    icon: Truck,
-    title: "Garanteerime õigeaegse kohaletoimetamise",
-    description: "Täpsed tarneajad ja usaldusväärne logistika"
-  }
-];
+const iconList = [Camera, Shield, Smile, Briefcase, Gift, Truck];
 
 // Add interface for featured blog posts
 interface FeaturedBlogPost {
@@ -200,6 +169,11 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
+  const [guarantees, setGuarantees] = useState<any[]>([]);
+  const [guaranteesLoading, setGuaranteesLoading] = useState(true);
+  const [guaranteesHeading, setGuaranteesHeading] = useState<string>("");
+  const [guaranteesDescription, setGuaranteesDescription] = useState<string>("");
+  const [guaranteesContentLoading, setGuaranteesContentLoading] = useState(true);
   
   // Fetch site content for dynamic product categories
   const { data: siteContent, isLoading: siteContentLoading, error: siteContentError } = useQuery({
@@ -374,6 +348,34 @@ const Products = () => {
     window.location.reload();
   };
 
+  useEffect(() => {
+    const fetchGuarantees = async () => {
+      setGuaranteesLoading(true);
+      const { data, error } = await supabase
+        .from("guarantees")
+        .select("*")
+        .order("order", { ascending: true });
+      setGuarantees(data || []);
+      setGuaranteesLoading(false);
+    };
+    fetchGuarantees();
+  }, []);
+
+  useEffect(() => {
+    const fetchGuaranteesContent = async () => {
+      setGuaranteesContentLoading(true);
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "tooted")
+        .in("key", ["guarantees_heading", "guarantees_description"]);
+      setGuaranteesHeading(data?.find((row: any) => row.key === "guarantees_heading")?.value || "Rahuloleva Kliendi Garantii");
+      setGuaranteesDescription(data?.find((row: any) => row.key === "guarantees_description")?.value || "Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.");
+      setGuaranteesContentLoading(false);
+    };
+    fetchGuaranteesContent();
+  }, []);
+
   if (loading) {
     return (
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
@@ -448,25 +450,31 @@ const Products = () => {
           <section className="mb-16">
             <div className="bg-white rounded-lg shadow-sm p-8">
               <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
+                <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
                 <p className="text-gray-600 max-w-4xl mx-auto">
-                  Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.
+                  {guaranteesContentLoading ? "..." : guaranteesDescription}
                 </p>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {guarantees.map((guarantee, index) => (
-                  <div key={index} className="flex items-start gap-4">
-                    <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                      <guarantee.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
-                      <p className="text-gray-600 text-sm">{guarantee.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {guaranteesLoading ? (
+                <div>Laen garantiiandmeid...</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {guarantees.map((guarantee, index) => {
+                    const Icon = iconList[index % iconList.length];
+                    return (
+                      <div key={guarantee.id} className="flex items-start gap-4">
+                        <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                          <Icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                          <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </section>
 
@@ -570,25 +578,32 @@ const Products = () => {
         <section className="mt-16 mb-16">
           <div className="bg-white rounded-lg shadow-sm p-8">
             <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold mb-4">Rahuloleva Kliendi Garantii</h2>
+              <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
               <p className="text-gray-600 max-w-4xl mx-auto">
-                Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.
+                {guaranteesContentLoading ? "..." : guaranteesDescription}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {guarantees.map((guarantee, index) => (
-                <div key={index} className="flex items-start gap-4">
-                  <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                    <guarantee.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
-                    <p className="text-gray-600 text-sm">{guarantee.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {guaranteesLoading ? (
+              <div>Laen garantiiandmeid...</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {guarantees.map((guarantee, index) => {
+                  const Icon = iconList[index % iconList.length];
+                  return (
+                    <div key={guarantee.id} className="flex items-start gap-4">
+                      <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                        <Icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                        <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 

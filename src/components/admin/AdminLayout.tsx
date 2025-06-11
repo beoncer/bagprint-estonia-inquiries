@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, Outlet, useLocation, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
@@ -15,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShoppingBag, FileText, ImageIcon, Search, LogOut, HelpCircle, Briefcase, BookOpen } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, FileText, ImageIcon, Search, LogOut, HelpCircle, Briefcase, BookOpen, ShieldCheck } from "lucide-react";
 
 const AdminLayout: React.FC = () => {
   const { user, loading, signOut } = useAuth();
@@ -106,6 +105,12 @@ const AdminLayout: React.FC = () => {
                 <Link to="/admin/footer" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/footer") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <LayoutDashboard className="h-5 w-5" />
                   <span>Footer</span>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/guarantees" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/guarantees") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <ShieldCheck className="h-5 w-5" />
+                  <span>Guarantees</span>
                 </Link>
               </SidebarMenuItem>
             </SidebarMenu>
