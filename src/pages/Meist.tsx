@@ -65,8 +65,8 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats Section - Reduced top padding */}
-      <section className="py-8">
+      {/* Stats Section - Moved closer to hero */}
+      <section className="py-2">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => (
@@ -151,8 +151,8 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section - Matching portfolio page style exactly */}
-      <div className="text-center mt-20">
+      {/* CTA Section - Added more bottom margin for space before footer */}
+      <div className="text-center mt-20 mb-32">
         <h2 className="text-3xl font-bold text-gray-900 mb-6">
           Valmis oma projekti alustama?
         </h2>
