@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -65,8 +64,8 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats Section - Moved closer to hero */}
-      <section className="py-2">
+      {/* Stats Section - Moved higher, overlapping with hero */}
+      <section className="-mt-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => (
@@ -151,18 +150,20 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section - Added more bottom margin for space before footer */}
-      <div className="text-center mt-20 mb-32">
-        <h2 className="text-3xl font-bold text-gray-900 mb-6">
-          Valmis oma projekti alustama?
-        </h2>
-        <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-          Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
-        </p>
-        <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
-          Küsi pakkumist
-        </Button>
-      </div>
+      {/* CTA Section - Matching portfolio page style exactly */}
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            Valmis oma projekti alustama?
+          </h2>
+          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+            Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
+          </p>
+          <Button size="xl" className="bg-primary hover:bg-primary/90 text-white">
+            Küsi pakkumist
+          </Button>
+        </div>
+      </section>
     </div>
   );
 };
