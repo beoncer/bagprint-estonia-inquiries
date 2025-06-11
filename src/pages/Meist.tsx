@@ -151,20 +151,18 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section - Matching portfolio page style exactly with white background */}
-      <section className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Valmis oma projekti alustama?
-          </h2>
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
-          </p>
-          <Button size="xl" className="bg-primary hover:bg-primary/90 text-white">
-            Küsi pakkumist
-          </Button>
-        </div>
-      </section>
+      {/* CTA Section - Matching portfolio page style exactly */}
+      <div className="text-center mt-20">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          Valmis oma projekti alustama?
+        </h2>
+        <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
+        </p>
+        <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
+          Küsi pakkumist
+        </Button>
+      </div>
     </div>
   );
 };
