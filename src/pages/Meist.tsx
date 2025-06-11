@@ -65,8 +65,8 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16">
+      {/* Stats Section - Reduced top padding */}
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {stats.map((stat, index) => (
@@ -132,7 +132,7 @@ const Meist: React.FC = () => {
                   <CardContent className="p-8">
                     <div className="flex items-start space-x-4">
                       <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors">
-                        <IconComponent className="w-6 h-6 text-white" />
+                        <IconComponent className="w-6 h-6 text-primary group-hover:text-white" />
                       </div>
                       <div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
@@ -151,30 +151,18 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <Card className="border-0 shadow-xl bg-gray-900">
-            <CardContent className="p-12 text-center">
-              <h2 className="text-4xl font-bold text-white mb-6">
-                Valmis alustama koostööd?
-              </h2>
-              <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-                Võta meiega ühendust ja arutame, kuidas saame aidata su brändi nähtavamaks muuta 
-                kvaliteetsete ja keskkonnasõbralike kottidega.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
-                  Küsi pakkumist
-                </Button>
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 text-lg">
-                  Vaata portfooliod
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+      {/* CTA Section - Matching portfolio page style exactly */}
+      <div className="text-center mt-20">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          Valmis oma projekti alustama?
+        </h2>
+        <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
+        </p>
+        <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
+          Küsi pakkumist
+        </Button>
+      </div>
     </div>
   );
 };
