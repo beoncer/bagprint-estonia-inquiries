@@ -105,6 +105,33 @@ export type Database = {
         }
         Relationships: []
       }
+      guarantees: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: number
+          order: number
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: number
+          order?: number
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: number
+          order?: number
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           created_at: string | null
