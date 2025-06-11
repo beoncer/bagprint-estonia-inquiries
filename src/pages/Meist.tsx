@@ -131,8 +131,8 @@ const Meist: React.FC = () => {
                 <Card key={guarantee.title} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
                   <CardContent className="p-8">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors">
-                        <IconComponent className="w-6 h-6 text-primary group-hover:text-white" />
+                      <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
+                        <IconComponent className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
