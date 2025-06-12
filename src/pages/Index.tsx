@@ -215,84 +215,59 @@ const Index = () => {
   }, []);
 
   return (
-    <>
-      {/* Hero Section */}
-      <section className="py-6">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <div 
-            className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
-            style={{
-              backgroundImage: `url('${bannerUrl || "/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png"}')`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              height: "auto",
-              minHeight: "520px"
-            }}
-          >
-            <div className="absolute inset-0 bg-white/45"></div>
-            <div className="relative z-10 h-full w-full">
-              <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
-                <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
-                  <div className="flex flex-col h-full justify-between">
-                    {isHeroLoading ? (
-                      <div className="animate-pulse space-y-4">
-                        <div className="h-12 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-full"></div>
-                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                        <div className="flex gap-4 mt-6">
-                          <div className="h-10 bg-gray-200 rounded w-32"></div>
-                          <div className="h-10 bg-gray-200 rounded w-32"></div>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="mt-4 md:mt-8">
-                          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-                            {heroContent?.title || "Kvaliteetsed kotid ja pakendid teie brändile"}
-                          </h1>
-                          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
-                            {heroContent?.description || "Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga."}
-                          </p>
-                        </div>
-                        
-                        <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
-                          <Button 
-                            variant="default"
-                            size="xl" 
-                            className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
-                            asChild
-                          >
-                            <Link to={heroContent?.button1?.link || "/tooted"}>
-                              {heroContent?.button1?.value || "Vaata tooteid"}
-                            </Link>
-                          </Button>
-                          <Button 
-                            variant="white" 
-                            size="xl" 
-                            className="text-base md:text-lg border border-gray-200 shadow-sm" 
-                            asChild
-                          >
-                            <Link to={heroContent?.button2?.link || "/paring"}>
-                              {heroContent?.button2?.value || "Küsi pakkumist"}
-                            </Link>
-                          </Button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className="hidden md:block md:w-1/3 lg:w-1/2">
-                  {/* Optional right side content if needed */}
+    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
+      {/* Hero Section - Matching portfolio page style */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            {isHeroLoading ? (
+              <div className="animate-pulse space-y-4">
+                <div className="h-12 bg-gray-200 rounded w-3/4 mx-auto"></div>
+                <div className="h-4 bg-gray-200 rounded w-full max-w-3xl mx-auto"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6 max-w-3xl mx-auto"></div>
+                <div className="flex gap-4 mt-6 justify-center">
+                  <div className="h-10 bg-gray-200 rounded w-32"></div>
+                  <div className="h-10 bg-gray-200 rounded w-32"></div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <>
+                <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                  {heroContent?.title || "Kvaliteetsed kotid ja pakendid teie brändile"}
+                </h1>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
+                  {heroContent?.description || "Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga."}
+                </p>
+                <div className="flex flex-wrap gap-4 justify-center">
+                  <Button 
+                    size="lg" 
+                    className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg" 
+                    asChild
+                  >
+                    <Link to={heroContent?.button1?.link || "/tooted"}>
+                      {heroContent?.button1?.value || "Vaata tooteid"}
+                    </Link>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="px-8 py-3 text-lg" 
+                    asChild
+                  >
+                    <Link to={heroContent?.button2?.link || "/paring"}>
+                      {heroContent?.button2?.value || "Küsi pakkumist"}
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
 
       {/* Why Choose Us Section */}
       <section className="py-12">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+        <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-left mb-12">{whyChooseUs.title}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {whyChooseUsQuery.isLoading ? (
@@ -321,7 +296,7 @@ const Index = () => {
 
       {/* Updated Categories Section */}
       <section className="py-16">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+        <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-left mb-10">{categoriesTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             {categories.map((cat, idx) => (
@@ -344,8 +319,8 @@ const Index = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-left mb-12">Populaarsed tooted</h2>
           {loading ? (
             <div className="animate-pulse">
@@ -369,22 +344,20 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary py-16">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            {ctaContent.cta_title}
-          </h2>
-          <p className="text-white text-lg mb-8 max-w-2xl mx-auto">
-            {ctaContent.cta_description}
-          </p>
-          <Button variant="secondary" size="lg" asChild>
-            <Link to={ctaContent.cta_button_link || "/inquiry"}>
-              {ctaContent.cta_button_text}
-            </Link>
-          </Button>
-        </div>
-      </section>
-    </>
+      <div className="text-center mt-20">
+        <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          {ctaContent.cta_title}
+        </h2>
+        <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+          {ctaContent.cta_description}
+        </p>
+        <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg" asChild>
+          <Link to={ctaContent.cta_button_link || "/inquiry"}>
+            {ctaContent.cta_button_text}
+          </Link>
+        </Button>
+      </div>
+    </div>
   );
 };
 
