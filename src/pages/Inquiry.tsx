@@ -1,3 +1,4 @@
+
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import InquiryForm from "@/components/ui/InquiryForm";
@@ -8,15 +9,23 @@ const Inquiry = () => {
   
   return (
     <Layout>
-      <div className="bg-gray-50 py-16">
-        <div className="w-full px-4">
+      <div className="bg-gray-50 min-h-screen">
+        {/* Hero Section - matching portfolio style */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                Küsi <span className="text-primary">pakkumist</span>
+              </h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Täida allolevad väljad ja saadame sulle personaalse pakkumise. Vastame pakkumise päringutele tavaliselt ühe tööpäeva jooksul.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <div className="max-w-7xl mx-auto px-4 pb-16">
           <div className="max-w-3xl mx-auto">
-            <h1 className="text-3xl font-bold mb-2">Küsi pakkumist</h1>
-            <p className="text-gray-600 mb-10">
-              Täida allolevad väljad ja saadame sulle personaalse pakkumise. 
-              Vastame pakkumise päringutele tavaliselt ühe tööpäeva jooksul.
-            </p>
-            
             <InquiryForm productId={productId || undefined} />
             
             <div className="mt-12 bg-white rounded-lg shadow-sm p-6">

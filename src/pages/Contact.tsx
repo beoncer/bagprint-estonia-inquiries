@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -67,15 +68,23 @@ const Contact = () => {
   };
   
   return (
-    <div className="bg-gray-50 py-16">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+    <div className="bg-gray-50 min-h-screen">
+      {/* Hero Section - matching portfolio style */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Võta meiega <span className="text-primary">ühendust</span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Kui sul on küsimusi meie toodete, hindade või muu kohta, siis võta meiega ühendust ja aitame sind parima meelega.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 pb-16">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Võta meiega ühendust</h1>
-          <p className="text-gray-600 mb-10">
-            Kui sul on küsimusi meie toodete, hindade või muu kohta, 
-            siis võta meiega ühendust ja aitame sind parima meelega.
-          </p>
-          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <Card>
               <CardContent className="pt-6">

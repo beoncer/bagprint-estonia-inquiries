@@ -64,8 +64,8 @@ const Blog = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-gray-50 py-10">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -81,8 +81,8 @@ const Blog = () => {
 
   if (error) {
     return (
-      <div className="bg-gray-50 py-10">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 text-center">
+      <div className="bg-gray-50 py-16">
+        <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Viga</h2>
           <p className="text-red-600 mb-8">Blogposte ei õnnestunud laadida. Palun proovige hiljem uuesti.</p>
         </div>
@@ -91,16 +91,22 @@ const Blog = () => {
   }
 
   return (
-    <div className="bg-gray-50 py-10">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Blogi</h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Kasulikud artiklid ja nõuanded kottide valimise, trükkimise ja kasutamise kohta
-          </p>
+    <div className="bg-gray-50 min-h-screen">
+      {/* Hero Section - matching portfolio style */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Meie <span className="text-primary">blogi</span>
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Kasulikud artiklid ja nõuanded kottide valimise, trükkimise ja kasutamise kohta
+            </p>
+          </div>
         </div>
+      </section>
 
+      <div className="max-w-7xl mx-auto px-4 pb-16">
         {/* Search */}
         <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
           <form onSubmit={handleSearch} className="relative max-w-md mx-auto">
