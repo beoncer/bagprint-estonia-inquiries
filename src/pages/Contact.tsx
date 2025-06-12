@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -19,7 +18,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
-import Layout from "@/components/layout/Layout";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -69,26 +67,15 @@ const Contact = () => {
   };
   
   return (
-    <Layout>
-      {/* Hero Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <div className="max-w-4xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              <span className="text-primary">Võta meiega</span>{" "}
-              <span className="text-black">ühendust</span>
-            </h1>
-            <p className="text-gray-600 text-lg md:text-xl leading-relaxed max-w-3xl">
-              Kui sul on küsimusi meie toodete, hindade või muu kohta, 
-              siis võta meiega ühendust ja aitame sind parima meelega.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Info Cards */}
-      <section className="bg-white py-16">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+    <div className="bg-gray-50 py-16">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold mb-2">Võta meiega ühendust</h1>
+          <p className="text-gray-600 mb-10">
+            Kui sul on küsimusi meie toodete, hindade või muu kohta, 
+            siis võta meiega ühendust ja aitame sind parima meelega.
+          </p>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <Card>
               <CardContent className="pt-6">
@@ -186,24 +173,22 @@ const Contact = () => {
             </Form>
           </div>
         </div>
-      </section>
+      </div>
       
       {/* Map Section */}
-      <section className="bg-gray-50">
-        <div className="h-[400px] bg-gray-200 w-full">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2028.6900409549314!2d24.74201731570651!3d59.43438281057916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4692949d640b7d95%3A0x52162063ef2cee9!2sKaupmehe%2010%2C%2010114%20Tallinn!5e0!3m2!1sen!2see!4v1652345678901!5m2!1sen!2see" 
-            width="100%" 
-            height="100%" 
-            style={{ border: 0 }} 
-            allowFullScreen={true} 
-            loading="lazy" 
-            referrerPolicy="no-referrer-when-downgrade"
-            title="bagprint.ee location"
-          />
-        </div>
-      </section>
-    </Layout>
+      <div className="h-[400px] bg-gray-200 w-full">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2028.6900409549314!2d24.74201731570651!3d59.43438281057916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4692949d640b7d95%3A0x52162063ef2cee9!2sKaupmehe%2010%2C%2010114%20Tallinn!5e0!3m2!1sen!2see!4v1652345678901!5m2!1sen!2see" 
+          width="100%" 
+          height="100%" 
+          style={{ border: 0 }} 
+          allowFullScreen={true} 
+          loading="lazy" 
+          referrerPolicy="no-referrer-when-downgrade"
+          title="bagprint.ee location"
+        />
+      </div>
+    </div>
   );
 };
 
