@@ -405,13 +405,29 @@ const Products = () => {
 
   // Show category listing only for /tooted page
   if (location.pathname === "/tooted") {
+    // Split heading for colored 'tooted'
+    const heading = tootedPageContent.heading || "Meie tooted";
+    const split = heading.split(/(tooted)/i);
     return (
-      <div className="bg-gray-50 py-10">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <h1 className="text-3xl font-bold mb-4">{tootedPageContent.heading}</h1>
-          <p className="text-gray-600 mb-8">
-            {tootedPageContent.description}
-          </p>
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Hero Section - Portfolio style */}
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              {split.length === 3 ? (
+                <>
+                  {split[0]}
+                  <span className="text-primary">{split[1]}</span>
+                  {split[2]}
+                </>
+              ) : (
+                heading
+              )}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              {tootedPageContent.description}
+            </p>
+          </div>
 
           {/* Product Categories Section */}
           <section className="mb-16">
