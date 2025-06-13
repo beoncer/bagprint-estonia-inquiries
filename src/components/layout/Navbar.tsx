@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,8 @@ const Navbar = () => {
   const { data: pages = [], isLoading } = useQuery({
     queryKey: ['pages'],
     queryFn: fetchPages,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 1000 * 60, // 1 minute for pages
+    refetchOnMount: 'always',
   });
 
   useEffect(() => {
