@@ -78,6 +78,12 @@ const AdminLayout: React.FC = () => {
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
+                <Link to="/admin/meist" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/meist") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <FileText className="h-5 w-5" />
+                  <span>Meist</span>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                 <Link to="/admin/assets" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/assets") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <ImageIcon className="h-5 w-5" />
                   <span>Media</span>

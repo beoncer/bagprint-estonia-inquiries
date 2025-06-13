@@ -38,6 +38,18 @@ const PortfolioAdmin: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [header, setHeader] = useState("");
+  const [headerHighlight, setHeaderHighlight] = useState("");
+  const [description, setDescription] = useState("");
+  const [achievementsTitle, setAchievementsTitle] = useState("Meie saavutused");
+  const [achievementsDescription, setAchievementsDescription] = useState("");
+  const [achievements, setAchievements] = useState([{ value: "", label: "" }]);
+  const [ctaTitle, setCtaTitle] = useState("Valmis oma projekti alustama?");
+  const [ctaText, setCtaText] = useState("Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.");
+  const [ctaButton, setCtaButton] = useState("Küsi pakkumist");
+  const [contentLoading, setContentLoading] = useState(true);
+  const [contentSaving, setContentSaving] = useState(false);
+  const [contentSuccess, setContentSuccess] = useState(false);
 
   const fetchItems = async () => {
     setLoading(true);
@@ -50,6 +62,36 @@ const PortfolioAdmin: React.FC = () => {
   };
 
   useEffect(() => { fetchItems(); }, []);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      setContentLoading(true);
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "portfolio");
+      if (data) {
+        setHeader(data.find((row: any) => row.key === "portfolio_header")?.value || "");
+        setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
+        setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
+        setAchievementsTitle(data.find((row: any) => row.key === "portfolio_achievements_title")?.value || "Meie saavutused");
+        setAchievementsDescription(data.find((row: any) => row.key === "portfolio_achievements_description")?.value || "");
+        // Achievements
+        const achArr = [];
+        for (let i = 1; i <= 6; i++) {
+          const value = data.find((row: any) => row.key === `portfolio_achievement_${i}_value`)?.value || "";
+          const label = data.find((row: any) => row.key === `portfolio_achievement_${i}_label`)?.value || "";
+          if (value || label) achArr.push({ value, label });
+        }
+        setAchievements(achArr.length ? achArr : [{ value: "", label: "" }]);
+        setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "Valmis oma projekti alustama?");
+        setCtaText(data.find((row: any) => row.key === "portfolio_cta_text")?.value || "Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.");
+        setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "Küsi pakkumist");
+      }
+      setContentLoading(false);
+    };
+    fetchContent();
+  }, []);
 
   const handleDialogOpen = (item?: PortfolioItem) => {
     if (item) {
@@ -163,6 +205,35 @@ const PortfolioAdmin: React.FC = () => {
     toast({ title: "Image uploaded" });
   };
 
+  const handleContentSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContentSaving(true);
+    setContentSuccess(false);
+    const updates = [
+      { page: "portfolio", key: "portfolio_header", value: header },
+      { page: "portfolio", key: "portfolio_header_highlight", value: headerHighlight },
+      { page: "portfolio", key: "portfolio_description", value: description },
+      { page: "portfolio", key: "portfolio_achievements_title", value: achievementsTitle },
+      { page: "portfolio", key: "portfolio_achievements_description", value: achievementsDescription },
+      ...achievements.map((a, i) => [
+        { page: "portfolio", key: `portfolio_achievement_${i + 1}_value`, value: a.value },
+        { page: "portfolio", key: `portfolio_achievement_${i + 1}_label`, value: a.label },
+      ]).flat(),
+      { page: "portfolio", key: "portfolio_cta_title", value: ctaTitle },
+      { page: "portfolio", key: "portfolio_cta_text", value: ctaText },
+      { page: "portfolio", key: "portfolio_cta_button", value: ctaButton },
+    ];
+    const { error } = await supabase.from("website_content").upsert(updates, { onConflict: "page,key" });
+    setContentSaving(false);
+    if (!error) setContentSuccess(true);
+  };
+
+  const handleAchievementChange = (idx: number, field: "value" | "label", val: string) => {
+    setAchievements(achievements => achievements.map((a, i) => i === idx ? { ...a, [field]: val } : a));
+  };
+  const addAchievement = () => setAchievements([...achievements, { value: "", label: "" }]);
+  const removeAchievement = (idx: number) => setAchievements(achievements => achievements.filter((_, i) => i !== idx));
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -266,6 +337,133 @@ const PortfolioAdmin: React.FC = () => {
           </Table>
         </div>
       )}
+      {/* Dynamic content admin UI */}
+      <form className="space-y-8 max-w-2xl mb-10" onSubmit={handleContentSave}>
+        <h2 className="text-2xl font-bold mb-2">Portfoolio lehe sisu</h2>
+        <div>
+          <label className="block font-medium mb-1">Pealkiri (header)</label>
+          <input
+            type="text"
+            className="w-full border rounded px-3 py-2"
+            placeholder="Meie portfoolio"
+            value={header}
+            onChange={e => setHeader(e.target.value)}
+            disabled={contentLoading || contentSaving}
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Tõsta esile sõna (highlight word)</label>
+          <input
+            type="text"
+            className="w-full border rounded px-3 py-2"
+            placeholder="portfoolio"
+            value={headerHighlight}
+            onChange={e => setHeaderHighlight(e.target.value)}
+            disabled={contentLoading || contentSaving}
+          />
+          <p className="text-sm text-gray-500 mt-1">Sisesta sõna, mida soovid pealkirjas punase värviga esile tõsta</p>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Kirjeldus (description)</label>
+          <textarea
+            className="w-full border rounded px-3 py-2"
+            placeholder="Tutvu meie valmistatud kottidega..."
+            rows={2}
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            disabled={contentLoading || contentSaving}
+          />
+        </div>
+        {/* Achievements Section */}
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Meie saavutused</h3>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Bloki pealkiri</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Meie saavutused"
+              value={achievementsTitle}
+              onChange={e => setAchievementsTitle(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Bloki kirjeldus</label>
+            <textarea
+              className="w-full border rounded px-3 py-2"
+              placeholder="Numbrid, mis räägivad meie kogemusest"
+              rows={2}
+              value={achievementsDescription}
+              onChange={e => setAchievementsDescription(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          {achievements.map((a, idx) => (
+            <div key={idx} className="flex gap-2 mb-2 items-center">
+              <input
+                type="text"
+                className="border rounded px-2 py-1 w-24"
+                placeholder="Väärtus"
+                value={a.value}
+                onChange={e => handleAchievementChange(idx, "value", e.target.value)}
+                disabled={contentLoading || contentSaving}
+              />
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                placeholder="Silt"
+                value={a.label}
+                onChange={e => handleAchievementChange(idx, "label", e.target.value)}
+                disabled={contentLoading || contentSaving}
+              />
+              <Button type="button" variant="outline" size="sm" onClick={() => removeAchievement(idx)} disabled={achievements.length === 1 || contentLoading || contentSaving}>Eemalda</Button>
+            </div>
+          ))}
+          <Button type="button" variant="secondary" size="sm" onClick={addAchievement} disabled={contentLoading || contentSaving}>Lisa saavutus</Button>
+        </div>
+        {/* CTA Section */}
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Kutse tegevusele (CTA)</h3>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Pealkiri (CTA title)</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Valmis oma projekti alustama?"
+              value={ctaTitle}
+              onChange={e => setCtaTitle(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Kirjeldus (CTA text)</label>
+            <textarea
+              className="w-full border rounded px-3 py-2"
+              placeholder="Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil."
+              rows={2}
+              value={ctaText}
+              onChange={e => setCtaText(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div>
+            <label className="block font-medium mb-1">Nupp (CTA button text)</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Küsi pakkumist"
+              value={ctaButton}
+              onChange={e => setCtaButton(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+        </div>
+        <Button type="submit" disabled={contentLoading || contentSaving}>
+          {contentSaving ? "Salvestan..." : "Salvesta sisu"}
+        </Button>
+        {contentSuccess && <div className="text-green-600 mt-2">Salvestatud!</div>}
+      </form>
     </div>
   );
 };

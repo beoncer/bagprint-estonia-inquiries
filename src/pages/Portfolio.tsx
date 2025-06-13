@@ -21,6 +21,17 @@ const Portfolio: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
 
+  // Dynamic content state
+  const [header, setHeader] = useState("");
+  const [headerHighlight, setHeaderHighlight] = useState("");
+  const [description, setDescription] = useState("");
+  const [achievementsTitle, setAchievementsTitle] = useState("");
+  const [achievementsDescription, setAchievementsDescription] = useState("");
+  const [achievements, setAchievements] = useState<{ value: string; label: string }[]>([]);
+  const [ctaTitle, setCtaTitle] = useState("");
+  const [ctaText, setCtaText] = useState("");
+  const [ctaButton, setCtaButton] = useState("");
+
   useEffect(() => {
     const fetchItems = async () => {
       setLoading(true);
@@ -33,6 +44,34 @@ const Portfolio: React.FC = () => {
       setLoading(false);
     };
     fetchItems();
+  }, []);
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "portfolio");
+      if (data) {
+        setHeader(data.find((row: any) => row.key === "portfolio_header")?.value || "");
+        setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
+        setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
+        setAchievementsTitle(data.find((row: any) => row.key === "portfolio_achievements_title")?.value || "");
+        setAchievementsDescription(data.find((row: any) => row.key === "portfolio_achievements_description")?.value || "");
+        // Achievements
+        const achArr = [];
+        for (let i = 1; i <= 6; i++) {
+          const value = data.find((row: any) => row.key === `portfolio_achievement_${i}_value`)?.value || "";
+          const label = data.find((row: any) => row.key === `portfolio_achievement_${i}_label`)?.value || "";
+          if (value || label) achArr.push({ value, label });
+        }
+        setAchievements(achArr);
+        setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "");
+        setCtaText(data.find((row: any) => row.key === "portfolio_cta_text")?.value || "");
+        setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "");
+      }
+    };
+    fetchContent();
   }, []);
 
   // Get unique categories from data
@@ -55,11 +94,16 @@ const Portfolio: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Meie <span className="text-primary">portfoolio</span>
+            {headerHighlight && header.includes(headerHighlight) ? (
+              <>
+                {header.split(headerHighlight)[0]}
+                <span className="text-primary">{headerHighlight}</span>
+                {header.split(headerHighlight)[1]}
+              </>
+            ) : header}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Tutvu meie valmistatud kottidega erinevate ettevõtete jaoks. 
-            Iga projekt on unikaalne ja peegeldab kliendi brändi ning vajadusi.
+            {description}
           </p>
         </div>
 
@@ -124,43 +168,37 @@ const Portfolio: React.FC = () => {
         </div>
 
         {/* Stats Section */}
-        <div className="bg-white rounded-3xl shadow-xl p-12 mt-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Meie saavutused</h2>
-            <p className="text-lg text-gray-600">Numbrid, mis räägivad meie kogemusest</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">150+</div>
-              <div className="text-gray-600">Lõpetatud projekti</div>
+        {achievements.length > 0 && (
+          <div className="bg-white rounded-3xl shadow-xl p-12 mt-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">{achievementsTitle}</h2>
+              <p className="text-lg text-gray-600">{achievementsDescription}</p>
             </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">50+</div>
-              <div className="text-gray-600">Rahulolev klient</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">4</div>
-              <div className="text-gray-600">Tootekategooriat</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-primary mb-2">99%</div>
-              <div className="text-gray-600">Kliendirahulolu</div>
+            <div className={`grid grid-cols-1 md:grid-cols-${achievements.length > 4 ? 6 : Math.min(achievements.length, 4)} gap-8`}>
+              {achievements.map((a, idx) => (
+                <div className="text-center" key={idx}>
+                  <div className="text-4xl font-bold text-primary mb-2">{a.value}</div>
+                  <div className="text-gray-600">{a.label}</div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
 
         {/* CTA Section */}
-        <div className="text-center mt-20">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Valmis oma projekti alustama?
-          </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
-          </p>
-          <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
-            Küsi pakkumist
-          </Button>
-        </div>
+        {ctaTitle && (
+          <div className="text-center mt-20">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              {ctaTitle}
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              {ctaText}
+            </p>
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
+              {ctaButton}
+            </Button>
+          </div>
+        )}
 
         {/* Image Zoom Modal */}
         <Dialog open={!!zoomedImage} onOpenChange={() => setZoomedImage(null)}>

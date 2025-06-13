@@ -1,129 +1,152 @@
-
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, Users, Globe, Heart } from "lucide-react";
+import { CheckCircle, Users, Globe, Heart, Star, ThumbsUp } from "lucide-react";
 
-const guarantees = [
-  {
-    title: "Parima hinna garantii",
-    desc: "Pakume alati parimat hinda. Kui leiad mujalt odavama pakkumise, teeme sulle veelgi parema!",
-    icon: CheckCircle,
-  },
-  {
-    title: "Personaalne teenindus",
-    desc: "Iga klient on meile oluline. Vastame kiiresti ja aitame igas küsimuses.",
-    icon: Users,
-  },
-  {
-    title: "Hea kvaliteet",
-    desc: "Meie kotid on valmistatud parimatest materjalidest, tagades vastupidavuse ja keskkonnasõbralikkuse.",
-    icon: Heart,
-  },
-  {
-    title: "Näidised",
-    desc: "Soovi korral saadame enne tellimust näidised, et saaksid veenduda kvaliteedis.",
-    icon: CheckCircle,
-  },
-  {
-    title: "Rahulolu garantii",
-    desc: "Seisame oma toodete ja teenuste eest. Kui sa pole rahul, leiame lahenduse!",
-    icon: CheckCircle,
-  },
-  {
-    title: "Õigeaegne kohaletoimetamine",
-    desc: "Tagame kiire ja täpse tarne – saad oma kotid alati õigel ajal kätte.",
-    icon: Globe,
-  },
-];
-
-const stats = [
-  { label: "Aastat turul", value: "7+" },
-  { label: "Riiki", value: "4" },
-  { label: "Rahulolevat klienti", value: "2000+" },
-];
+const ICON_MAP: Record<string, React.ElementType> = {
+  check: CheckCircle,
+  user: Users,
+  heart: Heart,
+  globe: Globe,
+  star: Star,
+  "thumbs-up": ThumbsUp,
+};
 
 const Meist: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [header, setHeader] = useState("");
+  const [description, setDescription] = useState("");
+  const [stats, setStats] = useState<{ value: string; label: string }[]>([]);
+  const [promises, setPromises] = useState<{ icon: string; title: string; text: string }[]>([]);
+  const [promisesTitle, setPromisesTitle] = useState("Meie lubadused");
+  const [promisesSubtitle, setPromisesSubtitle] = useState("");
+  const [ctaTitle, setCtaTitle] = useState("Valmis oma projekti alustama?");
+  const [ctaText, setCtaText] = useState("Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.");
+  const [ctaButton, setCtaButton] = useState("Küsi pakkumist");
+  const [missionTitle, setMissionTitle] = useState("Meie missioon");
+  const [missionTexts, setMissionTexts] = useState<string[]>([]);
+  const [headerHighlight, setHeaderHighlight] = useState("");
+
+  useEffect(() => {
+    const fetchContent = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "meist");
+      if (data) {
+        setHeader(data.find((row: any) => row.key === "meist_header")?.value || "Meie lugu");
+        setDescription(data.find((row: any) => row.key === "meist_description")?.value || "");
+        setPromisesTitle(data.find((row: any) => row.key === "meist_promises_title")?.value || "Meie lubadused");
+        setPromisesSubtitle(data.find((row: any) => row.key === "meist_promises_subtitle")?.value || "Need on põhimõtted, millele tugineme oma igapäevases töös ja millega tagame parima teenuse");
+        setCtaTitle(data.find((row: any) => row.key === "meist_cta_title")?.value || "Valmis oma projekti alustama?");
+        setCtaText(data.find((row: any) => row.key === "meist_cta_text")?.value || "Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.");
+        setCtaButton(data.find((row: any) => row.key === "meist_cta_button")?.value || "Küsi pakkumist");
+        // Stats
+        const statArr = [];
+        for (let i = 1; i <= 6; i++) {
+          const value = data.find((row: any) => row.key === `meist_stat_${i}_value`)?.value || "";
+          const label = data.find((row: any) => row.key === `meist_stat_${i}_label`)?.value || "";
+          if (value || label) statArr.push({ value, label });
+        }
+        setStats(statArr);
+        // Promises
+        const promiseArr = [];
+        for (let i = 1; i <= 6; i++) {
+          const icon = data.find((row: any) => row.key === `meist_promise_${i}_icon`)?.value || "check";
+          const title = data.find((row: any) => row.key === `meist_promise_${i}_title`)?.value || "";
+          const text = data.find((row: any) => row.key === `meist_promise_${i}_text`)?.value || "";
+          if (title || text) promiseArr.push({ icon, title, text });
+        }
+        setPromises(promiseArr);
+        setMissionTitle(data.find((row: any) => row.key === "meist_mission_title")?.value || "Meie missioon");
+        const missionArr = [];
+        for (let i = 1; i <= 3; i++) {
+          const text = data.find((row: any) => row.key === `meist_mission_text_${i}`)?.value || "";
+          if (text) missionArr.push(text);
+        }
+        setMissionTexts(missionArr);
+        setHeaderHighlight(data.find((row: any) => row.key === "meist_header_highlight")?.value || "");
+      }
+      setLoading(false);
+    };
+    fetchContent();
+  }, []);
+
+  if (loading) {
+    return <div className="py-32 text-center text-gray-500">Laadimine...</div>;
+  }
+
+  // Highlight logic for header
+  let headerNode: React.ReactNode = header;
+  if (header && headerHighlight) {
+    const idx = header.toLowerCase().indexOf(headerHighlight.toLowerCase());
+    if (idx !== -1) {
+      headerNode = <>
+        {header.slice(0, idx)}
+        <span className="text-primary">{header.slice(idx, idx + headerHighlight.length)}</span>
+        {header.slice(idx + headerHighlight.length)}
+      </>;
+    }
+  }
+
+  // Split header for colored 'lugu'
+  const split = header.split(/(lugu)/i);
+
   return (
     <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      {/* Hero Section - matching portfolio style */}
+      {/* Hero Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Meie <span className="text-primary">lugu</span>
+              {headerNode}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Tutvu meie missiooniga luua jätkusuutlikke kottide lahendusi, mis aitavad ettevõtetel oma brändi esindada ja samal ajal keskkonda hoida.
+              {description}
             </p>
           </div>
         </div>
       </section>
 
       {/* Stats Section */}
-      <section className="pb-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {stats.map((stat, index) => (
-              <Card key={stat.label} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                <CardContent className="p-8 text-center bg-white hover:bg-primary transition-colors duration-300">
-                  <div className="text-5xl font-bold text-gray-900 group-hover:text-white mb-2 transition-colors duration-300">
-                    {stat.value}
-                  </div>
-                  <div className="text-gray-600 group-hover:text-white text-lg uppercase tracking-wide font-medium transition-colors duration-300">
-                    {stat.label}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      {stats.length > 0 && (
+        <section className="pb-20">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {stats.map((stat, index) => (
+                <Card key={index} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <CardContent className="p-8 text-center bg-white hover:bg-primary transition-colors duration-300">
+                    <div className="text-5xl font-bold text-gray-900 group-hover:text-white mb-2 transition-colors duration-300">
+                      {stat.value}
+                    </div>
+                    <div className="text-gray-600 group-hover:text-white text-lg uppercase tracking-wide font-medium transition-colors duration-300">
+                      {stat.label}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Mission Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <Card className="border-0 shadow-xl">
-            <CardContent className="p-12">
-              <div className="flex items-center mb-8">
-                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mr-4">
-                  <Heart className="w-6 h-6 text-white" />
-                </div>
-                <h2 className="text-3xl font-bold text-gray-900">Meie missioon</h2>
-              </div>
-              <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
-                <p>
-                  Oleme pühendunud sellele, et pakkuda plastkottidele keskkonnasõbralikke alternatiive. 
-                  Usume, et iga väike samm aitab luua tervema planeedi järgmistele põlvkondadele. 
-                  Meie valikus on ainult hoolikalt valitud materjalidest kotid, mis on vastupidavad ja stiilsed.
-                </p>
-                <p>
-                  Meie meeskond hoolitseb selle eest, et iga klient saaks personaalset teenindust ja 
-                  parima võimaliku kogemuse. Oleme uhked oma kiire tarne, paindlike lahenduste ja 
-                  ausa suhtluse üle.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Guarantees Section */}
+      {/* Guarantees Section (Promises) */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Meie lubadused</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">{promisesTitle}</h2>
             <div className="w-24 h-1 bg-primary mx-auto mb-4"></div>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Need on põhimõtted, millele tugineme oma igapäevases töös ja millega tagame parima teenuse
+              {promisesSubtitle}
             </p>
           </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {guarantees.map((guarantee, index) => {
-              const IconComponent = guarantee.icon;
+            {promises.map((promise, index) => {
+              const IconComponent = ICON_MAP[promise.icon] || CheckCircle;
               return (
-                <Card key={guarantee.title} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
+                <Card key={index} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
                   <CardContent className="p-8">
                     <div className="flex items-start space-x-4">
                       <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
@@ -131,10 +154,10 @@ const Meist: React.FC = () => {
                       </div>
                       <div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
-                          {guarantee.title}
+                          {promise.title}
                         </h3>
                         <p className="text-gray-600 leading-relaxed">
-                          {guarantee.desc}
+                          {promise.text}
                         </p>
                       </div>
                     </div>
@@ -146,18 +169,41 @@ const Meist: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Mission Section (dynamic) */}
+      {missionTitle && missionTexts.length > 0 && (
+        <section className="py-20">
+          <div className="max-w-7xl mx-auto px-4">
+            <Card className="border-0 shadow-xl">
+              <CardContent className="p-12">
+                <div className="flex items-center mb-8">
+                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mr-4">
+                    <Heart className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl font-bold text-gray-900">{missionTitle}</h2>
+                </div>
+                <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
+                  {missionTexts.map((text, idx) => (
+                    <p key={idx}>{text}</p>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      )}
+
+      {/* CTA Section (dynamic) */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-6">
-              Valmis oma projekti alustama?
+              {ctaTitle}
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.
+              {ctaText}
             </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
-              Küsi pakkumist
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg" asChild>
+              <a href="/kontakt">{ctaButton}</a>
             </Button>
           </div>
         </div>

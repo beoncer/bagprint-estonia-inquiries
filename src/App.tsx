@@ -30,6 +30,7 @@ import PortfolioAdmin from "./pages/admin/Portfolio";
 import FooterAdmin from "./pages/admin/Footer";
 import BlogAdmin from "./pages/admin/Blog";
 import GuaranteesAdmin from "./pages/admin/Guarantees";
+import MeistAdmin from "./pages/admin/Meist";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
               <AdminLogin />
             </AuthProvider>
           } />
+          <Route path="/admin/meist" element={<MeistAdmin />} />
           <Route path="/admin" element={
             <AuthProvider>
               <AdminLayout />
