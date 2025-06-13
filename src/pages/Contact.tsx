@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -18,7 +17,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -41,6 +41,16 @@ const Contact = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Dynamic content state
+  const [header, setHeader] = useState("");
+  const [headerHighlight, setHeaderHighlight] = useState("");
+  const [description, setDescription] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [formTitle, setFormTitle] = useState("");
+  const [mapUrl, setMapUrl] = useState("");
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +60,27 @@ const Contact = () => {
       message: "",
     },
   });
+
+  // Fetch dynamic content
+  useEffect(() => {
+    const fetchContent = async () => {
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "contact");
+      if (data) {
+        setHeader(data.find((row: any) => row.key === "contact_header")?.value || "");
+        setHeaderHighlight(data.find((row: any) => row.key === "contact_header_highlight")?.value || "");
+        setDescription(data.find((row: any) => row.key === "contact_description")?.value || "");
+        setEmail(data.find((row: any) => row.key === "contact_email")?.value || "");
+        setPhone(data.find((row: any) => row.key === "contact_phone")?.value || "");
+        setAddress(data.find((row: any) => row.key === "contact_address")?.value || "");
+        setFormTitle(data.find((row: any) => row.key === "contact_form_title")?.value || "");
+        setMapUrl(data.find((row: any) => row.key === "contact_map_url")?.value || "");
+      }
+    };
+    fetchContent();
+  }, []);
   
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
@@ -74,10 +105,16 @@ const Contact = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Võta meiega <span className="text-primary">ühendust</span>
+              {headerHighlight && header.includes(headerHighlight) ? (
+                <>
+                  {header.split(headerHighlight)[0]}
+                  <span className="text-primary">{headerHighlight}</span>
+                  {header.split(headerHighlight)[1]}
+                </>
+              ) : header}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Kui sul on küsimusi meie toodete, hindade või muu kohta, siis võta meiega ühendust ja aitame sind parima meelega.
+              {description}
             </p>
           </div>
         </div>
@@ -89,27 +126,27 @@ const Contact = () => {
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">E-post</h3>
-                <p className="text-gray-600">info@bagprint.ee</p>
+                <p className="text-gray-600">{email}</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">Telefon</h3>
-                <p className="text-gray-600">+372 123 4567</p>
+                <p className="text-gray-600">{phone}</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">Aadress</h3>
-                <p className="text-gray-600">Kaupmehe 10, Tallinn</p>
+                <p className="text-gray-600">{address}</p>
               </CardContent>
             </Card>
           </div>
           
           <div className="bg-white p-8 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-6">Saada meile sõnum</h2>
+            <h2 className="text-2xl font-bold mb-6">{formTitle}</h2>
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -185,18 +222,20 @@ const Contact = () => {
       </div>
       
       {/* Map Section */}
-      <div className="h-[400px] bg-gray-200 w-full">
-        <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2028.6900409549314!2d24.74201731570651!3d59.43438281057916!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4692949d640b7d95%3A0x52162063ef2cee9!2sKaupmehe%2010%2C%2010114%20Tallinn!5e0!3m2!1sen!2see!4v1652345678901!5m2!1sen!2see" 
-          width="100%" 
-          height="100%" 
-          style={{ border: 0 }} 
-          allowFullScreen={true} 
-          loading="lazy" 
-          referrerPolicy="no-referrer-when-downgrade"
-          title="bagprint.ee location"
-        />
-      </div>
+      {mapUrl && (
+        <div className="h-[400px] bg-gray-200 w-full">
+          <iframe 
+            src={mapUrl}
+            width="100%" 
+            height="100%" 
+            style={{ border: 0 }} 
+            allowFullScreen={true} 
+            loading="lazy" 
+            referrerPolicy="no-referrer-when-downgrade"
+            title="bagprint.ee location"
+          />
+        </div>
+      )}
     </div>
   );
 };

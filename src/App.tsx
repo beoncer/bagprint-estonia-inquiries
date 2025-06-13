@@ -31,6 +31,7 @@ import FooterAdmin from "./pages/admin/Footer";
 import BlogAdmin from "./pages/admin/Blog";
 import GuaranteesAdmin from "./pages/admin/Guarantees";
 import MeistAdmin from "./pages/admin/Meist";
+import ContactAdmin from "./pages/admin/Contact";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
             <Route path="manual" element={<AdminManual />} />
             <Route path="pages" element={<PagesAdmin />} />
             <Route path="portfolio" element={<PortfolioAdmin />} />
+            <Route path="contact" element={<ContactAdmin />} />
             <Route path="footer" element={<FooterAdmin />} />
             <Route path="blog" element={<BlogAdmin />} />
             <Route path="guarantees" element={<GuaranteesAdmin />} />
