@@ -548,12 +548,17 @@ const Products = () => {
   }[activeCategory] || "toodete";
 
   return (
-    <div className="bg-gray-50 py-10">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-        <h1 className="text-3xl font-bold mb-4">{categoryTitle}</h1>
-        <p className="text-gray-600 mb-8">
-          Vaata meie {categoryDescription} valikut.
-        </p>
+    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Hero Section - matching portfolio style */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            {categoryTitle}
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Vaata meie {categoryDescription} valikut.
+          </p>
+        </div>
         
         {/* Search */}
         <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
@@ -591,7 +596,7 @@ const Products = () => {
         )}
 
         {/* Guarantees Section */}
-        <section className="mt-16 mb-16">
+        <section className="mt-20 mb-16">
           <div className="bg-white rounded-lg shadow-sm p-8">
             <div className="text-center mb-10">
               <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
@@ -599,7 +604,6 @@ const Products = () => {
                 {guaranteesContentLoading ? "..." : guaranteesDescription}
               </p>
             </div>
-            
             {guaranteesLoading ? (
               <div>Laen garantiiandmeid...</div>
             ) : (
@@ -620,53 +624,6 @@ const Products = () => {
                 })}
               </div>
             )}
-          </div>
-        </section>
-
-        {/* Need Help Section */}
-        <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
-          <h2 className="text-3xl font-bold mb-4">Küsimusi?</h2>
-          <h3 className="text-2xl font-medium mb-8">Aitame teid rõõmuga!</h3>
-          
-          <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-3 rounded-full">
-                <Phone className="h-6 w-6" />
-              </div>
-              <div className="text-left">
-                <div className="text-xl font-semibold">+372 5919 7172</div>
-                <div className="text-sm opacity-90">Ootame kõnet tööpäeviti 9.00-17.00</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <div className="bg-white/20 p-3 rounded-full">
-                <Mail className="h-6 w-6" />
-              </div>
-              <div className="text-left">
-                <div className="text-xl font-semibold">Vajad abi?</div>
-                <div className="text-sm opacity-90">Võtke meiega ühendust e-posti teel</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="mt-16 mb-16">
-          <h2 className="text-2xl font-bold mb-8">Tellimisprotsess</h2>
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            <Accordion type="single" collapsible className="w-full">
-              {categoryFAQs[activeCategory as keyof typeof categoryFAQs]?.map((faq, index) => (
-                <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-b-0">
-                  <AccordionTrigger className="text-left hover:no-underline py-4">
-                    <span className="font-medium">{faq.question}</span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pb-4 text-gray-600">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
           </div>
         </section>
       </div>
