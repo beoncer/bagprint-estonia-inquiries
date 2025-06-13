@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -74,6 +73,10 @@ const Navbar = () => {
     { name: "Tehtud tööd", url: "/portfoolio" }
   ];
 
+  // Remove duplicates from staticNavItems if they already exist in pages
+  const navNames = new Set(pages.map(p => p.name));
+  const filteredStaticNavItems = staticNavItems.filter(item => !navNames.has(item.name));
+
   return (
     <nav className="w-full z-50">
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-4">
@@ -114,7 +117,7 @@ const Navbar = () => {
                       </Link>
                     );
                   })}
-                  {staticNavItems.map((item) => (
+                  {filteredStaticNavItems.map((item) => (
                     <Link
                       key={item.name}
                       to={item.url}
@@ -128,8 +131,8 @@ const Navbar = () => {
               )}
               <Button asChild>
                 <Link 
-                  to="/paring"
-                  onClick={() => handleLinkClick('/paring')}
+                  to="/kontakt"
+                  onClick={() => handleLinkClick('/kontakt')}
                 >
                   Küsi pakkumist
                 </Link>
@@ -172,7 +175,7 @@ const Navbar = () => {
                         </Link>
                       );
                     })}
-                    {staticNavItems.map((item) => (
+                    {filteredStaticNavItems.map((item) => (
                       <Link
                         key={item.name}
                         to={item.url}
@@ -186,8 +189,8 @@ const Navbar = () => {
                 )}
                 <Button asChild className="w-full mt-2">
                   <Link 
-                    to="/paring" 
-                    onClick={() => handleLinkClick('/paring')}
+                    to="/kontakt" 
+                    onClick={() => handleLinkClick('/kontakt')}
                   >
                     Küsi pakkumist
                   </Link>

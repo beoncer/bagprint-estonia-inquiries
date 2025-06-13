@@ -10,7 +10,6 @@ import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import Contact from "./pages/Contact";
-import Inquiry from "./pages/Inquiry";
 import NotFound from "./pages/NotFound";
 import Meist from "./pages/Meist";
 import Portfolio from "./pages/Portfolio";
@@ -50,7 +49,6 @@ const App = () => (
             <Route path="/sussikotid" element={<Products />} />
             <Route path="/tooted/:slug" element={<ProductDetail />} />
             <Route path="/kontakt" element={<Contact />} />
-            <Route path="/paring" element={<Inquiry />} />
             <Route path="/meist" element={<Meist />} />
             <Route path="/portfoolio" element={<Portfolio />} />
             <Route path="/blogi" element={<Blog />} />
