@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -31,12 +30,43 @@ const fetchBlogPosts = async (): Promise<BlogPost[]> => {
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([]);
+  
+  // Dynamic content state
+  const [header, setHeader] = useState("");
+  const [headerHighlight, setHeaderHighlight] = useState("");
+  const [description, setDescription] = useState("");
+  const [ctaTitle, setCtaTitle] = useState("");
+  const [ctaSubtitle, setCtaSubtitle] = useState("");
+  const [ctaPhone, setCtaPhone] = useState("");
+  const [ctaPhoneHours, setCtaPhoneHours] = useState("");
+  const [ctaButton, setCtaButton] = useState("");
 
   const { data: blogPosts = [], isLoading, error } = useQuery({
     queryKey: ['blog-posts'],
     queryFn: fetchBlogPosts,
     staleTime: 1000 * 60 * 5,
   });
+
+  // Fetch dynamic content
+  useEffect(() => {
+    const fetchContent = async () => {
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "blog");
+      if (data) {
+        setHeader(data.find((row: any) => row.key === "blog_header")?.value || "");
+        setHeaderHighlight(data.find((row: any) => row.key === "blog_header_highlight")?.value || "");
+        setDescription(data.find((row: any) => row.key === "blog_description")?.value || "");
+        setCtaTitle(data.find((row: any) => row.key === "blog_cta_title")?.value || "");
+        setCtaSubtitle(data.find((row: any) => row.key === "blog_cta_subtitle")?.value || "");
+        setCtaPhone(data.find((row: any) => row.key === "blog_cta_phone")?.value || "");
+        setCtaPhoneHours(data.find((row: any) => row.key === "blog_cta_phone_hours")?.value || "");
+        setCtaButton(data.find((row: any) => row.key === "blog_cta_button")?.value || "");
+      }
+    };
+    fetchContent();
+  }, []);
 
   useEffect(() => {
     if (searchTerm.trim() === "") {
@@ -97,10 +127,16 @@ const Blog = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Meie <span className="text-primary">blogi</span>
+              {headerHighlight && header.includes(headerHighlight) ? (
+                <>
+                  {header.split(headerHighlight)[0]}
+                  <span className="text-primary">{headerHighlight}</span>
+                  {header.split(headerHighlight)[1]}
+                </>
+              ) : header}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Kasulikud artiklid ja nõuanded kottide valimise, trükkimise ja kasutamise kohta
+              {description}
             </p>
           </div>
         </div>
@@ -175,19 +211,25 @@ const Blog = () => {
         )}
 
         {/* CTA Section */}
-        <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
-          <h2 className="text-3xl font-bold mb-4">Küsimusi artiklite kohta?</h2>
-          <h3 className="text-2xl font-medium mb-8">Võtke meiega ühendust!</h3>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
-            <div className="text-left">
-              <div className="text-xl font-semibold">+372 5919 7172</div>
-              <div className="text-sm opacity-90">Ootame kõnet tööpäeviti 9.00-17.00</div>
+        {ctaTitle && (
+          <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
+            <h2 className="text-3xl font-bold mb-4">{ctaTitle}</h2>
+            {ctaSubtitle && <h3 className="text-2xl font-medium mb-8">{ctaSubtitle}</h3>}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
+              {ctaPhone && (
+                <div className="text-left">
+                  <div className="text-xl font-semibold">{ctaPhone}</div>
+                  {ctaPhoneHours && <div className="text-sm opacity-90">{ctaPhoneHours}</div>}
+                </div>
+              )}
+              {ctaButton && (
+                <Button variant="secondary" size="lg">
+                  {ctaButton}
+                </Button>
+              )}
             </div>
-            <Button variant="secondary" size="lg">
-              Võta ühendust
-            </Button>
-          </div>
-        </section>
+          </section>
+        )}
       </div>
     </div>
   );

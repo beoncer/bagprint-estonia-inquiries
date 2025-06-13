@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -45,6 +44,20 @@ const BlogAdmin = () => {
     read_time: "5 min",
     image_url: ""
   });
+  
+  // Dynamic content state for blog page
+  const [header, setHeader] = useState("");
+  const [headerHighlight, setHeaderHighlight] = useState("");
+  const [description, setDescription] = useState("");
+  const [ctaTitle, setCtaTitle] = useState("");
+  const [ctaSubtitle, setCtaSubtitle] = useState("");
+  const [ctaPhone, setCtaPhone] = useState("");
+  const [ctaPhoneHours, setCtaPhoneHours] = useState("");
+  const [ctaButton, setCtaButton] = useState("");
+  const [contentLoading, setContentLoading] = useState(true);
+  const [contentSaving, setContentSaving] = useState(false);
+  const [contentSuccess, setContentSuccess] = useState(false);
+  
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -177,6 +190,61 @@ const BlogAdmin = () => {
       });
     }
   });
+
+  // Fetch dynamic content for blog page
+  const fetchContent = async () => {
+    setContentLoading(true);
+    const { data } = await supabase
+      .from("website_content")
+      .select("key, value")
+      .eq("page", "blog");
+    if (data) {
+      setHeader(data.find((row: any) => row.key === "blog_header")?.value || "");
+      setHeaderHighlight(data.find((row: any) => row.key === "blog_header_highlight")?.value || "");
+      setDescription(data.find((row: any) => row.key === "blog_description")?.value || "");
+      setCtaTitle(data.find((row: any) => row.key === "blog_cta_title")?.value || "");
+      setCtaSubtitle(data.find((row: any) => row.key === "blog_cta_subtitle")?.value || "");
+      setCtaPhone(data.find((row: any) => row.key === "blog_cta_phone")?.value || "");
+      setCtaPhoneHours(data.find((row: any) => row.key === "blog_cta_phone_hours")?.value || "");
+      setCtaButton(data.find((row: any) => row.key === "blog_cta_button")?.value || "");
+    }
+    setContentLoading(false);
+  };
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const handleContentSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setContentSaving(true);
+    setContentSuccess(false);
+    const updates = [
+      { page: "blog", key: "blog_header", value: header },
+      { page: "blog", key: "blog_header_highlight", value: headerHighlight },
+      { page: "blog", key: "blog_description", value: description },
+      { page: "blog", key: "blog_cta_title", value: ctaTitle },
+      { page: "blog", key: "blog_cta_subtitle", value: ctaSubtitle },
+      { page: "blog", key: "blog_cta_phone", value: ctaPhone },
+      { page: "blog", key: "blog_cta_phone_hours", value: ctaPhoneHours },
+      { page: "blog", key: "blog_cta_button", value: ctaButton },
+    ];
+    const { error } = await supabase.from("website_content").upsert(updates, { onConflict: "page,key" });
+    setContentSaving(false);
+    if (!error) {
+      setContentSuccess(true);
+      toast({
+        title: "Success",
+        description: "Blog page content updated successfully"
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: `Failed to save content: ${error.message}`,
+        variant: "destructive"
+      });
+    }
+  };
 
   const resetForm = () => {
     setFormData({
@@ -449,6 +517,108 @@ const BlogAdmin = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Dynamic content admin UI */}
+      <form className="space-y-8 max-w-2xl mb-10" onSubmit={handleContentSave}>
+        <h2 className="text-2xl font-bold mb-2">Blogi lehe sisu</h2>
+        <div>
+          <label className="block font-medium mb-1">Pealkiri (header)</label>
+          <input
+            type="text"
+            className="w-full border rounded px-3 py-2"
+            placeholder="Meie blogi"
+            value={header}
+            onChange={e => setHeader(e.target.value)}
+            disabled={contentLoading || contentSaving}
+          />
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Tõsta esile sõna (highlight word)</label>
+          <input
+            type="text"
+            className="w-full border rounded px-3 py-2"
+            placeholder="blogi"
+            value={headerHighlight}
+            onChange={e => setHeaderHighlight(e.target.value)}
+            disabled={contentLoading || contentSaving}
+          />
+          <p className="text-sm text-gray-500 mt-1">Sisesta sõna, mida soovid pealkirjas punase värviga esile tõsta</p>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Kirjeldus (description)</label>
+          <textarea
+            className="w-full border rounded px-3 py-2"
+            placeholder="Kasulikud artiklid ja nõuanded kottide valimise, trükkimise ja kasutamise kohta"
+            rows={2}
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            disabled={contentLoading || contentSaving}
+          />
+        </div>
+        {/* CTA Section */}
+        <div>
+          <h3 className="text-lg font-semibold mb-2">Kutse tegevusele (CTA)</h3>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Pealkiri (CTA title)</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Küsimusi artiklite kohta?"
+              value={ctaTitle}
+              onChange={e => setCtaTitle(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Alapealkiri (CTA subtitle)</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Võtke meiega ühendust!"
+              value={ctaSubtitle}
+              onChange={e => setCtaSubtitle(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Telefoninumber</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="+372 5919 7172"
+              value={ctaPhone}
+              onChange={e => setCtaPhone(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block font-medium mb-1">Tööajad</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Ootame kõnet tööpäeviti 9.00-17.00"
+              value={ctaPhoneHours}
+              onChange={e => setCtaPhoneHours(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+          <div>
+            <label className="block font-medium mb-1">Nupu tekst</label>
+            <input
+              type="text"
+              className="w-full border rounded px-3 py-2"
+              placeholder="Võta ühendust"
+              value={ctaButton}
+              onChange={e => setCtaButton(e.target.value)}
+              disabled={contentLoading || contentSaving}
+            />
+          </div>
+        </div>
+        <Button type="submit" disabled={contentLoading || contentSaving}>
+          {contentSaving ? "Salvestan..." : "Salvesta sisu"}
+        </Button>
+        {contentSuccess && <div className="text-green-600 mt-2">Salvestatud!</div>}
+      </form>
     </div>
   );
 };
