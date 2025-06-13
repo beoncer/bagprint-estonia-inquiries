@@ -32,6 +32,7 @@ import BlogAdmin from "./pages/admin/Blog";
 import GuaranteesAdmin from "./pages/admin/Guarantees";
 import MeistAdmin from "./pages/admin/Meist";
 import ContactAdmin from "./pages/admin/Contact";
+import ProductPagesAdmin from "./pages/admin/ProductPages";
 
 const queryClient = new QueryClient();
 
@@ -71,6 +72,7 @@ const App = () => (
           }>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="product-pages" element={<ProductPagesAdmin />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="assets" element={<AdminAssets />} />
             <Route path="seo" element={<AdminSEO />} />

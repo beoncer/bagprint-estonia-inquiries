@@ -175,6 +175,10 @@ const Products = () => {
   const [guaranteesDescription, setGuaranteesDescription] = useState<string>("");
   const [guaranteesContentLoading, setGuaranteesContentLoading] = useState(true);
   
+  // Dynamic content state for product pages
+  const [productPageContent, setProductPageContent] = useState<Record<string, any>>({});
+  const [productPagesLoading, setProductPagesLoading] = useState(true);
+  
   // Fetch site content for dynamic product categories
   const { data: siteContent, isLoading: siteContentLoading, error: siteContentError } = useQuery({
     queryKey: ['site-content'],
@@ -196,6 +200,31 @@ const Products = () => {
     },
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
+
+  // Fetch dynamic content for product pages
+  useEffect(() => {
+    const fetchProductPagesContent = async () => {
+      setProductPagesLoading(true);
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "product_pages");
+      
+      if (data) {
+        const content: Record<string, any> = {};
+        data.forEach((row: any) => {
+          const keyParts = row.key.split('_');
+          const field = keyParts.pop();
+          const categoryId = keyParts.join('_');
+          if (!content[categoryId]) content[categoryId] = {};
+          content[categoryId][field] = row.value;
+        });
+        setProductPageContent(content);
+      }
+      setProductPagesLoading(false);
+    };
+    fetchProductPagesContent();
+  }, []);
 
   // Get dynamic content for /tooted page
   const tootedPageContent = siteContent ? {
@@ -376,6 +405,28 @@ const Products = () => {
     fetchGuaranteesContent();
   }, []);
 
+  // Show filtered products for category pages
+  const getCategoryContent = (categoryId: string) => {
+    const content = productPageContent[categoryId] || {};
+    return {
+      title: content.title || {
+        cotton_bag: "Riidest kotid",
+        paper_bag: "Paberkotid", 
+        drawstring_bag: "Nööriga kotid",
+        shoebag: "Sussikotid"
+      }[activeCategory] || "Tooted",
+      description: content.description || {
+        cotton_bag: "Vaata meie riidest kottide valikut.",
+        paper_bag: "Vaata meie paberkottide valikut.",
+        drawstring_bag: "Vaata meie nööriga kottide valikut.", 
+        shoebag: "Vaata meie sussikottide valikut."
+      }[activeCategory] || "Vaata meie toodete valikut.",
+      highlight: content.highlight || "kotid"
+    };
+  };
+
+  const categoryContent = getCategoryContent(activeCategory);
+
   if (loading) {
     return (
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
@@ -532,31 +583,22 @@ const Products = () => {
     );
   }
 
-  // Show filtered products for category pages
-  const categoryTitle = {
-    cotton_bag: "Riidest kotid",
-    paper_bag: "Paberkotid", 
-    drawstring_bag: "Nööriga kotid",
-    shoebag: "Sussikotid"
-  }[activeCategory] || "Tooted";
-
-  const categoryDescription = {
-    cotton_bag: "riidest kottide",
-    paper_bag: "paberkottide",
-    drawstring_bag: "nööriga kottide", 
-    shoebag: "sussikottide"
-  }[activeCategory] || "toodete";
-
   return (
     <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4">
         {/* Hero Section - matching portfolio style */}
         <div className="text-center mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            {categoryTitle}
+            {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
+              <>
+                {categoryContent.title.split(categoryContent.highlight)[0]}
+                <span className="text-primary">{categoryContent.highlight}</span>
+                {categoryContent.title.split(categoryContent.highlight)[1]}
+              </>
+            ) : categoryContent.title}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Vaata meie {categoryDescription} valikut.
+            {categoryContent.description}
           </p>
         </div>
         
