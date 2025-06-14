@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -35,17 +34,7 @@ import MeistAdmin from "./pages/admin/Meist";
 import ContactAdmin from "./pages/admin/Contact";
 import ProductPagesAdmin from "./pages/admin/ProductPages";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 0, // Always consider data stale
-      gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
-      refetchOnMount: true,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: true,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

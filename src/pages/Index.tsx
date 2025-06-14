@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -161,19 +160,17 @@ const Index = () => {
     cta_button_link: "/inquiry"
   });
 
-  // Use React Query for hero content with reduced stale time and refetch on mount
+  // Use React Query for hero content
   const { data: heroContent, isLoading: isHeroLoading, error: heroError } = useQuery({
     queryKey: ['heroContent'],
     queryFn: fetchHeroContent,
-    staleTime: 1000 * 30, // Reduced to 30 seconds
-    refetchOnMount: 'always', // Always refetch on mount
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  const { data: bannerUrl, isLoading: isBannerLoading } = useQuery({
+  const { data: bannerUrl } = useQuery({
     queryKey: ["homepageBannerUrl"],
     queryFn: fetchBannerUrl,
-    staleTime: 1000 * 30, // Reduced to 30 seconds
-    refetchOnMount: 'always',
+    staleTime: 1000 * 60 * 5,
   });
 
   console.log('Hero content from query:', heroContent);
@@ -183,8 +180,7 @@ const Index = () => {
   const whyChooseUsQuery = useQuery({
     queryKey: ["whyChooseUsContent"],
     queryFn: fetchWhyChooseUsContent,
-    staleTime: 1000 * 60, // 1 minute for less critical content
-    refetchOnMount: 'always',
+    staleTime: 1000 * 60 * 5,
   });
   const whyChooseUs = whyChooseUsQuery.data ? parseWhyChooseUs(whyChooseUsQuery.data) : { title: "Miks valida meid", cards: [] };
 
@@ -218,36 +214,6 @@ const Index = () => {
     fetchCtaContent().then(setCtaContent);
   }, []);
 
-  // Show loading skeleton for hero content to prevent flash of old content
-  if (isHeroLoading || isBannerLoading) {
-    return (
-      <div className="py-6">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <div className="relative bg-gray-200 rounded-lg overflow-hidden animate-pulse" style={{ minHeight: "520px" }}>
-            <div className="absolute inset-0 bg-white/45"></div>
-            <div className="relative z-10 h-full w-full">
-              <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
-                <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
-                  <div className="flex flex-col h-full justify-between">
-                    <div className="mt-4 md:mt-8">
-                      <div className="h-12 bg-gray-300 rounded w-3/4 mb-4"></div>
-                      <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
-                      <div className="h-4 bg-gray-300 rounded w-5/6 mb-6"></div>
-                      <div className="flex gap-4">
-                        <div className="h-10 bg-gray-300 rounded w-32"></div>
-                        <div className="h-10 bg-gray-300 rounded w-32"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       {/* Hero Section */}
@@ -268,37 +234,51 @@ const Index = () => {
               <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
                 <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
                   <div className="flex flex-col h-full justify-between">
-                    <div className="mt-4 md:mt-8">
-                      <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-                        {heroContent?.title || "Kvaliteetsed kotid ja pakendid teie brändile"}
-                      </h1>
-                      <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
-                        {heroContent?.description || "Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga."}
-                      </p>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
-                      <Button 
-                        variant="default"
-                        size="xl" 
-                        className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
-                        asChild
-                      >
-                        <Link to={heroContent?.button1?.link || "/tooted"}>
-                          {heroContent?.button1?.value || "Vaata tooteid"}
-                        </Link>
-                      </Button>
-                      <Button 
-                        variant="white" 
-                        size="xl" 
-                        className="text-base md:text-lg border border-gray-200 shadow-sm" 
-                        asChild
-                      >
-                        <Link to={heroContent?.button2?.link || "/paring"}>
-                          {heroContent?.button2?.value || "Küsi pakkumist"}
-                        </Link>
-                      </Button>
-                    </div>
+                    {isHeroLoading ? (
+                      <div className="animate-pulse space-y-4">
+                        <div className="h-12 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-4 bg-gray-200 rounded w-full"></div>
+                        <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                        <div className="flex gap-4 mt-6">
+                          <div className="h-10 bg-gray-200 rounded w-32"></div>
+                          <div className="h-10 bg-gray-200 rounded w-32"></div>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mt-4 md:mt-8">
+                          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+                            {heroContent?.title || "Kvaliteetsed kotid ja pakendid teie brändile"}
+                          </h1>
+                          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
+                            {heroContent?.description || "Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga."}
+                          </p>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
+                          <Button 
+                            variant="default"
+                            size="xl" 
+                            className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
+                            asChild
+                          >
+                            <Link to={heroContent?.button1?.link || "/tooted"}>
+                              {heroContent?.button1?.value || "Vaata tooteid"}
+                            </Link>
+                          </Button>
+                          <Button 
+                            variant="white" 
+                            size="xl" 
+                            className="text-base md:text-lg border border-gray-200 shadow-sm" 
+                            asChild
+                          >
+                            <Link to={heroContent?.button2?.link || "/paring"}>
+                              {heroContent?.button2?.value || "Küsi pakkumist"}
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
                 <div className="hidden md:block md:w-1/3 lg:w-1/2">

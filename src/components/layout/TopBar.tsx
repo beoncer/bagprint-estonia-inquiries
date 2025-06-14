@@ -1,4 +1,3 @@
-
 import { Phone, Mail } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -55,12 +54,10 @@ const TopBar = () => {
   const { data: topBarContent, isLoading } = useQuery({
     queryKey: ['topBarContent'],
     queryFn: fetchTopBarContent,
-    staleTime: 1000 * 30, // Reduced to 30 seconds
-    refetchOnMount: 'always', // Always refetch on mount
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  // Show loading skeleton immediately to prevent flash of old content
-  if (isLoading || !topBarContent) {
+  if (isLoading) {
     return (
       <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
