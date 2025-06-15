@@ -32,7 +32,7 @@ const Navbar = () => {
   const location = useLocation();
   const [navbarLogoUrl, setNavbarLogoUrl] = useState<string>("");
 
-  const { data: pages = [], isLoading } = useQuery({
+  const { data: pages = [], isLoading, isError } = useQuery({
     queryKey: ['pages'],
     queryFn: fetchPages,
     staleTime: 0,
@@ -69,15 +69,29 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  // Default navigation items that should always appear
+  const defaultNavItems = [
+    { id: "default-1", name: "Avaleht", url_et: "/", visible: true, sort_order: 1 },
+    { id: "default-2", name: "Tooted", url_et: "/tooted", visible: true, sort_order: 2 },
+    { id: "default-3", name: "Meist", url_et: "/meist", visible: true, sort_order: 3 },
+    { id: "default-4", name: "Kontakt", url_et: "/kontakt", visible: true, sort_order: 4 }
+  ];
+
   // Hardcoded navigation items that should always appear
   const staticNavItems = [
     { name: "Blogi", url: "/blogi" },
     { name: "Tehtud tööd", url: "/portfoolio" }
   ];
 
+  // Use default items if loading or error, otherwise use fetched pages
+  const displayPages = (isLoading || isError || pages.length === 0) ? defaultNavItems : pages;
+
   // Remove duplicates from staticNavItems if they already exist in pages
-  const navNames = new Set(pages.map(p => p.name));
+  const navNames = new Set(displayPages.map(p => p.name));
   const filteredStaticNavItems = staticNavItems.filter(item => !navNames.has(item.name));
+
+  // Add cache buster to logo URL to prevent old logo from flashing
+  const logoUrlWithCacheBuster = navbarLogoUrl ? `${navbarLogoUrl}?t=${Date.now()}` : "";
 
   return (
     <nav className="w-full z-50">
@@ -89,8 +103,13 @@ const Navbar = () => {
               className="text-4xl font-bold text-primary flex items-center gap-2"
               onClick={() => handleLinkClick('/')}
             >
-              {navbarLogoUrl ? (
-                <img src={navbarLogoUrl} alt="Leatex logo" className="h-10 w-auto max-w-[180px] object-contain" />
+              {logoUrlWithCacheBuster ? (
+                <img 
+                  src={logoUrlWithCacheBuster} 
+                  alt="Leatex logo" 
+                  className="h-10 w-auto max-w-[180px] object-contain" 
+                  key={logoUrlWithCacheBuster} // Force re-render when URL changes
+                />
               ) : (
                 "Leatex"
               )}
@@ -98,38 +117,29 @@ const Navbar = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8 items-center">
-              {isLoading ? (
-                // Show minimal placeholder during loading
-                <div className="flex space-x-4">
-                  <span className="text-gray-400">Loading...</span>
-                </div>
-              ) : (
-                <>
-                  {pages.map((page) => {
-                    const absolutePath = getAbsolutePath(page.url_et);
-                    return (
-                      <Link 
-                        key={page.id}
-                        to={absolutePath}
-                        className="text-gray-800 font-medium hover:text-primary transition-colors"
-                        onClick={() => handleLinkClick(absolutePath)}
-                      >
-                        {page.name}
-                      </Link>
-                    );
-                  })}
-                  {filteredStaticNavItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.url}
-                      className="text-gray-800 font-medium hover:text-primary transition-colors"
-                      onClick={() => handleLinkClick(item.url)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </>
-              )}
+              {displayPages.map((page) => {
+                const absolutePath = getAbsolutePath(page.url_et);
+                return (
+                  <Link 
+                    key={page.id}
+                    to={absolutePath}
+                    className="text-gray-800 font-medium hover:text-primary transition-colors"
+                    onClick={() => handleLinkClick(absolutePath)}
+                  >
+                    {page.name}
+                  </Link>
+                );
+              })}
+              {filteredStaticNavItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.url}
+                  className="text-gray-800 font-medium hover:text-primary transition-colors"
+                  onClick={() => handleLinkClick(item.url)}
+                >
+                  {item.name}
+                </Link>
+              ))}
               <Button asChild>
                 <Link 
                   to="/kontakt"
@@ -155,37 +165,29 @@ const Navbar = () => {
           {isOpen && (
             <div className="md:hidden pt-4 pb-2 animate-fade-in bg-white rounded-lg mt-2">
               <div className="flex flex-col space-y-3">
-                {isLoading ? (
-                  <div className="px-4">
-                    <span className="text-gray-400">Loading...</span>
-                  </div>
-                ) : (
-                  <>
-                    {pages.map((page) => {
-                      const absolutePath = getAbsolutePath(page.url_et);
-                      return (
-                        <Link 
-                          key={page.id}
-                          to={absolutePath}
-                          className="py-2 hover:text-primary transition-colors px-4"
-                          onClick={() => handleLinkClick(absolutePath)}
-                        >
-                          {page.name}
-                        </Link>
-                      );
-                    })}
-                    {filteredStaticNavItems.map((item) => (
-                      <Link
-                        key={item.name}
-                        to={item.url}
-                        className="py-2 hover:text-primary transition-colors px-4"
-                        onClick={() => handleLinkClick(item.url)}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
-                  </>
-                )}
+                {displayPages.map((page) => {
+                  const absolutePath = getAbsolutePath(page.url_et);
+                  return (
+                    <Link 
+                      key={page.id}
+                      to={absolutePath}
+                      className="py-2 hover:text-primary transition-colors px-4"
+                      onClick={() => handleLinkClick(absolutePath)}
+                    >
+                      {page.name}
+                    </Link>
+                  );
+                })}
+                {filteredStaticNavItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.url}
+                    className="py-2 hover:text-primary transition-colors px-4"
+                    onClick={() => handleLinkClick(item.url)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
                 <Button asChild className="w-full mt-2">
                   <Link 
                     to="/kontakt" 

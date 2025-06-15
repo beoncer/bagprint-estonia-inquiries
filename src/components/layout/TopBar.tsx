@@ -52,25 +52,21 @@ const fetchTopBarContent = async (): Promise<TopBarContent> => {
 };
 
 const TopBar = () => {
-  const { data: topBarContent, isLoading } = useQuery({
+  const { data: topBarContent, isLoading, isError } = useQuery({
     queryKey: ['topBarContent'],
     queryFn: fetchTopBarContent,
     staleTime: 0,
     gcTime: 0,
   });
 
-  // Don't render anything while loading to prevent flash
-  if (isLoading) {
-    return (
-      <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <div className="flex justify-between items-center text-sm h-6">
-            {/* Render with default values immediately to prevent flash */}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // Render immediately with default content to prevent flash
+  const displayContent = isLoading || isError ? {
+    leftText: "Kvaliteetsed kotid ja pakendid teie brändile",
+    middleText: "",
+    phone: "+372 123 4567",
+    email: "info@leatex.ee",
+    workingHours: "E-R 9:00-17:00"
+  } : topBarContent;
 
   return (
     <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
@@ -78,26 +74,26 @@ const TopBar = () => {
         <div className="flex justify-between items-center text-sm">
           {/* Left side text */}
           <div className="hidden md:block">
-            <span>{topBarContent?.leftText || "Kvaliteetsed kotid ja pakendid teie brändile"}</span>
+            <span>{displayContent?.leftText || "Kvaliteetsed kotid ja pakendid teie brändile"}</span>
           </div>
           
           {/* Middle text */}
           <div className="hidden md:block">
-            <span>{topBarContent?.middleText || ""}</span>
+            <span>{displayContent?.middleText || ""}</span>
           </div>
           
           {/* Right side - contact information and opening hours */}
           <div className="flex items-center justify-end w-full md:w-auto space-x-4">
             <div className="flex items-center gap-1">
               <Phone size={14} />
-              <span>{topBarContent?.phone || "+372 123 4567"}</span>
+              <span>{displayContent?.phone || "+372 123 4567"}</span>
             </div>
             <div className="flex items-center gap-1">
               <Mail size={14} />
-              <span>{topBarContent?.email || "info@leatex.ee"}</span>
+              <span>{displayContent?.email || "info@leatex.ee"}</span>
             </div>
             <div className="hidden md:block">
-              <span>{topBarContent?.workingHours || "E-R 9:00-17:00"}</span>
+              <span>{displayContent?.workingHours || "E-R 9:00-17:00"}</span>
             </div>
           </div>
         </div>
