@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,8 @@ const Navbar = () => {
   const { data: pages = [], isLoading } = useQuery({
     queryKey: ['pages'],
     queryFn: fetchPages,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 0,
+    gcTime: 0,
   });
 
   useEffect(() => {
@@ -97,10 +99,9 @@ const Navbar = () => {
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8 items-center">
               {isLoading ? (
+                // Show minimal placeholder during loading
                 <div className="flex space-x-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-                  ))}
+                  <span className="text-gray-400">Loading...</span>
                 </div>
               ) : (
                 <>
@@ -155,10 +156,8 @@ const Navbar = () => {
             <div className="md:hidden pt-4 pb-2 animate-fade-in bg-white rounded-lg mt-2">
               <div className="flex flex-col space-y-3">
                 {isLoading ? (
-                  <div className="space-y-3">
-                    {[...Array(5)].map((_, i) => (
-                      <div key={i} className="h-4 w-24 bg-gray-200 rounded animate-pulse mx-4"></div>
-                    ))}
+                  <div className="px-4">
+                    <span className="text-gray-400">Loading...</span>
                   </div>
                 ) : (
                   <>

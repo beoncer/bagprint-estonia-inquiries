@@ -1,3 +1,4 @@
+
 import { Phone, Mail } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -54,27 +55,17 @@ const TopBar = () => {
   const { data: topBarContent, isLoading } = useQuery({
     queryKey: ['topBarContent'],
     queryFn: fetchTopBarContent,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 0,
+    gcTime: 0,
   });
 
+  // Don't render anything while loading to prevent flash
   if (isLoading) {
     return (
       <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <div className="flex justify-between items-center text-sm">
-            <div className="hidden md:block">
-              <div className="animate-pulse bg-gray-200 h-4 w-64 rounded"></div>
-            </div>
-            <div className="hidden md:block">
-              <div className="animate-pulse bg-gray-200 h-4 w-48 rounded"></div>
-            </div>
-            <div className="flex items-center justify-end w-full md:w-auto space-x-4">
-              <div className="animate-pulse bg-gray-200 h-4 w-32 rounded"></div>
-              <div className="animate-pulse bg-gray-200 h-4 w-40 rounded"></div>
-              <div className="hidden md:block">
-                <div className="animate-pulse bg-gray-200 h-4 w-24 rounded"></div>
-              </div>
-            </div>
+          <div className="flex justify-between items-center text-sm h-6">
+            {/* Render with default values immediately to prevent flash */}
           </div>
         </div>
       </div>
