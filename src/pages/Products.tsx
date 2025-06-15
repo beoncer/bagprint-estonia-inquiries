@@ -228,14 +228,10 @@ const Products = () => {
 
   // Get dynamic content for /tooted page
   const tootedPageContent = siteContent ? {
-    heading: siteContent.tooted_page_heading || "Meie tooted",
-    description: siteContent.tooted_page_description || "Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.",
-    blog_section_title: siteContent.tooted_blog_section_title || "Kasulikud artiklid"
-  } : {
-    heading: "Meie tooted",
-    description: "Sirvige laia valikut kotte ja pakendeid, mida saate kohandada vastavalt oma brändi vajadustele.",
-    blog_section_title: "Kasulikud artiklid"
-  };
+    heading: siteContent.tooted_page_heading,
+    description: siteContent.tooted_page_description,
+    blog_section_title: siteContent.tooted_blog_section_title
+  } : null;
 
   console.log('Site content query - Loading:', siteContentLoading, 'Error:', siteContentError, 'Data:', siteContent);
 
@@ -244,56 +240,30 @@ const Products = () => {
     {
       id: "cotton_bag",
       name: "Riidest kotid",
-      image: siteContent.product_category_1_image || "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
+      image: siteContent.product_category_1_image,
       link: "/riidest-kotid"
     },
     {
       id: "paper_bag", 
       name: "Paberkotid",
-      image: siteContent.product_category_2_image || "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
+      image: siteContent.product_category_2_image,
       link: "/paberkotid"
     },
     {
       id: "drawstring_bag",
       name: "Nööriga kotid", 
-      image: siteContent.product_category_3_image || "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
+      image: siteContent.product_category_3_image,
       link: "/nooriga-kotid"
     },
     {
       id: "shoebag",
       name: "Sussikotid",
-      image: siteContent.product_category_4_image || "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
+      image: siteContent.product_category_4_image,
       link: "/sussikotid"
     }
-  ] : [
-    // Fallback categories while loading
-    {
-      id: "cotton_bag",
-      name: "Riidest kotid",
-      image: "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop",
-      link: "/riidest-kotid"
-    },
-    {
-      id: "paper_bag", 
-      name: "Paberkotid",
-      image: "https://images.unsplash.com/photo-1572584642822-6f8de0243c93?w=800&auto=format&fit=crop",
-      link: "/paberkotid"
-    },
-    {
-      id: "drawstring_bag",
-      name: "Nööriga kotid", 
-      image: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=800&auto=format&fit=crop",
-      link: "/nooriga-kotid"
-    },
-    {
-      id: "shoebag",
-      name: "Sussikotid",
-      image: "https://images.unsplash.com/photo-1605040742661-bbb75bc29d9a?w=800&auto=format&fit=crop", 
-      link: "/sussikotid"
-    }
-  ];
+  ] : null;
 
-  console.log('Final product categories:', productCategories.map(cat => ({
+  console.log('Final product categories:', productCategories?.map(cat => ({
     id: cat.id,
     name: cat.name,
     image: cat.image,
@@ -398,8 +368,8 @@ const Products = () => {
         .select("key, value")
         .eq("page", "tooted")
         .in("key", ["guarantees_heading", "guarantees_description"]);
-      setGuaranteesHeading(data?.find((row: any) => row.key === "guarantees_heading")?.value || "Rahuloleva Kliendi Garantii");
-      setGuaranteesDescription(data?.find((row: any) => row.key === "guarantees_description")?.value || "Kinkekott.ee seame teie kui kliendi meeleirahu esikohale. Tagame, et trükiga reklaamtoodete tellimise protsess on sujuv ja probleemideta. Alates tootesoovisuste pakkumisest kuni lõpptoodete kohaletoimetamiseni hoolitseme kõikide aspektide eest, et teie kogemust lihtsustada.");
+      setGuaranteesHeading(data?.find((row: any) => row.key === "guarantees_heading")?.value || "");
+      setGuaranteesDescription(data?.find((row: any) => row.key === "guarantees_description")?.value || "");
       setGuaranteesContentLoading(false);
     };
     fetchGuaranteesContent();
@@ -409,23 +379,22 @@ const Products = () => {
   const getCategoryContent = (categoryId: string) => {
     const content = productPageContent[categoryId] || {};
     return {
-      title: content.title || {
-        cotton_bag: "Riidest kotid",
-        paper_bag: "Paberkotid", 
-        drawstring_bag: "Nööriga kotid",
-        shoebag: "Sussikotid"
-      }[activeCategory] || "Tooted",
-      description: content.description || {
-        cotton_bag: "Vaata meie riidest kottide valikut.",
-        paper_bag: "Vaata meie paberkottide valikut.",
-        drawstring_bag: "Vaata meie nööriga kottide valikut.", 
-        shoebag: "Vaata meie sussikottide valikut."
-      }[activeCategory] || "Vaata meie toodete valikut.",
-      highlight: content.highlight || "kotid"
+      title: content.title,
+      description: content.description,
+      highlight: content.highlight
     };
   };
 
   const categoryContent = getCategoryContent(activeCategory);
+
+  // Don't render anything until all data is loaded to prevent flash
+  if (siteContentLoading || !tootedPageContent || !productCategories) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl text-gray-400">
+        Laadimine...
+      </div>
+    );
+  }
 
   if (loading) {
     return (

@@ -173,16 +173,12 @@ const Index = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  console.log('Hero content from query:', heroContent);
-  console.log('Hero loading state:', isHeroLoading);
-  console.log('Hero error:', heroError);
-
   const whyChooseUsQuery = useQuery({
     queryKey: ["whyChooseUsContent"],
     queryFn: fetchWhyChooseUsContent,
     staleTime: 1000 * 60 * 5,
   });
-  const whyChooseUs = whyChooseUsQuery.data ? parseWhyChooseUs(whyChooseUsQuery.data) : { title: "Miks valida meid", cards: [] };
+  const whyChooseUs = whyChooseUsQuery.data ? parseWhyChooseUs(whyChooseUsQuery.data) : { title: "", cards: [] };
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -214,6 +210,10 @@ const Index = () => {
     fetchCtaContent().then(setCtaContent);
   }, []);
 
+  if (isHeroLoading || !heroContent) {
+    return <div className="min-h-screen flex items-center justify-center text-xl text-gray-400">Laadimine...</div>;
+  }
+
   return (
     <>
       {/* Hero Section */}
@@ -222,7 +222,7 @@ const Index = () => {
           <div 
             className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
             style={{
-              backgroundImage: `url('${bannerUrl || "/lovable-uploads/df14f86d-deb5-425a-bbf5-22630946d650.png"}')`,
+              backgroundImage: `url('${bannerUrl || ""}')`,
               backgroundSize: "cover",
               backgroundPosition: "center",
               height: "auto",
@@ -248,13 +248,12 @@ const Index = () => {
                       <>
                         <div className="mt-4 md:mt-8">
                           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-                            {heroContent?.title || "Kvaliteetsed kotid ja pakendid teie brändile"}
+                            {heroContent.title}
                           </h1>
                           <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
-                            {heroContent?.description || "Leatex pakub laia valikut puuvillakotte, paberkotte, paelaga kotte ja e-poe pakendeid, mida saab kohandada teie brändi logo ja disainiga."}
+                            {heroContent.description}
                           </p>
                         </div>
-                        
                         <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
                           <Button 
                             variant="default"
@@ -262,8 +261,8 @@ const Index = () => {
                             className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
                             asChild
                           >
-                            <Link to={heroContent?.button1?.link || "/tooted"}>
-                              {heroContent?.button1?.value || "Vaata tooteid"}
+                            <Link to={heroContent.button1.link}>
+                              {heroContent.button1.value}
                             </Link>
                           </Button>
                           <Button 
@@ -272,8 +271,8 @@ const Index = () => {
                             className="text-base md:text-lg border border-gray-200 shadow-sm" 
                             asChild
                           >
-                            <Link to={heroContent?.button2?.link || "/paring"}>
-                              {heroContent?.button2?.value || "Küsi pakkumist"}
+                            <Link to={heroContent.button2.link}>
+                              {heroContent.button2.value}
                             </Link>
                           </Button>
                         </div>

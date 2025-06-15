@@ -74,6 +74,10 @@ const Portfolio: React.FC = () => {
     fetchContent();
   }, []);
 
+  if (loading || !header) {
+    return <div className="py-32 text-center text-gray-500">Laadimine...</div>;
+  }
+
   // Get unique categories from data
   const categories = [
     { id: "all", name: "Kõik projektid", slug: "all" },

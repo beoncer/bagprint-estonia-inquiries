@@ -90,7 +90,7 @@ const Navbar = () => {
               {navbarLogoUrl ? (
                 <img src={navbarLogoUrl} alt="Leatex logo" className="h-10 w-auto max-w-[180px] object-contain" />
               ) : (
-                "Leatex"
+                <div className="animate-pulse bg-gray-200 h-10 w-24 rounded"></div>
               )}
             </Link>
 

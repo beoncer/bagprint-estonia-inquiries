@@ -57,7 +57,7 @@ const TopBar = () => {
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  if (isLoading) {
+  if (isLoading || !topBarContent) {
     return (
       <div className="bg-[#f7f2f3] text-black w-full py-2 border-b">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
@@ -87,26 +87,24 @@ const TopBar = () => {
         <div className="flex justify-between items-center text-sm">
           {/* Left side text */}
           <div className="hidden md:block">
-            <span>{topBarContent?.leftText || "Kvaliteetsed kotid ja pakendid teie brändile"}</span>
+            <span>{topBarContent.leftText}</span>
           </div>
-          
           {/* Middle text */}
           <div className="hidden md:block">
-            <span>{topBarContent?.middleText || ""}</span>
+            <span>{topBarContent.middleText}</span>
           </div>
-          
           {/* Right side - contact information and opening hours */}
           <div className="flex items-center justify-end w-full md:w-auto space-x-4">
             <div className="flex items-center gap-1">
               <Phone size={14} />
-              <span>{topBarContent?.phone || "+372 123 4567"}</span>
+              <span>{topBarContent.phone}</span>
             </div>
             <div className="flex items-center gap-1">
               <Mail size={14} />
-              <span>{topBarContent?.email || "info@leatex.ee"}</span>
+              <span>{topBarContent.email}</span>
             </div>
             <div className="hidden md:block">
-              <span>{topBarContent?.workingHours || "E-R 9:00-17:00"}</span>
+              <span>{topBarContent.workingHours}</span>
             </div>
           </div>
         </div>

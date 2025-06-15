@@ -19,12 +19,12 @@ const Meist: React.FC = () => {
   const [description, setDescription] = useState("");
   const [stats, setStats] = useState<{ value: string; label: string }[]>([]);
   const [promises, setPromises] = useState<{ icon: string; title: string; text: string }[]>([]);
-  const [promisesTitle, setPromisesTitle] = useState("Meie lubadused");
+  const [promisesTitle, setPromisesTitle] = useState("");
   const [promisesSubtitle, setPromisesSubtitle] = useState("");
-  const [ctaTitle, setCtaTitle] = useState("Valmis oma projekti alustama?");
-  const [ctaText, setCtaText] = useState("Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.");
-  const [ctaButton, setCtaButton] = useState("Küsi pakkumist");
-  const [missionTitle, setMissionTitle] = useState("Meie missioon");
+  const [ctaTitle, setCtaTitle] = useState("");
+  const [ctaText, setCtaText] = useState("");
+  const [ctaButton, setCtaButton] = useState("");
+  const [missionTitle, setMissionTitle] = useState("");
   const [missionTexts, setMissionTexts] = useState<string[]>([]);
   const [headerHighlight, setHeaderHighlight] = useState("");
 
@@ -36,13 +36,13 @@ const Meist: React.FC = () => {
         .select("key, value")
         .eq("page", "meist");
       if (data) {
-        setHeader(data.find((row: any) => row.key === "meist_header")?.value || "Meie lugu");
+        setHeader(data.find((row: any) => row.key === "meist_header")?.value || "");
         setDescription(data.find((row: any) => row.key === "meist_description")?.value || "");
-        setPromisesTitle(data.find((row: any) => row.key === "meist_promises_title")?.value || "Meie lubadused");
-        setPromisesSubtitle(data.find((row: any) => row.key === "meist_promises_subtitle")?.value || "Need on põhimõtted, millele tugineme oma igapäevases töös ja millega tagame parima teenuse");
-        setCtaTitle(data.find((row: any) => row.key === "meist_cta_title")?.value || "Valmis oma projekti alustama?");
-        setCtaText(data.find((row: any) => row.key === "meist_cta_text")?.value || "Arutame su ideid ja loome koos midagi ainulaadset, mis esindab su brändi parimal viisil.");
-        setCtaButton(data.find((row: any) => row.key === "meist_cta_button")?.value || "Küsi pakkumist");
+        setPromisesTitle(data.find((row: any) => row.key === "meist_promises_title")?.value || "");
+        setPromisesSubtitle(data.find((row: any) => row.key === "meist_promises_subtitle")?.value || "");
+        setCtaTitle(data.find((row: any) => row.key === "meist_cta_title")?.value || "");
+        setCtaText(data.find((row: any) => row.key === "meist_cta_text")?.value || "");
+        setCtaButton(data.find((row: any) => row.key === "meist_cta_button")?.value || "");
         // Stats
         const statArr = [];
         for (let i = 1; i <= 6; i++) {
@@ -60,7 +60,7 @@ const Meist: React.FC = () => {
           if (title || text) promiseArr.push({ icon, title, text });
         }
         setPromises(promiseArr);
-        setMissionTitle(data.find((row: any) => row.key === "meist_mission_title")?.value || "Meie missioon");
+        setMissionTitle(data.find((row: any) => row.key === "meist_mission_title")?.value || "");
         const missionArr = [];
         for (let i = 1; i <= 3; i++) {
           const text = data.find((row: any) => row.key === `meist_mission_text_${i}`)?.value || "";
@@ -74,7 +74,7 @@ const Meist: React.FC = () => {
     fetchContent();
   }, []);
 
-  if (loading) {
+  if (loading || !header) {
     return <div className="py-32 text-center text-gray-500">Laadimine...</div>;
   }
 

@@ -92,7 +92,7 @@ const Blog = () => {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || !header) {
     return (
       <div className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4">
