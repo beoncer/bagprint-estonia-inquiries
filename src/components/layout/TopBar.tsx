@@ -51,10 +51,11 @@ const fetchTopBarContent = async (): Promise<TopBarContent> => {
 };
 
 const TopBar = () => {
-  const { data: topBarContent, isLoading } = useQuery({
+  const { data: topBarContent, isLoading, isError } = useQuery({
     queryKey: ['topBarContent'],
     queryFn: fetchTopBarContent,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 0,
+    gcTime: 0,
   });
 
   if (isLoading || !topBarContent) {

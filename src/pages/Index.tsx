@@ -160,23 +160,26 @@ const Index = () => {
     cta_button_link: "/inquiry"
   });
 
-  // Use React Query for hero content
+  // Use React Query for hero content with immediate default values
   const { data: heroContent, isLoading: isHeroLoading, error: heroError } = useQuery({
     queryKey: ['heroContent'],
     queryFn: fetchHeroContent,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 0,
+    gcTime: 0,
   });
 
-  const { data: bannerUrl } = useQuery({
+  const { data: bannerUrl, isLoading: isBannerLoading } = useQuery({
     queryKey: ["homepageBannerUrl"],
     queryFn: fetchBannerUrl,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const whyChooseUsQuery = useQuery({
     queryKey: ["whyChooseUsContent"],
     queryFn: fetchWhyChooseUsContent,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    gcTime: 0,
   });
   const whyChooseUs = whyChooseUsQuery.data ? parseWhyChooseUs(whyChooseUsQuery.data) : { title: "", cards: [] };
 
@@ -323,21 +326,26 @@ const Index = () => {
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <h2 className="text-3xl font-bold text-left mb-10">{categoriesTitle}</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            {categories.map((cat, idx) => (
-              <div className="text-center" key={idx}>
-                <div className="h-60 mb-4 overflow-hidden rounded-lg">
-                  <img
-                    src={cat.image || '/placeholder.svg'}
-                    alt={cat.name}
-                    className="w-full h-full object-cover transition-all hover:scale-105"
-                  />
+            {categories.map((cat, idx) => {
+              // Add cache buster to category images
+              const imageWithCacheBuster = cat.image ? `${cat.image}?t=${Date.now()}` : '/placeholder.svg';
+              return (
+                <div className="text-center" key={idx}>
+                  <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                    <img
+                      src={imageWithCacheBuster}
+                      alt={cat.name}
+                      className="w-full h-full object-cover transition-all hover:scale-105"
+                      key={imageWithCacheBuster} // Force re-render when URL changes
+                    />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{cat.name}</h3>
+                  <Button variant="link" asChild>
+                    <Link to={cat.link || '#'}>{cat.button}</Link>
+                  </Button>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{cat.name}</h3>
-                <Button variant="link" asChild>
-                  <Link to={cat.link || '#'}>{cat.button}</Link>
-                </Button>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
