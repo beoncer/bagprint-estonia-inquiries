@@ -9,8 +9,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import FAQStructuredData from "@/components/seo/FAQStructuredData";
-import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
-import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -568,8 +566,6 @@ const Products = () => {
     <>
       {/* Add FAQ structured data for category pages */}
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
-      {/* Add ordering FAQ structured data for all product pages */}
-      {activeCategory !== "all" && <OrderingFAQStructuredData category={activeCategory} />}
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
         <div className="max-w-7xl mx-auto px-4">
@@ -644,9 +640,6 @@ const Products = () => {
               </div>
             </section>
           )}
-
-          {/* Ordering FAQ Section - show for all product category pages */}
-          {activeCategory !== "all" && <OrderingFAQSection category={activeCategory} />}
 
           {/* Guarantees Section */}
           <section className="mt-20 mb-16">
