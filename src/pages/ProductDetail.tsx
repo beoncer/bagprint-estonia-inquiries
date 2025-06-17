@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getProductBySlug, Product } from "@/lib/supabase";
+import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
+import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -83,6 +85,8 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
+      <OrderingFAQStructuredData />
+      
       {/* Breadcrumbs */}
       <div className="text-sm text-gray-500 mb-6">
         <Link to="/" className="hover:text-primary">Avaleht</Link>
@@ -177,8 +181,7 @@ const ProductDetail = () => {
       </div>
       
       {/* Product Specifications */}
-      {/*
-      <div className="mt-16">
+      {/* <div className="mt-16">
         <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -209,8 +212,10 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
-      </div>
-      */}
+      </div> */}
+      
+      {/* Add the FAQ section at the bottom */}
+      <OrderingFAQSection />
     </div>
   );
 };
