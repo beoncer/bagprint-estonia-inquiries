@@ -8,6 +8,7 @@ import { getProducts, Product, getSiteContent } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import FAQStructuredData from "@/components/seo/FAQStructuredData";
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -375,6 +376,13 @@ const Products = () => {
     fetchGuaranteesContent();
   }, []);
 
+  // Get FAQs for the current category
+  const getCurrentCategoryFAQs = () => {
+    if (activeCategory === "all") return [];
+    const faqs = categoryFAQs[activeCategory as keyof typeof categoryFAQs] || [];
+    return faqs;
+  };
+
   // Show filtered products for category pages
   const getCategoryContent = (categoryId: string) => {
     const content = productPageContent[categoryId] || {};
@@ -552,93 +560,121 @@ const Products = () => {
     );
   }
 
-  return (
-    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Hero Section - matching portfolio style */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
-              <>
-                {categoryContent.title.split(categoryContent.highlight)[0]}
-                <span className="text-primary">{categoryContent.highlight}</span>
-                {categoryContent.title.split(categoryContent.highlight)[1]}
-              </>
-            ) : categoryContent.title}
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            {categoryContent.description}
-          </p>
-        </div>
-        
-        {/* Search */}
-        <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
-          <div className="w-full md:w-auto">
-            <form onSubmit={handleSearch} className="relative">
-              <Input
-                type="text"
-                placeholder="Otsi tooteid..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            </form>
-          </div>
-        </div>
-        
-        {/* Results */}
-        {filteredProducts.length > 0 ? (
-          <>
-            <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
-            <ProductGrid products={filteredProducts} />
-          </>
-        ) : (
-          <div className="text-center py-20">
-            <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
-            <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
-            <Button onClick={() => {
-              setSearchTerm("");
-              handleCategoryChange("all");
-            }}>
-              Näita kõiki tooteid
-            </Button>
-          </div>
-        )}
+  const currentFAQs = getCurrentCategoryFAQs();
 
-        {/* Guarantees Section */}
-        <section className="mt-20 mb-16">
-          <div className="bg-white rounded-lg shadow-sm p-8">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
-              <p className="text-gray-600 max-w-4xl mx-auto">
-                {guaranteesContentLoading ? "..." : guaranteesDescription}
-              </p>
-            </div>
-            {guaranteesLoading ? (
-              <div>Laen garantiiandmeid...</div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {guarantees.map((guarantee, index) => {
-                  const Icon = iconList[index % iconList.length];
-                  return (
-                    <div key={guarantee.id} className="flex items-start gap-4">
-                      <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                        <Icon className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
-                        <p className="text-gray-600 text-sm">{guarantee.description}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+  return (
+    <>
+      {/* Add FAQ structured data for category pages */}
+      <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
+      
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Hero Section - matching portfolio style */}
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
+                <>
+                  {categoryContent.title.split(categoryContent.highlight)[0]}
+                  <span className="text-primary">{categoryContent.highlight}</span>
+                  {categoryContent.title.split(categoryContent.highlight)[1]}
+                </>
+              ) : categoryContent.title}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              {categoryContent.description}
+            </p>
           </div>
-        </section>
+          
+          {/* Search */}
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
+            <div className="w-full md:w-auto">
+              <form onSubmit={handleSearch} className="relative">
+                <Input
+                  type="text"
+                  placeholder="Otsi tooteid..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              </form>
+            </div>
+          </div>
+          
+          {/* Results */}
+          {filteredProducts.length > 0 ? (
+            <>
+              <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
+              <ProductGrid products={filteredProducts} />
+            </>
+          ) : (
+            <div className="text-center py-20">
+              <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
+              <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
+              <Button onClick={() => {
+                setSearchTerm("");
+                handleCategoryChange("all");
+              }}>
+                Näita kõiki tooteid
+              </Button>
+            </div>
+          )}
+
+          {/* FAQ Section - only show if there are FAQs for this category */}
+          {currentFAQs.length > 0 && (
+            <section className="mt-20 mb-16">
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <h2 className="text-3xl font-bold mb-8 text-center">Korduma kippuvad küsimused</h2>
+                <Accordion type="single" collapsible className="w-full">
+                  {currentFAQs.map((faq, index) => (
+                    <AccordionItem key={index} value={`item-${index}`}>
+                      <AccordionTrigger className="text-left">
+                        {faq.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-gray-600">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            </section>
+          )}
+
+          {/* Guarantees Section */}
+          <section className="mt-20 mb-16">
+            <div className="bg-white rounded-lg shadow-sm p-8">
+              <div className="text-center mb-10">
+                <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
+                <p className="text-gray-600 max-w-4xl mx-auto">
+                  {guaranteesContentLoading ? "..." : guaranteesDescription}
+                </p>
+              </div>
+              {guaranteesLoading ? (
+                <div>Laen garantiiandmeid...</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {guarantees.map((guarantee, index) => {
+                    const Icon = iconList[index % iconList.length];
+                    return (
+                      <div key={guarantee.id} className="flex items-start gap-4">
+                        <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                          <Icon className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                          <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
