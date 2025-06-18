@@ -58,97 +58,6 @@ const blogArticles = [
   }
 ];
 
-const categoryFAQs = {
-  cotton_bag: [
-    {
-      question: "Millised on puuvillakottide peamised eelised?",
-      answer: "Puuvillakotid on keskkonnasõbralikud, vastupidavad ja korduvkasutatavad. Need sobivad hästi igapäevaseks kasutamiseks ja on ideaalsed brändi reklaamimiseks."
-    },
-    {
-      question: "Kas puuvillakotte saab pesta?",
-      answer: "Jah, puuvillakotte saab pesta masinpesu või käsitsi. Soovitame kasutada külma vett ja õrna pesuvahendi, et säilitada koti kvaliteet ja trükk."
-    },
-    {
-      question: "Millised trükimeetodid sobivad puuvillakottidele?",
-      answer: "Puuvillakottidele sobivad hästi siittrükk, termotransfer ja brodeeritus. Valime parima meetodi sõltuvalt disainist ja kogusest."
-    },
-    {
-      question: "Kui kaua kestab puuvillakottide tellimine?",
-      answer: "Tavaline tarneaeg on 7-14 tööpäeva, sõltuvalt kogusest ja trüki keerukusest. Kiireloomuliste tellimuste puhul võime pakkuda kiiremat täitmist."
-    },
-    {
-      question: "Mis on minimaalne tellimiskogus?",
-      answer: "Minimaalne tellimiskogus sõltub toote tüübist ja trükimeetodist. Tavaliselt alates 50 tükist, kuid võime arutada ka väiksemaid koguseid."
-    }
-  ],
-  paper_bag: [
-    {
-      question: "Millised paberkotid on kõige vastupidavamad?",
-      answer: "Kraft-paberkotid on kõige vastupidavamad ja sobivad hästi raskete esemete kandmiseks. Need on valmistatud kvaliteetsest paksust paberist."
-    },
-    {
-      question: "Kas paberkotid on keskkonnasõbralikud?",
-      answer: "Jah, meie paberkotid on valmistatud taaskasutatud materjalist ja on täielikult lagunevad. Need on suurepärane keskkonnasõbralik alternatiiv plastikkottidele."
-    },
-    {
-      question: "Millised trükimeetodid sobivad paberkottidele?",
-      answer: "Paberkottidele sobivad fleksotükk, digitaaltrükk ja tempel. Valime parima meetodi sõltuvalt koti tüübist ja disainist."
-    },
-    {
-      question: "Kas paberkotte saab personaliseerida?",
-      answer: "Jah, pakume täielikku personaliseerimist - logod, tekstid, värvid ja isegi erikujulised aknad. Saame luua unikaalse disaini teie brändile."
-    },
-    {
-      question: "Millised on paberkottide hoiutingimused?",
-      answer: "Paberkotte tuleks hoida kuivas kohas, kaitstuna niiskuse eest. Õige hoiustamise korral säilivad need pikka aega oma kvaliteeti."
-    }
-  ],
-  drawstring_bag: [
-    {
-      question: "Milleks sobivad nööriga kotid kõige paremini?",
-      answer: "Nööriga kotid sobivad suurepäraselt spordivahendite, jalanõude, rõivaste ja väikeste esemete hoiustamiseks. Need on mugavad seljakotina kandmiseks."
-    },
-    {
-      question: "Millised materjalid on saadaval?",
-      answer: "Pakume nööriga kotte erinevatest materjalidest: puuvill, polüester, nonwoven ja jute. Iga materjal omab erinevaid omadusi ja hinda."
-    },
-    {
-      question: "Kas nöörid on reguleeritavad?",
-      answer: "Jah, enamik meie nööriga kotte on varustatud reguleeritavate nööridega, mis muudab kandmise mugavamaks ja võimaldab kohandada seljarihma pikkust."
-    },
-    {
-      question: "Millised on trükivõimalused nööriga kottidel?",
-      answer: "Pakume siittrükki, termotransferit ja brodeeritust. Trükiala sõltub koti suurusest, kuid tavaliselt saab trükkida nii ees- kui tagaküljele."
-    },
-    {
-      question: "Kas nööriga kotid sobivad lastele?",
-      answer: "Jah, nööriga kotid on suurepärane valik lastele - need on kerged, ohutud ja lihtsad kasutada. Saadaval erinevates värvides ja suurustes."
-    }
-  ],
-  shoebag: [
-    {
-      question: "Milleks on sussikotid mõeldud?",
-      answer: "Sussikotid on spetsiaalselt mõeldud jalanõude hoiustamiseks ja transportimiseks. Need kaitsevad teisi esemeid mustuse eest ja hoiavad sussid eraldi."
-    },
-    {
-      question: "Millised suurused on saadaval?",
-      answer: "Pakume erinevaid suurusi alates laste jalanõudest kuni suure mehe sussideni. Saadaval ka eritellimusel vastavalt teie vajadustele."
-    },
-    {
-      question: "Kas sussikotid on hingavad?",
-      answer: "Jah, meie sussikotid on valmistatud hingavatest materjalidest, mis võimaldavad õhuringlust ja takistavad ebameeldiva lõhna tekkimist."
-    },
-    {
-      question: "Kas sussikotte saab pesta?",
-      answer: "Enamikku sussikotte saab pesta masinpesu või käsitsi. Soovitame kontrollida pesujuhendit igal kindlal koti tüübil."
-    },
-    {
-      question: "Millised on personaliseerimise võimalused?",
-      answer: "Saame trükkida logosid, nimesid või muid tekste. Sussikotid sobivad hästi spordiklubidele, hotellidele ja isikliku kasutuse jaoks."
-    }
-  ]
-};
-
 const iconList = [Camera, Shield, Smile, Briefcase, Gift, Truck];
 
 // Add interface for featured blog posts
@@ -180,12 +89,104 @@ const Products = () => {
   const [productPageContent, setProductPageContent] = useState<Record<string, any>>({});
   const [productPagesLoading, setProductPagesLoading] = useState(true);
   
+  // Add state for FAQs
+  const [categoryFAQs, setCategoryFAQs] = useState<Record<string, Array<{question: string, answer: string}>>>({});
+  const [faqsLoading, setFaqsLoading] = useState(true);
+
   // Fetch site content for dynamic product categories
   const { data: siteContent, isLoading: siteContentLoading, error: siteContentError } = useQuery({
     queryKey: ['site-content'],
     queryFn: getSiteContent,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
+
+  // Fetch FAQs from Supabase
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      setFaqsLoading(true);
+      try {
+        console.log('Fetching FAQs...');
+        const { data, error } = await supabase
+          .from("website_content")
+          .select("key, value")
+          .eq("page", "product_pages")
+          .like("key", "%_faq_%");
+        
+        if (error) throw error;
+        
+        console.log('Raw FAQ data from Supabase:', data);
+
+        // Process the FAQ data
+        const faqs: Record<string, Array<{question: string, answer: string}>> = {};
+        
+        if (data) {
+          // First, map the short category IDs to full IDs
+          const categoryMap: Record<string, string> = {
+            'cotton': 'cotton_bag',
+            'paper': 'paper_bag',
+            'drawstring': 'drawstring_bag',
+            'shoebag': 'shoebag'
+          };
+
+          data.forEach((row) => {
+            // Extract category_id and faq index from the key
+            const parts = row.key.split('_');
+            const rawCategoryId = parts[0];
+            const categoryId = categoryMap[rawCategoryId] || rawCategoryId;
+            
+            // Initialize the category array if it doesn't exist
+            if (!faqs[categoryId]) {
+              faqs[categoryId] = [];
+            }
+
+            // Handle both FAQ formats
+            let faqIndex: number;
+            let type: string;
+
+            if (parts.includes('faq')) {
+              const faqParts = row.key.split('faq_');
+              if (faqParts[1]) {
+                const remainingParts = faqParts[1].split('_');
+                faqIndex = parseInt(remainingParts[0]);
+                type = remainingParts[1] || remainingParts[0];
+              }
+            } else {
+              faqIndex = parseInt(parts[1]);
+              type = parts[2];
+            }
+
+            console.log('Processing row:', { categoryId, faqIndex, type, value: row.value });
+            
+            // Make sure we have an array of sufficient length
+            while (faqs[categoryId].length <= faqIndex) {
+              faqs[categoryId].push({ question: '', answer: '' });
+            }
+            
+            // Handle both question/answer formats
+            if (type === 'question' || type.includes('question')) {
+              faqs[categoryId][faqIndex].question = row.value;
+            } else if (type === 'answer' || type.includes('answer')) {
+              faqs[categoryId][faqIndex].answer = row.value;
+            }
+          });
+
+          // Clean up any incomplete FAQs
+          Object.keys(faqs).forEach((categoryId) => {
+            faqs[categoryId] = faqs[categoryId].filter(faq => faq.question && faq.answer);
+          });
+        }
+        
+        console.log('Processed FAQs:', faqs);
+        setCategoryFAQs(faqs);
+      } catch (err) {
+        console.error('Error fetching FAQs:', err);
+      } finally {
+        setFaqsLoading(false);
+      }
+    };
+
+    fetchFAQs();
+  }, []);
 
   // Fetch featured blog posts
   const { data: featuredBlogPosts, isLoading: featuredBlogLoading } = useQuery({
@@ -379,7 +380,10 @@ const Products = () => {
   // Get FAQs for the current category
   const getCurrentCategoryFAQs = () => {
     if (activeCategory === "all") return [];
-    const faqs = categoryFAQs[activeCategory as keyof typeof categoryFAQs] || [];
+    console.log('Getting FAQs for category:', activeCategory);
+    console.log('All FAQs:', categoryFAQs);
+    const faqs = categoryFAQs[activeCategory] || [];
+    console.log('Current category FAQs:', faqs);
     return faqs;
   };
 
@@ -621,22 +625,39 @@ const Products = () => {
           )}
 
           {/* FAQ Section - only show if there are FAQs for this category */}
-          {currentFAQs.length > 0 && (
+          {activeCategory !== "all" && (
             <section className="mt-20 mb-16">
               <div className="bg-white rounded-lg shadow-sm p-8">
                 <h2 className="text-3xl font-bold mb-8 text-center">Korduma kippuvad küsimused</h2>
-                <Accordion type="single" collapsible className="w-full">
-                  {currentFAQs.map((faq, index) => (
-                    <AccordionItem key={index} value={`item-${index}`}>
-                      <AccordionTrigger className="text-left">
-                        {faq.question}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-gray-600">
-                        {faq.answer}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                {faqsLoading ? (
+                  <div className="space-y-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="animate-pulse">
+                        <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+                        <div className="h-16 bg-gray-100 rounded w-full"></div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    {getCurrentCategoryFAQs().length > 0 ? (
+                      <Accordion type="single" collapsible className="w-full">
+                        {getCurrentCategoryFAQs().map((faq, index) => (
+                          <AccordionItem key={index} value={`item-${index}`}>
+                            <AccordionTrigger className="text-left">
+                              {faq.question}
+                            </AccordionTrigger>
+                            <AccordionContent className="text-gray-600">
+                              {faq.answer}
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    ) : (
+                      <p className="text-center text-gray-500">Sellele kategooriale pole veel KKK-sid lisatud.</p>
+                    )}
+                  </>
+                )}
               </div>
             </section>
           )}
