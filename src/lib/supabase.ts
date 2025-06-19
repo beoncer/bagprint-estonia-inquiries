@@ -22,19 +22,20 @@ export interface Product {
   id: string;
   type: string;
   name: string;
-  description: string | null;
+  description: string;
   image_url: string | null;
+  image?: string;
   pricing_without_print: Record<string, number>;
   pricing_with_print: Record<string, number>;
   slug?: string | null;
   created_at: string;
   updated_at: string;
   colors: ProductColor[];
-  model?: string | null;
   is_eco?: boolean;
-  image?: string;
+  badges: string[];
   category?: string;
   startingPrice?: number;
+  is_popular?: boolean;
 }
 
 function extractStartingPrice(pricing: any): number | undefined {
@@ -61,16 +62,46 @@ export async function getProducts() {
     }
 
     console.log('Successfully fetched products:', data);
-    return (data || []).map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      description: item.description,
-      image: item.image_url,
-      category: item.type,
-      startingPrice: extractStartingPrice(item.pricing_without_print),
-      slug: item.slug,
-      is_popular: item.is_popular || false,
-    })) as Product[];
+    return (data || []).map((item: any) => {
+      // Safely parse pricing data
+      const pricingWithoutPrint = typeof item.pricing_without_print === 'string' 
+        ? JSON.parse(item.pricing_without_print) 
+        : (item.pricing_without_print || {});
+
+      // Calculate starting price safely with validation
+      let startingPrice: number | undefined = undefined;
+      const priceValues = Object.values(pricingWithoutPrint);
+      if (priceValues.length > 0) {
+        const validPrices = priceValues
+          .map(price => typeof price === 'number' ? price : parseFloat(price as string))
+          .filter(price => !isNaN(price));
+        if (validPrices.length > 0) {
+          startingPrice = Math.min(...validPrices);
+        }
+      }
+
+      return {
+        id: item.id,
+        type: item.type,
+        name: item.name,
+        description: item.description || '',
+        image_url: item.image_url,
+        image: item.image_url,
+        pricing_without_print: pricingWithoutPrint,
+        pricing_with_print: typeof item.pricing_with_print === 'string' 
+          ? JSON.parse(item.pricing_with_print) 
+          : (item.pricing_with_print || {}),
+        slug: item.slug,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        colors: item.colors || [],
+        is_eco: item.is_eco || false,
+        badges: item.badges || [],
+        category: item.type,
+        startingPrice,
+        is_popular: item.is_popular || false,
+      };
+    }) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
     throw err;
@@ -94,6 +125,8 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
       Math.min(...Object.values(data.pricing_without_print)) : 
       undefined,
     image: data.image_url, // Map image_url to image for backward compatibility
+    colors: data.colors || [],
+    badges: data.badges || [], // Include badges with default empty array
   };
 };
 

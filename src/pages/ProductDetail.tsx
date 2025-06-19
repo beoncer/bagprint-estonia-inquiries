@@ -9,54 +9,61 @@ import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
 import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
 import ColorPicker from "@/components/product/ColorPicker";
 import EcoBadge from "@/components/product/EcoBadge";
+import { ProductBadge } from "@/components/product/ProductBadge";
+import { BadgeType } from "@/lib/badge-constants";
 
 const ProductDetail = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   
   // Calculator state
-  const [quantity, setQuantity] = useState<number>(50);
-  const [printColors, setPrintColors] = useState<number>(0);
+  const [quantity, setQuantity] = useState<string>("50");
+  const [printType, setPrintType] = useState<string>("without");
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
   const [pricePerItem, setPricePerItem] = useState<number>(0);
+  const [withPrint, setWithPrint] = useState(false);
   
   useEffect(() => {
     const fetchProduct = async () => {
-      setLoading(true);
       try {
-        if (slug) {
-          const prod = await getProductBySlug(slug);
-          setProduct(prod);
-          setSelectedImage(prod.image);
-          // Set initial color to first available color
-          if (prod.colors && prod.colors.length > 0) {
-            setSelectedColor(prod.colors[0]);
-          }
+        setLoading(true);
+        if (!slug) throw new Error("No slug provided");
+        const productData = await getProductBySlug(slug);
+        setProduct(productData);
+        // Set initial color if product has colors
+        if (productData.colors && productData.colors.length > 0) {
+          setSelectedColor(productData.colors[0]);
         }
-      } catch (e) {
-        setProduct(null);
+        // Set initial image
+        if (productData.image) {
+          setSelectedImage(productData.image);
+        }
+      } catch (error) {
+        console.error("Error fetching product:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchProduct();
   }, [slug]);
   
   useEffect(() => {
-    if (product) {
-      calculatePrice(quantity, printColors);
+    if (product && quantity) {
+      const basePrice = withPrint
+        ? product.pricing_with_print[quantity]
+        : product.pricing_without_print[quantity];
+
+      if (basePrice) {
+        const total = parseFloat(quantity) * basePrice;
+        setCalculatedPrice(total);
+        setPricePerItem(basePrice);
+      }
     }
-  }, [quantity, printColors, product]);
-  
-  const calculatePrice = (qty: number, colors: number) => {
-    if (!product) return;
-    let basePrice = product.startingPrice || 0;
-    setPricePerItem(basePrice);
-    setCalculatedPrice(basePrice * qty);
-  };
+  }, [product, quantity, withPrint]);
   
   if (loading) {
     return (
@@ -119,15 +126,20 @@ const ProductDetail = () => {
         {/* Product Info and Calculator */}
         <div>
           <h1 className="text-3xl font-bold mb-2">{product?.name}</h1>
-          {product?.model && (
-            <p className="text-gray-500 mb-4">Model: {product.model}</p>
-          )}
+          <p className="text-gray-500 mb-4">Kategooria: {product?.category}</p>
+          {product?.is_eco && <EcoBadge />}
+          <p className="text-primary font-medium">
+            Alates {product?.startingPrice !== undefined ? product?.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}
+          </p>
           <div className="flex flex-col gap-4 mb-6">
-            <p className="text-gray-500">Kategooria: {product?.category}</p>
-            {product?.is_eco && <EcoBadge />}
-            <p className="text-primary font-medium">
-              Alates {product?.startingPrice !== undefined ? product?.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}
-            </p>
+            {/* Display badges if they exist */}
+            {product?.badges && product.badges.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {product.badges.map((badge) => (
+                  <ProductBadge key={badge} type={badge as BadgeType} />
+                ))}
+              </div>
+            )}
           </div>
           <p className="text-gray-700 mb-6 whitespace-pre-wrap break-words max-w-full">
             {product?.description}
@@ -151,35 +163,36 @@ const ProductDetail = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="quantity" className="mb-2 block">Kogus</Label>
-                <Input 
-                  id="quantity" 
-                  type="number" 
-                  min="50" 
+                <Select 
                   value={quantity} 
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full"
-                />
+                  onValueChange={(value) => setQuantity(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Vali kogus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                    <SelectItem value="500">500</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
               <div>
-                <Label htmlFor="print-colors" className="mb-2 block">Trüki värvid</Label>
+                <Label htmlFor="print-type" className="mb-2 block">Trüki tüüp</Label>
                 <Select 
-                  value={printColors.toString()} 
-                  onValueChange={(value) => setPrintColors(Number(value))}
+                  value={printType} 
+                  onValueChange={(value) => {
+                    setPrintType(value);
+                    setWithPrint(value === "with");
+                  }}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Vali värvide arv" />
+                    <SelectValue placeholder="Vali trüki tüüp" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">Ilma trükita</SelectItem>
-                    <SelectItem value="1">1 värv</SelectItem>
-                    <SelectItem value="2">2 värvi</SelectItem>
-                    <SelectItem value="3">3 värvi</SelectItem>
-                    <SelectItem value="4">4 värvi</SelectItem>
-                    <SelectItem value="5">5 värvi</SelectItem>
-                    <SelectItem value="6">6 värvi</SelectItem>
-                    <SelectItem value="7">7 värvi</SelectItem>
-                    <SelectItem value="8">8 värvi</SelectItem>
+                    <SelectItem value="without">Ilma trükita</SelectItem>
+                    <SelectItem value="with">Trükiga</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -200,7 +213,7 @@ const ProductDetail = () => {
           
           <div className="space-y-6">
             <Button size="lg" className="w-full md:w-auto" asChild>
-              <Link to={`/inquiry?product=${product?.id}&quantity=${quantity}&colors=${printColors}&selectedColor=${selectedColor}`}>
+              <Link to={`/inquiry?product=${product?.id}&quantity=${quantity}&printType=${printType}&selectedColor=${selectedColor}`}>
                 Küsi pakkumist
               </Link>
             </Button>

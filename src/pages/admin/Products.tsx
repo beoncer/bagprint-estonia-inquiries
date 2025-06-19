@@ -32,6 +32,8 @@ import { PlusIcon, Trash2, Edit, Star, StarOff, X } from "lucide-react";
 import { PRODUCT_COLORS, ProductColor } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { BadgeType, BADGE_CONFIGS } from "@/lib/badge-constants";
+import { cn } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -46,6 +48,7 @@ interface Product {
   updated_at: string;
   colors: ProductColor[];
   is_eco?: boolean;
+  badges: BadgeType[];
 }
 
 interface PopularProduct {
@@ -77,6 +80,7 @@ const ProductsPage: React.FC = () => {
   const [priceWith500, setPriceWith500] = useState("");
   const [selectedColors, setSelectedColors] = useState<ProductColor[]>([]);
   const [isEco, setIsEco] = useState(false);
+  const [selectedBadges, setSelectedBadges] = useState<BadgeType[]>([]);
 
   useEffect(() => {
     fetchProducts();
@@ -86,9 +90,11 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     if (selectedProduct) {
       setSelectedColors(selectedProduct.colors || []);
+      setSelectedBadges(selectedProduct.badges || []);
       setIsEco(selectedProduct.is_eco || false);
     } else {
       setSelectedColors([]);
+      setSelectedBadges([]);
       setIsEco(false);
     }
   }, [selectedProduct]);
@@ -188,6 +194,7 @@ const ProductsPage: React.FC = () => {
         slug: formData.slug || null,
         colors: selectedColors,
         is_eco: isEco,
+        badges: selectedBadges,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -274,6 +281,7 @@ const ProductsPage: React.FC = () => {
         slug: formData.slug || null,
         colors: selectedColors,
         is_eco: isEco,
+        badges: selectedBadges,
         updated_at: new Date().toISOString(),
       };
 
@@ -471,6 +479,14 @@ const ProductsPage: React.FC = () => {
     setSelectedColors(selectedColors.filter(c => c !== color));
   };
 
+  const handleBadgeToggle = (badge: BadgeType) => {
+    setSelectedBadges(prev => 
+      prev.includes(badge)
+        ? prev.filter(b => b !== badge)
+        : [...prev, badge]
+    );
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -626,6 +642,32 @@ const ProductsPage: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-sm font-medium">Product Badges</label>
+                <div className="flex flex-wrap gap-2">
+                  {Object.values(BADGE_CONFIGS).map((config) => (
+                    <button
+                      key={config.id}
+                      type="button"
+                      onClick={() => handleBadgeToggle(config.id)}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full border transition-colors",
+                        "bg-white hover:bg-gray-50",
+                        selectedBadges.includes(config.id)
+                          ? "border-2"
+                          : "border opacity-50"
+                      )}
+                      style={{
+                        borderColor: config.borderColor,
+                        color: config.borderColor,
+                      }}
+                    >
+                      {config.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2">
