@@ -12,6 +12,7 @@ import ColorPicker from "@/components/product/ColorPicker";
 import EcoBadge from "@/components/product/EcoBadge";
 import { ProductBadge } from "@/components/product/ProductBadge";
 import { BadgeType } from "@/lib/badge-constants";
+import { Textarea } from "@/components/ui/textarea";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -27,6 +28,12 @@ const ProductDetail = () => {
   const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
   const [pricePerItem, setPricePerItem] = useState<number>(0);
   const [withPrint, setWithPrint] = useState(false);
+  
+  // Inquiry form state
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -105,7 +112,7 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
           <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
@@ -120,7 +127,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Product details section */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Title and badges */}
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
@@ -136,15 +143,15 @@ const ProductDetail = () => {
           </div>
 
           <div className="prose max-w-none">
-            <p>{product.description}</p>
+            <p className="text-sm text-gray-600 break-words whitespace-pre-wrap">{product.description}</p>
           </div>
 
           {/* Product options section */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Size selection */}
             {product.sizes && product.sizes.length > 0 && (
               <div className="space-y-2">
-                <Label>Suurus</Label>
+                <Label className="text-sm font-medium">Suurus</Label>
                 <Select
                   value={selectedSize || ""}
                   onValueChange={setSelectedSize}
@@ -165,24 +172,21 @@ const ProductDetail = () => {
 
             {/* Color selection */}
             {product.colors && product.colors.length > 0 && (
-              <div className="space-y-2">
-                <Label>Värv</Label>
-                <ColorPicker
-                  colors={product.colors}
-                  selectedColor={selectedColor}
-                  onColorSelect={setSelectedColor}
-                />
-              </div>
+              <ColorPicker
+                colors={product.colors}
+                selectedColor={selectedColor}
+                onColorSelect={setSelectedColor}
+              />
             )}
           </div>
 
           {/* Calculator section */}
-          <div className="bg-gray-50 p-6 rounded-lg mt-8">
-            <h2 className="text-xl font-semibold mb-4">Arvuta hind</h2>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Arvuta hind</h2>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label>Kogus</Label>
+                <Label className="text-sm">Kogus</Label>
                 <Select
                   value={quantity}
                   onValueChange={(value) => setQuantity(value)}
@@ -199,7 +203,7 @@ const ProductDetail = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Trüki tüüp</Label>
+                <Label className="text-sm">Trüki tüüp</Label>
                 <Select
                   value={printType}
                   onValueChange={(value) => {
@@ -217,24 +221,65 @@ const ProductDetail = () => {
                 </Select>
               </div>
 
-              <div className="pt-4 border-t">
-                <div className="flex justify-between items-center">
+              <div className="pt-3 border-t">
+                <div className="flex justify-between items-center text-sm">
                   <span>Hind/tk:</span>
                   <span className="font-semibold">{pricePerItem.toFixed(2)} €</span>
                 </div>
-                <div className="flex justify-between items-center text-lg font-bold mt-2">
+                <div className="flex justify-between items-center text-lg font-bold mt-1">
                   <span>Kokku:</span>
                   <span>{calculatedPrice.toFixed(2)} €</span>
                 </div>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 mt-2">
                   * Hinnad on indikatiivsed ja ei sisalda käibemaksu
                 </p>
               </div>
-
-              <Button className="w-full" size="lg">
-                Küsi pakkumist
-              </Button>
             </div>
+          </div>
+
+          {/* Inquiry form */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Input
+                  placeholder="Nimi*"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Input
+                  placeholder="E-mail*"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+            </div>
+            
+            <Input
+              placeholder="Telefoninumber*"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="bg-white"
+            />
+            
+            <Textarea
+              placeholder="Lisainformatsioon*"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="bg-white min-h-[100px]"
+            />
+
+            <Button className="w-full" size="lg">
+              Küsi pakkumist
+            </Button>
+            
+            <p className="text-xs text-gray-500 text-center">
+              Tellimus läheb töössse ainult peale pakkumise ja digitaalse mustandi kinnitust.
+            </p>
           </div>
         </div>
       </div>
