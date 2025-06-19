@@ -34,7 +34,7 @@ export interface Product {
   sizes?: string[]; // Add sizes property
   is_eco?: boolean;
   badges: string[];
-  category?: string;
+  category: string; // Make this required to match ProductProps
   startingPrice?: number;
   is_popular?: boolean;
 }
@@ -99,7 +99,7 @@ export async function getProducts() {
         sizes: item.sizes || [], // Include sizes
         is_eco: item.is_eco || false,
         badges: item.badges || [],
-        category: item.type,
+        category: item.type, // Ensure category is always provided
         startingPrice,
         is_popular: item.is_popular || false,
       };
@@ -124,7 +124,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     ...data,
     category: data.type, // Map type to category
     startingPrice: data.pricing_without_print ? 
-      Math.min(...Object.values(data.pricing_without_print)) : 
+      Math.min(...Object.values(data.pricing_without_print as Record<string, number>).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
       undefined,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     colors: data.colors || [],
@@ -152,7 +152,7 @@ export async function getPopularProducts(): Promise<Product[]> {
     ...data,
     category: data.type,
     startingPrice: data.pricing_without_print ? 
-      Math.min(...Object.values(data.pricing_without_print as Record<string, number>)) : 
+      Math.min(...Object.values(data.pricing_without_print as Record<string, number>).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
       undefined,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     sizes: data.sizes || [], // Include sizes
