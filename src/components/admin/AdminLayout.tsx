@@ -131,6 +131,13 @@ const AdminLayout: React.FC = () => {
                   <span>Guarantees</span>
                 </Link>
               </SidebarMenuItem>
+              <div className="my-4 border-t border-gray-200" />
+              <SidebarMenuItem>
+                <Link to="/admin/product-faq" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/product-faq") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <HelpCircle className="h-5 w-5" />
+                  <span>Product FAQ</span>
+                </Link>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>

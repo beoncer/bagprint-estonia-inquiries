@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,6 +33,7 @@ import GuaranteesAdmin from "./pages/admin/Guarantees";
 import MeistAdmin from "./pages/admin/Meist";
 import ContactAdmin from "./pages/admin/Contact";
 import ProductPagesAdmin from "./pages/admin/ProductPages";
+import ProductFAQAdmin from "./pages/admin/ProductFAQ";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -85,6 +85,7 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="product-pages" element={<ProductPagesAdmin />} />
+            <Route path="product-faq" element={<ProductFAQAdmin />} />
             <Route path="content" element={<AdminContent />} />
             <Route path="assets" element={<AdminAssets />} />
             <Route path="seo" element={<AdminSEO />} />

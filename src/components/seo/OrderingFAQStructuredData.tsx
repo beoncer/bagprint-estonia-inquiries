@@ -1,60 +1,62 @@
+import { useEffect, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
-import { useEffect } from 'react';
+interface FAQ {
+  question: string;
+  answer: string;
+}
 
 const OrderingFAQStructuredData = () => {
+  const [faqs, setFaqs] = useState<FAQ[]>([]);
+
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      const { data } = await supabase
+        .from('website_content')
+        .select('key, value')
+        .eq('page', 'product_faq');
+      if (data) {
+        const faqArr: FAQ[] = [];
+        data.forEach((row: any) => {
+          const match = row.key.match(/^ordering_faq_(\d+)_(question|answer)$/);
+          if (match) {
+            const idx = parseInt(match[1]);
+            const type = match[2];
+            if (!faqArr[idx]) faqArr[idx] = { question: '', answer: '' };
+            faqArr[idx][type] = row.value;
+          }
+        });
+        setFaqs(faqArr.filter(faq => faq && (faq.question || faq.answer)));
+      }
+    };
+    fetchFAQs();
+  }, []);
+
   useEffect(() => {
     // Remove any existing ordering FAQ structured data
     const existingScript = document.querySelector('script[data-ordering-faq-structured-data]');
     if (existingScript) {
       existingScript.remove();
     }
-
-    const orderingFAQs = [
-      {
-        question: "Kuidas ma saan tellimuse esitada?",
-        answer: "Tellimuse esitamiseks klikkige nupul 'Küsi pakkumist' ja täitke vorm oma kontaktandmete ja soovitava kogusega. Meie meeskond võtab teiega 24 tunni jooksul ühendust."
-      },
-      {
-        question: "Kui kiiresti ma saan hinnapakkumise?",
-        answer: "Saadame teile hinnapakkumise tavaliselt 24 tunni jooksul pärast päringu saamist. Keerulisemate tellimuste puhul võib see võtta kuni 48 tundi."
-      },
-      {
-        question: "Kas on olemas miinimumtellimusekogus?",
-        answer: "Jah, meie miinimumtellimusekogus on tavaliselt 50 tk. Väiksemate koguste kohta palun võtke meiega otse ühendust."
-      },
-      {
-        question: "Millised on maksevõimalused?",
-        answer: "Pakume mitmeid maksevõimalusi: pangaülekanne, arve järgi maksmine ettevõtetele ja sularahamakse kaupade kättetoimetamisel."
-      },
-      {
-        question: "Kui kaua võtab tellimuse täitmine?",
-        answer: "Standardsed tellimused täidame tavaliselt 5-10 tööpäeva jooksul. Kohandatud trükiga tooted võivad võtta 10-15 tööpäeva, sõltuvalt keerukusest ja kogusest."
-      },
-      {
-        question: "Kas pakute kohaletoimetamist?",
-        answer: "Jah, pakume kohaletoimetamist üle Eesti. Tallinna ja Tartu piires on kohaletoimetamine tasuta tellimustele alates 100€. Teistesse piirkondadesse kehtivad soodsamad tarnehinnad."
-      }
-    ];
-
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": orderingFAQs.map(faq => ({
-        "@type": "Question",
-        "name": faq.question,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": faq.answer
-        }
-      }))
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-ordering-faq-structured-data', 'true');
-    script.textContent = JSON.stringify(structuredData);
-    document.head.appendChild(script);
-
+    if (faqs && faqs.length > 0) {
+      const structuredData = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": faqs.map(faq => ({
+          "@type": "Question",
+          "name": faq.question,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": faq.answer
+          }
+        }))
+      };
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-ordering-faq-structured-data', 'true');
+      script.textContent = JSON.stringify(structuredData);
+      document.head.appendChild(script);
+    }
     // Cleanup function to remove script when component unmounts
     return () => {
       const scriptToRemove = document.querySelector('script[data-ordering-faq-structured-data]');
@@ -62,7 +64,7 @@ const OrderingFAQStructuredData = () => {
         scriptToRemove.remove();
       }
     };
-  }, []);
+  }, [faqs]);
 
   return null; // This component doesn't render anything visible
 };
