@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -131,7 +130,6 @@ const ProductDetail = () => {
           {/* Title and badges */}
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
-            <p className="text-gray-500 mt-2">Kategooria: {product.category}</p>
             
             {product.badges && product.badges.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
