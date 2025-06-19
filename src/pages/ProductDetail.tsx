@@ -18,6 +18,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   
   // Calculator state
   const [quantity, setQuantity] = useState<string>("50");
@@ -36,6 +37,10 @@ const ProductDetail = () => {
         // Set initial color if product has colors
         if (productData.colors && productData.colors.length > 0) {
           setSelectedColor(productData.colors[0]);
+        }
+        // Set initial size if product has sizes
+        if (productData.sizes && productData.sizes.length > 0) {
+          setSelectedSize(productData.sizes[0]);
         }
         // Set initial image
         if (productData.image) {
@@ -99,41 +104,28 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
-      <OrderingFAQStructuredData />
-      
-      {/* Breadcrumbs */}
-      <div className="text-sm text-gray-500 mb-6">
-        <Link to="/" className="hover:text-primary">Avaleht</Link>
-        <span className="mx-2">/</span>
-        <Link to="/tooted" className="hover:text-primary">Tooted</Link>
-        <span className="mx-2">/</span>
-        <span className="text-gray-900">{product?.name}</span>
-      </div>
-      
-      {/* Product Details */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        {/* Product Images */}
-        <div>
-          <div className="mb-4 aspect-square overflow-hidden rounded-lg">
-            <img 
-              src={selectedImage || product?.image} 
-              alt={product?.name}
-              className="w-full h-full object-cover"
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+        {/* Image section */}
+        <div className="space-y-6">
+          <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt={product.name}
+                className="object-cover w-full h-full"
+              />
+            )}
           </div>
         </div>
-        
-        {/* Product Info and Calculator */}
-        <div>
-          <h1 className="text-3xl font-bold mb-2">{product?.name}</h1>
-          <p className="text-gray-500 mb-4">Kategooria: {product?.category}</p>
-          {product?.is_eco && <EcoBadge />}
-          <p className="text-primary font-medium">
-            Alates {product?.startingPrice !== undefined ? product?.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}
-          </p>
-          <div className="flex flex-col gap-4 mb-6">
-            {/* Display badges if they exist */}
-            {product?.badges && product.badges.length > 0 && (
+
+        {/* Product details section */}
+        <div className="space-y-8">
+          {/* Title and badges */}
+          <div>
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+            <p className="text-gray-500 mt-2">Kategooria: {product.category}</p>
+            
+            {product.badges && product.badges.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {product.badges.map((badge) => (
                   <ProductBadge key={badge} type={badge as BadgeType} />
@@ -141,33 +133,60 @@ const ProductDetail = () => {
               </div>
             )}
           </div>
-          <p className="text-gray-700 mb-6 whitespace-pre-wrap break-words max-w-full">
-            {product?.description}
-          </p>
-          
-          {/* Color Picker */}
-          {product?.colors && product.colors.length > 0 && (
-            <div className="mb-6">
-              <ColorPicker
-                selectedColor={selectedColor}
-                availableColors={product.colors}
-                onColorChange={setSelectedColor}
-              />
-            </div>
-          )}
-          
-          {/* Price Calculator */}
-          <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
-            <h3 className="text-xl font-semibold mb-4">Arvuta hind</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="quantity" className="mb-2 block">Kogus</Label>
-                <Select 
-                  value={quantity} 
+
+          <div className="prose max-w-none">
+            <p>{product.description}</p>
+          </div>
+
+          {/* Product options section */}
+          <div className="space-y-6">
+            {/* Size selection */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="space-y-2">
+                <Label>Suurus</Label>
+                <Select
+                  value={selectedSize || ""}
+                  onValueChange={setSelectedSize}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Vali suurus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {product.sizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Color selection */}
+            {product.colors && product.colors.length > 0 && (
+              <div className="space-y-2">
+                <Label>Värv</Label>
+                <ColorPicker
+                  colors={product.colors}
+                  selectedColor={selectedColor}
+                  onColorSelect={setSelectedColor}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Calculator section */}
+          <div className="bg-gray-50 p-6 rounded-lg mt-8">
+            <h2 className="text-xl font-semibold mb-4">Arvuta hind</h2>
+
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <Label>Kogus</Label>
+                <Select
+                  value={quantity}
                   onValueChange={(value) => setQuantity(value)}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white">
                     <SelectValue placeholder="Vali kogus" />
                   </SelectTrigger>
                   <SelectContent>
@@ -177,17 +196,17 @@ const ProductDetail = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div>
-                <Label htmlFor="print-type" className="mb-2 block">Trüki tüüp</Label>
-                <Select 
-                  value={printType} 
+
+              <div className="space-y-2">
+                <Label>Trüki tüüp</Label>
+                <Select
+                  value={printType}
                   onValueChange={(value) => {
                     setPrintType(value);
                     setWithPrint(value === "with");
                   }}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full bg-white">
                     <SelectValue placeholder="Vali trüki tüüp" />
                   </SelectTrigger>
                   <SelectContent>
@@ -196,67 +215,31 @@ const ProductDetail = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="border-t pt-4 mt-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span>Hind/tk:</span>
-                  <span className="font-medium">{pricePerItem.toFixed(2)} €</span>
-                </div>
+
+              <div className="pt-4 border-t">
                 <div className="flex justify-between items-center">
-                  <span className="font-medium">Kokku:</span>
-                  <span className="text-xl font-bold text-primary">{calculatedPrice.toFixed(2)} €</span>
+                  <span>Hind/tk:</span>
+                  <span className="font-semibold">{pricePerItem.toFixed(2)} €</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">* Hinnad on indikatiivsed ja ei sisalda käibemaksu</p>
+                <div className="flex justify-between items-center text-lg font-bold mt-2">
+                  <span>Kokku:</span>
+                  <span>{calculatedPrice.toFixed(2)} €</span>
+                </div>
+                <p className="text-sm text-gray-500 mt-2">
+                  * Hinnad on indikatiivsed ja ei sisalda käibemaksu
+                </p>
               </div>
-            </div>
-          </div>
-          
-          <div className="space-y-6">
-            <Button size="lg" className="w-full md:w-auto" asChild>
-              <Link to={`/inquiry?product=${product?.id}&quantity=${quantity}&printType=${printType}&selectedColor=${selectedColor}`}>
+
+              <Button className="w-full" size="lg">
                 Küsi pakkumist
-              </Link>
-            </Button>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-      
-      {/* Product Specifications */}
-      {/* <div className="mt-16">
-        <h3 className="text-xl font-semibold mb-4">Spetsifikatsioonid</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <table className="w-full">
-              <tbody>
-                {Object.entries(product.specifications).map(([key, value]) => {
-                  if (key !== 'colors') {
-                    return (
-                      <tr key={key} className="border-b">
-                        <td className="py-3 font-medium">{key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                        <td className="py-3">{value as string}</td>
-                      </tr>
-                    );
-                  }
-                  return null;
-                })}
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <h4 className="font-medium mb-2">Saadaval värvid:</h4>
-            <div className="flex flex-wrap gap-2">
-              {product.specifications.colors.map((color: string) => (
-                <span key={color} className="bg-gray-100 px-3 py-1 rounded-full text-sm">
-                  {color}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div> */}
-      
-      {/* Add the FAQ section at the bottom */}
+
       <OrderingFAQSection />
+      <OrderingFAQStructuredData />
     </div>
   );
 };
