@@ -238,72 +238,39 @@ export type Database = {
         }
         Relationships: []
       }
-      product_sizes: {
-        Row: {
-          created_at: string | null
-          id: string
-          size_value: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          size_value: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          size_value?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
       products: {
         Row: {
-          badges: string[] | null
-          colors: string[] | null
           created_at: string
           description: string | null
           id: string
           image_url: string | null
-          is_eco: boolean | null
           name: string
           pricing_with_print: Json
           pricing_without_print: Json
-          sizes: string[] | null
           slug: string | null
           type: string
           updated_at: string
         }
         Insert: {
-          badges?: string[] | null
-          colors?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
-          is_eco?: boolean | null
           name: string
           pricing_with_print?: Json
           pricing_without_print?: Json
-          sizes?: string[] | null
           slug?: string | null
           type: string
           updated_at?: string
         }
         Update: {
-          badges?: string[] | null
-          colors?: string[] | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
-          is_eco?: boolean | null
           name?: string
           pricing_with_print?: Json
           pricing_without_print?: Json
-          sizes?: string[] | null
           slug?: string | null
           type?: string
           updated_at?: string
@@ -399,121 +366,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_product_size: {
-        Args: { size_value: string }
-        Returns: string
-      }
-      gtrgm_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_options: {
-        Args: { "": unknown }
-        Returns: undefined
-      }
-      gtrgm_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      search_products_by_colors: {
-        Args: { search_colors: string[] }
-        Returns: {
-          badges: string[] | null
-          colors: string[] | null
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          is_eco: boolean | null
-          name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
-          sizes: string[] | null
-          slug: string | null
-          type: string
-          updated_at: string
-        }[]
-      }
-      set_limit: {
-        Args: { "": number }
-        Returns: number
-      }
-      show_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      show_trgm: {
-        Args: { "": string }
-        Returns: string[]
-      }
-      toggle_eco_status: {
-        Args: { product_id: string; new_status: boolean }
-        Returns: {
-          badges: string[] | null
-          colors: string[] | null
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          is_eco: boolean | null
-          name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
-          sizes: string[] | null
-          slug: string | null
-          type: string
-          updated_at: string
-        }
-      }
-      update_product_badges: {
-        Args: { product_id: string; new_badges: string[] }
-        Returns: {
-          badges: string[] | null
-          colors: string[] | null
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          is_eco: boolean | null
-          name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
-          sizes: string[] | null
-          slug: string | null
-          type: string
-          updated_at: string
-        }
-      }
-      update_product_colors: {
-        Args: { product_id: string; new_colors: string[] }
-        Returns: {
-          badges: string[] | null
-          colors: string[] | null
-          created_at: string
-          description: string | null
-          id: string
-          image_url: string | null
-          is_eco: boolean | null
-          name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
-          sizes: string[] | null
-          slug: string | null
-          type: string
-          updated_at: string
-        }
-      }
+      [_ in never]: never
     }
     Enums: {
-      badge_type: "eco" | "organic" | "reusable" | "recycled"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -628,8 +484,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      badge_type: ["eco", "organic", "reusable", "recycled"],
-    },
+    Enums: {},
   },
 } as const

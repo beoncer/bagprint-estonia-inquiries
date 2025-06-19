@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Select,
@@ -10,29 +9,25 @@ import {
 import { PRODUCT_COLORS } from '@/lib/constants';
 
 interface ColorPickerProps {
-  selectedColor: string | null;
-  colors: string[];
-  onColorSelect: (color: string) => void;
+  selectedColor: string;
+  availableColors: string[];
+  onColorChange: (color: string) => void;
 }
 
 const ColorPicker: React.FC<ColorPickerProps> = ({
   selectedColor,
-  colors = [], // Default to empty array to prevent undefined
-  onColorSelect,
+  availableColors,
+  onColorChange,
 }) => {
   // Filter PRODUCT_COLORS to only show available colors for this product
   const colorOptions = PRODUCT_COLORS.filter(color => 
-    colors.includes(color.value)
+    availableColors.includes(color.value)
   );
-
-  if (!colorOptions.length) {
-    return null; // Don't render if no colors available
-  }
 
   return (
     <div className="space-y-2">
       <label className="text-gray-600 text-sm">Värv</label>
-      <Select value={selectedColor || ""} onValueChange={onColorSelect}>
+      <Select value={selectedColor} onValueChange={onColorChange}>
         <SelectTrigger className="w-full bg-white border-gray-200">
           <SelectValue>
             <div className="flex items-center gap-2">
@@ -57,7 +52,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
                     selectedColor === 'granate' ? '#800000' : 'transparent'
                 }}
               />
-              {PRODUCT_COLORS.find(c => c.value === selectedColor)?.label || selectedColor}
+              {PRODUCT_COLORS.find(c => c.value === selectedColor)?.label}
             </div>
           </SelectValue>
         </SelectTrigger>
@@ -96,4 +91,4 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   );
 };
 
-export default ColorPicker;
+export default ColorPicker; 

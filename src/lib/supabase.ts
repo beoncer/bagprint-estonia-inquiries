@@ -24,17 +24,16 @@ export interface Product {
   name: string;
   description: string;
   image_url: string | null;
-  image: string; // Make this required to match ProductProps
+  image?: string;
   pricing_without_print: Record<string, number>;
   pricing_with_print: Record<string, number>;
-  slug: string; // Make this required to match ProductProps
+  slug?: string | null;
   created_at: string;
   updated_at: string;
   colors: ProductColor[];
-  sizes: string[]; // Add sizes property
   is_eco?: boolean;
   badges: string[];
-  category: string; // Make this required to match ProductProps
+  category?: string;
   startingPrice?: number;
   is_popular?: boolean;
 }
@@ -74,7 +73,7 @@ export async function getProducts() {
       const priceValues = Object.values(pricingWithoutPrint);
       if (priceValues.length > 0) {
         const validPrices = priceValues
-          .map(price => typeof price === 'number' ? price : parseFloat(String(price)))
+          .map(price => typeof price === 'number' ? price : parseFloat(price as string))
           .filter(price => !isNaN(price));
         if (validPrices.length > 0) {
           startingPrice = Math.min(...validPrices);
@@ -87,19 +86,18 @@ export async function getProducts() {
         name: item.name,
         description: item.description || '',
         image_url: item.image_url,
-        image: item.image_url || '/placeholder.svg', // Ensure image is always provided
+        image: item.image_url,
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: typeof item.pricing_with_print === 'string' 
           ? JSON.parse(item.pricing_with_print) 
           : (item.pricing_with_print || {}),
-        slug: item.slug || `${item.type}-${item.id}`, // Ensure slug is always provided
+        slug: item.slug,
         created_at: item.created_at,
         updated_at: item.updated_at,
         colors: item.colors || [],
-        sizes: item.sizes || [], // Include sizes
         is_eco: item.is_eco || false,
         badges: item.badges || [],
-        category: item.type, // Ensure category is always provided
+        category: item.type,
         startingPrice,
         is_popular: item.is_popular || false,
       };
@@ -124,13 +122,11 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     ...data,
     category: data.type, // Map type to category
     startingPrice: data.pricing_without_print ? 
-      Math.min(...Object.values(data.pricing_without_print as Record<string, number>).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
+      Math.min(...Object.values(data.pricing_without_print)) : 
       undefined,
-    image: data.image_url || '/placeholder.svg', // Ensure image is always provided
+    image: data.image_url, // Map image_url to image for backward compatibility
     colors: data.colors || [],
-    sizes: data.sizes || [], // Include sizes
     badges: data.badges || [], // Include badges with default empty array
-    slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
   };
 };
 
@@ -153,11 +149,9 @@ export async function getPopularProducts(): Promise<Product[]> {
     ...data,
     category: data.type,
     startingPrice: data.pricing_without_print ? 
-      Math.min(...Object.values(data.pricing_without_print as Record<string, number>).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
+      Math.min(...Object.values(data.pricing_without_print as Record<string, number>)) : 
       undefined,
-    image: data.image_url || '/placeholder.svg', // Ensure image is always provided
-    sizes: data.sizes || [], // Include sizes
-    slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
+    image: data.image_url,
   })) as Product[];
 }
 
