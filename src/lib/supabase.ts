@@ -27,11 +27,11 @@ export interface Product {
   image: string; // Make this required to match ProductProps
   pricing_without_print: Record<string, number>;
   pricing_with_print: Record<string, number>;
-  slug?: string | null;
+  slug: string; // Make this required to match ProductProps
   created_at: string;
   updated_at: string;
   colors: ProductColor[];
-  sizes?: string[]; // Add sizes property
+  sizes: string[]; // Add sizes property
   is_eco?: boolean;
   badges: string[];
   category: string; // Make this required to match ProductProps
@@ -92,7 +92,7 @@ export async function getProducts() {
         pricing_with_print: typeof item.pricing_with_print === 'string' 
           ? JSON.parse(item.pricing_with_print) 
           : (item.pricing_with_print || {}),
-        slug: item.slug,
+        slug: item.slug || `${item.type}-${item.id}`, // Ensure slug is always provided
         created_at: item.created_at,
         updated_at: item.updated_at,
         colors: item.colors || [],
@@ -130,6 +130,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     colors: data.colors || [],
     sizes: data.sizes || [], // Include sizes
     badges: data.badges || [], // Include badges with default empty array
+    slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
   };
 };
 
@@ -156,6 +157,7 @@ export async function getPopularProducts(): Promise<Product[]> {
       undefined,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     sizes: data.sizes || [], // Include sizes
+    slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
   })) as Product[];
 }
 
