@@ -65,14 +65,14 @@ const ProductDetail = () => {
   
   useEffect(() => {
     if (product && quantity) {
-      const basePrice = withPrint
-        ? product.pricing_with_print[quantity]
-        : product.pricing_without_print[quantity];
-
-      if (basePrice) {
-        const total = parseFloat(quantity) * basePrice;
-        setCalculatedPrice(total);
-        setPricePerItem(basePrice);
+      const pricingField = withPrint ? product.pricing_with_print : product.pricing_without_print;
+      if (pricingField && typeof pricingField === 'object') {
+        const basePrice = pricingField[quantity];
+        if (basePrice) {
+          const total = parseFloat(quantity) * basePrice;
+          setCalculatedPrice(total);
+          setPricePerItem(basePrice);
+        }
       }
     }
   }, [product, quantity, withPrint]);

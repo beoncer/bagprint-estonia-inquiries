@@ -119,18 +119,29 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
 
   if (error) throw error;
 
+  // Parse pricing data
+  const pricingWithoutPrint = typeof data.pricing_without_print === 'string'
+    ? JSON.parse(data.pricing_without_print)
+    : (data.pricing_without_print || {});
+
+  const pricingWithPrint = typeof data.pricing_with_print === 'string'
+    ? JSON.parse(data.pricing_with_print)
+    : (data.pricing_with_print || {});
+
   // Transform the data to match our interface
   return {
     ...data,
     category: data.type, // Map type to category
-    startingPrice: data.pricing_without_print ? 
-      Math.min(...Object.values(data.pricing_without_print as Record<string, number>).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
+    startingPrice: pricingWithoutPrint ? 
+      Math.min(...Object.values(pricingWithoutPrint).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
       undefined,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     colors: data.colors || [],
     sizes: data.sizes || [], // Include sizes
     badges: data.badges || [], // Include badges with default empty array
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
+    pricing_without_print: pricingWithoutPrint,
+    pricing_with_print: pricingWithPrint,
   };
 };
 
