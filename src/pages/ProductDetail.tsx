@@ -7,12 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getProductBySlug, Product } from "@/lib/supabase";
 import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
 import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
+import ColorPicker from "@/components/product/ColorPicker";
+import EcoBadge from "@/components/product/EcoBadge";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string>("");
   
   // Calculator state
   const [quantity, setQuantity] = useState<number>(50);
@@ -28,6 +31,10 @@ const ProductDetail = () => {
           const prod = await getProductBySlug(slug);
           setProduct(prod);
           setSelectedImage(prod.image);
+          // Set initial color to first available color
+          if (prod.colors && prod.colors.length > 0) {
+            setSelectedColor(prod.colors[0]);
+          }
         }
       } catch (e) {
         setProduct(null);
@@ -93,7 +100,7 @@ const ProductDetail = () => {
         <span className="mx-2">/</span>
         <Link to="/tooted" className="hover:text-primary">Tooted</Link>
         <span className="mx-2">/</span>
-        <span className="text-gray-900">{product.name}</span>
+        <span className="text-gray-900">{product?.name}</span>
       </div>
       
       {/* Product Details */}
@@ -102,8 +109,8 @@ const ProductDetail = () => {
         <div>
           <div className="mb-4 aspect-square overflow-hidden rounded-lg">
             <img 
-              src={selectedImage || product.image} 
-              alt={product.name}
+              src={selectedImage || product?.image} 
+              alt={product?.name}
               className="w-full h-full object-cover"
             />
           </div>
@@ -111,10 +118,31 @@ const ProductDetail = () => {
         
         {/* Product Info and Calculator */}
         <div>
-          <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
-          <p className="text-gray-700 mb-2">{product.description}</p>
-          <p className="text-gray-500 mb-2">Kategooria: {product.category}</p>
-          <p className="text-primary font-medium mb-6">Alates {product.startingPrice !== undefined ? product.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}</p>
+          <h1 className="text-3xl font-bold mb-2">{product?.name}</h1>
+          {product?.model && (
+            <p className="text-gray-500 mb-4">Model: {product.model}</p>
+          )}
+          <div className="flex flex-col gap-4 mb-6">
+            <p className="text-gray-500">Kategooria: {product?.category}</p>
+            {product?.is_eco && <EcoBadge />}
+            <p className="text-primary font-medium">
+              Alates {product?.startingPrice !== undefined ? product?.startingPrice.toFixed(2) + ' €' : 'Hind puudub'}
+            </p>
+          </div>
+          <p className="text-gray-700 mb-6 whitespace-pre-wrap break-words max-w-full">
+            {product?.description}
+          </p>
+          
+          {/* Color Picker */}
+          {product?.colors && product.colors.length > 0 && (
+            <div className="mb-6">
+              <ColorPicker
+                selectedColor={selectedColor}
+                availableColors={product.colors}
+                onColorChange={setSelectedColor}
+              />
+            </div>
+          )}
           
           {/* Price Calculator */}
           <div className="bg-gray-50 p-6 rounded-lg shadow-sm mb-6">
@@ -172,7 +200,7 @@ const ProductDetail = () => {
           
           <div className="space-y-6">
             <Button size="lg" className="w-full md:w-auto" asChild>
-              <Link to={`/inquiry?product=${product.id}&quantity=${quantity}&colors=${printColors}`}>
+              <Link to={`/inquiry?product=${product?.id}&quantity=${quantity}&colors=${printColors}&selectedColor=${selectedColor}`}>
                 Küsi pakkumist
               </Link>
             </Button>

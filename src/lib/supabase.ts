@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
+import { ProductColor } from './constants'
 
+// Try to get from environment variables first, fallback to hardcoded values
 const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co'
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3RweGxpYWVya3pqem55aXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4MTQ1NzUsImV4cCI6MjA2MzM5MDU3NX0.GCIW0R71JBJDvwqdqVSNKNwFuuzOp_Bvpd_ua4VQgtc'
 
@@ -10,13 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 console.log('Initializing Supabase client with URL:', supabaseUrl);
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: true
-  }
-});
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // For server-side operations that require higher privileges
 const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3RweGxpYWVya3pqem55aXBpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzgxNDU3NSwiZXhwIjoyMDYzMzkwNTc1fQ.2fW1J9z8RQAd3WopZHjQ-rSwaf5exwneU1MfQ_DgJME'
@@ -24,13 +20,21 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
 export interface Product {
   id: string;
+  type: string;
   name: string;
-  description: string;
-  image: string;
-  category: string;
+  description: string | null;
+  image_url: string | null;
+  pricing_without_print: Record<string, number>;
+  pricing_with_print: Record<string, number>;
+  slug?: string | null;
+  created_at: string;
+  updated_at: string;
+  colors: ProductColor[];
+  model?: string | null;
+  is_eco?: boolean;
+  image?: string;
+  category?: string;
   startingPrice?: number;
-  slug: string;
-  is_popular?: boolean;
 }
 
 function extractStartingPrice(pricing: any): number | undefined {
@@ -73,68 +77,48 @@ export async function getProducts() {
   }
 }
 
-export async function getProductBySlug(slug: string) {
-  try {
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('slug', slug)
-      .single();
+export const getProductBySlug = async (slug: string): Promise<Product> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('slug', slug)
+    .single();
 
-    if (error) {
-      console.error('Supabase error details:', error);
-      throw error;
-    }
+  if (error) throw error;
 
-    return {
-      id: data.id,
-      name: data.name,
-      description: data.description,
-      image: data.image_url,
-      category: data.type,
-      startingPrice: extractStartingPrice(data.pricing_without_print),
-      slug: data.slug,
-    } as Product;
-  } catch (err) {
-    console.error('Unexpected error in getProductBySlug:', err);
-    throw err;
-  }
-}
+  // Transform the data to match our interface
+  return {
+    ...data,
+    category: data.type, // Map type to category
+    startingPrice: data.pricing_without_print ? 
+      Math.min(...Object.values(data.pricing_without_print)) : 
+      undefined,
+    image: data.image_url, // Map image_url to image for backward compatibility
+  };
+};
 
-export async function getPopularProducts() {
-  // Fetch popular product IDs from popular_products table
-  const { data: popularRows, error: popularError } = await supabase
+export async function getPopularProducts(): Promise<Product[]> {
+  const { data: popularProductIds } = await supabase
     .from('popular_products')
     .select('product_id');
 
-  if (popularError) throw popularError;
+  if (!popularProductIds?.length) return [];
 
-  console.log('Fetched popular_products rows:', popularRows);
-
-  const popularIds = (popularRows || []).map(row => row.product_id);
-  if (popularIds.length === 0) {
-    console.log('No popular product IDs found.');
-    return [];
-  }
-
-  // Fetch product details for those IDs
-  const { data: products, error: productsError } = await supabase
+  const { data: products, error } = await supabase
     .from('products')
     .select('*')
-    .in('id', popularIds);
+    .in('id', popularProductIds.map(p => p.product_id));
 
-  if (productsError) throw productsError;
+  if (error) throw error;
 
-  console.log('Fetched products for popular IDs:', products);
-
-  return (products || []).map((item: any) => ({
-    id: item.id,
-    name: item.name,
-    description: item.description,
-    image: item.image_url,
-    category: item.type,
-    startingPrice: extractStartingPrice(item.pricing_without_print),
-    slug: item.slug,
+  // Transform the data to match our interface
+  return products.map(data => ({
+    ...data,
+    category: data.type,
+    startingPrice: data.pricing_without_print ? 
+      Math.min(...Object.values(data.pricing_without_print as Record<string, number>)) : 
+      undefined,
+    image: data.image_url,
   })) as Product[];
 }
 

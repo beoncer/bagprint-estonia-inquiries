@@ -28,7 +28,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusIcon, Trash2, Edit, Star, StarOff } from "lucide-react";
+import { PlusIcon, Trash2, Edit, Star, StarOff, X } from "lucide-react";
+import { PRODUCT_COLORS, ProductColor } from "@/lib/constants";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Product {
   id: string;
@@ -41,6 +44,8 @@ interface Product {
   slug?: string | null;
   created_at: string;
   updated_at: string;
+  colors: ProductColor[];
+  is_eco?: boolean;
 }
 
 interface PopularProduct {
@@ -70,11 +75,23 @@ const ProductsPage: React.FC = () => {
   const [priceWith50, setPriceWith50] = useState("");
   const [priceWith100, setPriceWith100] = useState("");
   const [priceWith500, setPriceWith500] = useState("");
+  const [selectedColors, setSelectedColors] = useState<ProductColor[]>([]);
+  const [isEco, setIsEco] = useState(false);
 
   useEffect(() => {
     fetchProducts();
     fetchPopularProducts();
   }, []);
+
+  useEffect(() => {
+    if (selectedProduct) {
+      setSelectedColors(selectedProduct.colors || []);
+      setIsEco(selectedProduct.is_eco || false);
+    } else {
+      setSelectedColors([]);
+      setIsEco(false);
+    }
+  }, [selectedProduct]);
 
   const fetchProducts = async () => {
     try {
@@ -169,6 +186,8 @@ const ProductsPage: React.FC = () => {
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: pricingWithPrint,
         slug: formData.slug || null,
+        colors: selectedColors,
+        is_eco: isEco,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -253,13 +272,17 @@ const ProductsPage: React.FC = () => {
         pricing_without_print: pricingWithoutPrint,
         pricing_with_print: pricingWithPrint,
         slug: formData.slug || null,
+        colors: selectedColors,
+        is_eco: isEco,
+        updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .update(updatedProductData)
-        .eq("id", selectedProduct.id);
-        
+        .eq("id", selectedProduct.id)
+        .select();
+
       if (error) throw error;
 
       toast({
@@ -332,16 +355,29 @@ const ProductsPage: React.FC = () => {
       description: product.description || "",
       slug: product.slug || "",
     });
-    
-    // Set pricing fields
-    setPriceWithout50(product.pricing_without_print?.["50"]?.toString() || "");
-    setPriceWithout100(product.pricing_without_print?.["100"]?.toString() || "");
-    setPriceWithout500(product.pricing_without_print?.["500"]?.toString() || "");
-    setPriceWith50(product.pricing_with_print?.["50"]?.toString() || "");
-    setPriceWith100(product.pricing_with_print?.["100"]?.toString() || "");
-    setPriceWith500(product.pricing_with_print?.["500"]?.toString() || "");
-    
+    // Set price fields
+    setPriceWithout50(product.pricing_without_print["50"]?.toString() || "");
+    setPriceWithout100(product.pricing_without_print["100"]?.toString() || "");
+    setPriceWithout500(product.pricing_without_print["500"]?.toString() || "");
+    setPriceWith50(product.pricing_with_print["50"]?.toString() || "");
+    setPriceWith100(product.pricing_with_print["100"]?.toString() || "");
+    setPriceWith500(product.pricing_with_print["500"]?.toString() || "");
     setIsDialogOpen(true);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleTypeChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      type: value
+    }));
   };
 
   const handleDeleteClick = (product: Product) => {
@@ -425,6 +461,16 @@ const ProductsPage: React.FC = () => {
     }
   };
 
+  const handleColorSelect = (color: ProductColor) => {
+    if (!selectedColors.includes(color)) {
+      setSelectedColors([...selectedColors, color]);
+    }
+  };
+
+  const handleColorRemove = (color: ProductColor) => {
+    setSelectedColors(selectedColors.filter(c => c !== color));
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -435,7 +481,7 @@ const ProductsPage: React.FC = () => {
               <PlusIcon className="mr-2 h-4 w-4" /> Add New Product
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {selectedProduct ? "Edit Product" : "Add New Product"}
@@ -444,156 +490,181 @@ const ProductsPage: React.FC = () => {
                 Fill in the fields to {selectedProduct ? "edit" : "add"} a product.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <label htmlFor="type">Product Type</label>
-                <Select 
-                  value={formData.type} 
-                  onValueChange={(value) => setFormData({ ...formData, type: value })}
-                >
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Select value={formData.type} onValueChange={handleTypeChange}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select product type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="cotton_bag">Cotton Bag</SelectItem>
                     <SelectItem value="paper_bag">Paper Bag</SelectItem>
-                    <SelectItem value="drawstring_bag">Drawstring Bag</SelectItem>
-                    <SelectItem value="packaging_box">Packaging Box</SelectItem>
+                    <SelectItem value="string_bag">String Bag</SelectItem>
+                    <SelectItem value="shoe_bag">Shoe Bag</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div className="grid gap-2">
-                <label htmlFor="name">Product Name</label>
+
+              <div className="space-y-2">
                 <Input
-                  id="name"
+                  name="name"
+                  placeholder="Product Name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Enter product name"
+                  onChange={handleInputChange}
                 />
               </div>
-              <div className="grid gap-2">
-                <label htmlFor="description">Description</label>
+
+              <div className="space-y-2">
                 <Textarea
-                  id="description"
+                  name="description"
+                  placeholder="Product Description"
                   value={formData.description || ""}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Enter product description"
+                  onChange={handleInputChange}
                 />
               </div>
-              <div className="grid gap-2">
-                <label>Prices without print</label>
+
+              <div className="space-y-2">
+                <Input
+                  name="slug"
+                  placeholder="Product URL Slug"
+                  value={formData.slug || ""}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Prices without print</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label htmlFor="price-50" className="text-sm">50 pcs</label>
                     <Input
-                      id="price-50"
+                      type="number"
+                      placeholder="50 pcs"
                       value={priceWithout50}
                       onChange={(e) => setPriceWithout50(e.target.value)}
-                      placeholder="Price"
-                      type="number"
-                      step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-100" className="text-sm">100 pcs</label>
                     <Input
-                      id="price-100"
+                      type="number"
+                      placeholder="100 pcs"
                       value={priceWithout100}
                       onChange={(e) => setPriceWithout100(e.target.value)}
-                      placeholder="Price"
-                      type="number"
-                      step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-500" className="text-sm">500 pcs</label>
                     <Input
-                      id="price-500"
+                      type="number"
+                      placeholder="500 pcs"
                       value={priceWithout500}
                       onChange={(e) => setPriceWithout500(e.target.value)}
-                      placeholder="Price"
-                      type="number"
-                      step="0.01"
                     />
                   </div>
                 </div>
               </div>
-              <div className="grid gap-2">
-                <label>Prices with print</label>
+
+              <div className="space-y-4">
+                <h4 className="font-medium">Prices with print</h4>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label htmlFor="price-print-50" className="text-sm">50 pcs</label>
                     <Input
-                      id="price-print-50"
+                      type="number"
+                      placeholder="50 pcs"
                       value={priceWith50}
                       onChange={(e) => setPriceWith50(e.target.value)}
-                      placeholder="Price"
-                      type="number"
-                      step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-print-100" className="text-sm">100 pcs</label>
                     <Input
-                      id="price-print-100"
+                      type="number"
+                      placeholder="100 pcs"
                       value={priceWith100}
                       onChange={(e) => setPriceWith100(e.target.value)}
-                      placeholder="Price"
-                      type="number"
-                      step="0.01"
                     />
                   </div>
                   <div>
-                    <label htmlFor="price-print-500" className="text-sm">500 pcs</label>
                     <Input
-                      id="price-print-500"
+                      type="number"
+                      placeholder="500 pcs"
                       value={priceWith500}
                       onChange={(e) => setPriceWith500(e.target.value)}
-                      placeholder="Price"
-                      type="number"
-                      step="0.01"
                     />
                   </div>
                 </div>
               </div>
-              <div className="grid gap-2">
-                <label htmlFor="image">Product Image</label>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Colors</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {selectedColors.map(color => (
+                    <Badge key={color} variant="secondary" className="flex items-center gap-1">
+                      {PRODUCT_COLORS.find(c => c.value === color)?.label}
+                      <button
+                        onClick={() => handleColorRemove(color)}
+                        className="ml-1 hover:text-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                <Select
+                  value=""
+                  onValueChange={(value) => handleColorSelect(value as ProductColor)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Add color" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PRODUCT_COLORS.map(color => (
+                      <SelectItem
+                        key={color.value}
+                        value={color.value}
+                        disabled={selectedColors.includes(color.value)}
+                      >
+                        {color.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Input
-                  id="image"
                   type="file"
                   accept="image/*"
                   onChange={(e) => setImageFile(e.target.files?.[0] || null)}
                 />
-                {selectedProduct && selectedProduct.image_url && (
+                {selectedProduct?.image_url && (
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-2">Current image:</p>
+                    <p className="text-sm text-gray-500">Current image:</p>
                     <img
                       src={selectedProduct.image_url}
-                      alt={selectedProduct.name}
-                      className="w-32 h-32 object-contain bg-gray-100 rounded"
+                      alt="Current product"
+                      className="mt-1 max-h-40 rounded"
                     />
                   </div>
                 )}
               </div>
-              <div className="grid gap-2">
-                <label htmlFor="slug">Product URL Slug</label>
-                <Input
-                  id="slug"
-                  value={formData.slug || ""}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="e.g. premium-cotton-tote-bag"
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="is-eco"
+                  checked={isEco}
+                  onCheckedChange={(checked) => setIsEco(checked as boolean)}
                 />
-                <span className="text-xs text-gray-500">This will be used in the product URL: /tooted/&lt;slug&gt;</span>
+                <label
+                  htmlFor="is-eco"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Öko toode
+                </label>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={handleDialogClose}>
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button 
-                className="bg-red-600 hover:bg-red-700" 
-                onClick={selectedProduct ? handleEditProduct : handleAddProduct}
-              >
+              <Button onClick={selectedProduct ? handleEditProduct : handleAddProduct}>
                 {selectedProduct ? "Save Changes" : "Add Product"}
               </Button>
             </DialogFooter>
