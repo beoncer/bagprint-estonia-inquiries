@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BadgeType, BADGE_CONFIGS } from "@/lib/badge-constants";
 import { cn } from "@/lib/utils";
+import { usePricing } from "@/hooks/usePricing";
 
 interface Product {
   id: string;
@@ -41,12 +43,12 @@ interface Product {
   name: string;
   description: string | null;
   image_url: string | null;
-  pricing_without_print: Record<string, number>;
-  pricing_with_print: Record<string, number>;
+  base_price: number;
   slug?: string | null;
   created_at: string;
   updated_at: string;
   colors: ProductColor[];
+  sizes: string[];
   is_eco?: boolean;
   badges: BadgeType[];
 }
@@ -68,19 +70,15 @@ const ProductsPage: React.FC = () => {
     type: "",
     name: "",
     description: "",
-    pricing_without_print: {},
-    pricing_with_print: {},
+    base_price: 0,
     slug: "",
   });
-  const [priceWithout50, setPriceWithout50] = useState("");
-  const [priceWithout100, setPriceWithout100] = useState("");
-  const [priceWithout500, setPriceWithout500] = useState("");
-  const [priceWith50, setPriceWith50] = useState("");
-  const [priceWith100, setPriceWith100] = useState("");
-  const [priceWith500, setPriceWith500] = useState("");
   const [selectedColors, setSelectedColors] = useState<ProductColor[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [isEco, setIsEco] = useState(false);
   const [selectedBadges, setSelectedBadges] = useState<BadgeType[]>([]);
+  
+  const { calculatePrice } = usePricing();
 
   useEffect(() => {
     fetchProducts();
@@ -90,10 +88,12 @@ const ProductsPage: React.FC = () => {
   useEffect(() => {
     if (selectedProduct) {
       setSelectedColors(selectedProduct.colors || []);
+      setSelectedSizes(selectedProduct.sizes || []);
       setSelectedBadges(selectedProduct.badges || []);
       setIsEco(selectedProduct.is_eco || false);
     } else {
       setSelectedColors([]);
+      setSelectedSizes([]);
       setSelectedBadges([]);
       setIsEco(false);
     }
@@ -106,17 +106,7 @@ const ProductsPage: React.FC = () => {
       if (error) throw error;
       
       if (data) {
-        // Convert Json type to Record<string, number>
-        const processedData: Product[] = data.map(product => ({
-          ...product,
-          pricing_without_print: typeof product.pricing_without_print === 'string' 
-            ? JSON.parse(product.pricing_without_print as string) 
-            : product.pricing_without_print as Record<string, number>,
-          pricing_with_print: typeof product.pricing_with_print === 'string'
-            ? JSON.parse(product.pricing_with_print as string)
-            : product.pricing_with_print as Record<string, number>
-        }));
-        setProducts(processedData);
+        setProducts(data);
       }
     } catch (error: any) {
       toast({
@@ -148,25 +138,14 @@ const ProductsPage: React.FC = () => {
 
   const handleAddProduct = async () => {
     try {
-      if (!formData.name || !formData.type) {
+      if (!formData.name || !formData.type || !formData.base_price) {
         toast({
           title: "Validation error",
-          description: "Name and type are required fields",
+          description: "Name, type, and base price are required fields",
           variant: "destructive",
         });
         return;
       }
-
-      // Build pricing objects
-      const pricingWithoutPrint: Record<string, number> = {};
-      if (priceWithout50) pricingWithoutPrint["50"] = parseFloat(priceWithout50);
-      if (priceWithout100) pricingWithoutPrint["100"] = parseFloat(priceWithout100);
-      if (priceWithout500) pricingWithoutPrint["500"] = parseFloat(priceWithout500);
-
-      const pricingWithPrint: Record<string, number> = {};
-      if (priceWith50) pricingWithPrint["50"] = parseFloat(priceWith50);
-      if (priceWith100) pricingWithPrint["100"] = parseFloat(priceWith100);
-      if (priceWith500) pricingWithPrint["500"] = parseFloat(priceWith500);
 
       let imageUrl = "";
       if (imageFile) {
@@ -189,10 +168,10 @@ const ProductsPage: React.FC = () => {
         type: formData.type,
         description: formData.description || null,
         image_url: imageUrl || null,
-        pricing_without_print: pricingWithoutPrint,
-        pricing_with_print: pricingWithPrint,
+        base_price: formData.base_price,
         slug: formData.slug || null,
         colors: selectedColors,
+        sizes: selectedSizes,
         is_eco: isEco,
         badges: selectedBadges,
       };
@@ -205,24 +184,7 @@ const ProductsPage: React.FC = () => {
         description: "Product has been added successfully",
       });
 
-      // Reset form
-      setFormData({
-        type: "",
-        name: "",
-        description: "",
-        pricing_without_print: {},
-        pricing_with_print: {},
-        slug: "",
-      });
-      setPriceWithout50("");
-      setPriceWithout100("");
-      setPriceWithout500("");
-      setPriceWith50("");
-      setPriceWith100("");
-      setPriceWith500("");
-      setImageFile(null);
-      setIsDialogOpen(false);
-      
+      handleDialogClose();
       await fetchProducts();
     } catch (error: any) {
       toast({
@@ -235,25 +197,14 @@ const ProductsPage: React.FC = () => {
 
   const handleEditProduct = async () => {
     try {
-      if (!selectedProduct || !formData.name || !formData.type) {
+      if (!selectedProduct || !formData.name || !formData.type || !formData.base_price) {
         toast({
           title: "Validation error",
-          description: "Name and type are required fields",
+          description: "Name, type, and base price are required fields",
           variant: "destructive",
         });
         return;
       }
-
-      // Build pricing objects
-      const pricingWithoutPrint: Record<string, number> = {};
-      if (priceWithout50) pricingWithoutPrint["50"] = parseFloat(priceWithout50);
-      if (priceWithout100) pricingWithoutPrint["100"] = parseFloat(priceWithout100);
-      if (priceWithout500) pricingWithoutPrint["500"] = parseFloat(priceWithout500);
-
-      const pricingWithPrint: Record<string, number> = {};
-      if (priceWith50) pricingWithPrint["50"] = parseFloat(priceWith50);
-      if (priceWith100) pricingWithPrint["100"] = parseFloat(priceWith100);
-      if (priceWith500) pricingWithPrint["500"] = parseFloat(priceWith500);
 
       let imageUrl = selectedProduct.image_url;
       if (imageFile) {
@@ -276,10 +227,10 @@ const ProductsPage: React.FC = () => {
         type: formData.type,
         description: formData.description || null,
         image_url: imageUrl,
-        pricing_without_print: pricingWithoutPrint,
-        pricing_with_print: pricingWithPrint,
+        base_price: formData.base_price,
         slug: formData.slug || null,
         colors: selectedColors,
+        sizes: selectedSizes,
         is_eco: isEco,
         badges: selectedBadges,
         updated_at: new Date().toISOString(),
@@ -298,25 +249,7 @@ const ProductsPage: React.FC = () => {
         description: "Product has been updated successfully",
       });
 
-      // Reset form and close dialog
-      setFormData({
-        type: "",
-        name: "",
-        description: "",
-        pricing_without_print: {},
-        pricing_with_print: {},
-        slug: "",
-      });
-      setPriceWithout50("");
-      setPriceWithout100("");
-      setPriceWithout500("");
-      setPriceWith50("");
-      setPriceWith100("");
-      setPriceWith500("");
-      setImageFile(null);
-      setSelectedProduct(null);
-      setIsDialogOpen(false);
-      
+      handleDialogClose();
       await fetchProducts();
     } catch (error: any) {
       toast({
@@ -361,15 +294,9 @@ const ProductsPage: React.FC = () => {
       type: product.type,
       name: product.name,
       description: product.description || "",
+      base_price: product.base_price,
       slug: product.slug || "",
     });
-    // Set price fields
-    setPriceWithout50(product.pricing_without_print["50"]?.toString() || "");
-    setPriceWithout100(product.pricing_without_print["100"]?.toString() || "");
-    setPriceWithout500(product.pricing_without_print["500"]?.toString() || "");
-    setPriceWith50(product.pricing_with_print["50"]?.toString() || "");
-    setPriceWith100(product.pricing_with_print["100"]?.toString() || "");
-    setPriceWith500(product.pricing_with_print["500"]?.toString() || "");
     setIsDialogOpen(true);
   };
 
@@ -377,7 +304,7 @@ const ProductsPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: name === 'base_price' ? parseFloat(value) || 0 : value
     }));
   };
 
@@ -400,7 +327,6 @@ const ProductsPage: React.FC = () => {
   const handleTogglePopular = async (productId: string) => {
     try {
       if (isPopular(productId)) {
-        // Remove from popular products
         const productToRemove = popularProducts.find(pp => pp.product_id === productId);
         if (productToRemove) {
           const { error } = await supabase
@@ -416,7 +342,6 @@ const ProductsPage: React.FC = () => {
           });
         }
       } else {
-        // Add to popular products
         const { error } = await supabase
           .from("popular_products")
           .insert({ product_id: productId });
@@ -446,16 +371,9 @@ const ProductsPage: React.FC = () => {
       type: "",
       name: "",
       description: "",
-      pricing_without_print: {},
-      pricing_with_print: {},
+      base_price: 0,
       slug: "",
     });
-    setPriceWithout50("");
-    setPriceWithout100("");
-    setPriceWithout500("");
-    setPriceWith50("");
-    setPriceWith100("");
-    setPriceWith500("");
     setImageFile(null);
   };
 
@@ -479,12 +397,36 @@ const ProductsPage: React.FC = () => {
     setSelectedColors(selectedColors.filter(c => c !== color));
   };
 
+  const handleSizeAdd = (size: string) => {
+    if (size.trim() && !selectedSizes.includes(size.trim())) {
+      setSelectedSizes([...selectedSizes, size.trim()]);
+    }
+  };
+
+  const handleSizeRemove = (size: string) => {
+    setSelectedSizes(selectedSizes.filter(s => s !== size));
+  };
+
   const handleBadgeToggle = (badge: BadgeType) => {
     setSelectedBadges(prev => 
       prev.includes(badge)
         ? prev.filter(b => b !== badge)
         : [...prev, badge]
     );
+  };
+
+  const getPriceDisplay = (product: Product) => {
+    const priceResult = calculatePrice({
+      basePrice: product.base_price,
+      quantity: 50,
+      withPrint: false
+    });
+    
+    if (priceResult) {
+      return `From €${priceResult.pricePerItem.toFixed(2)} (50pcs)`;
+    }
+    
+    return `Base: €${product.base_price.toFixed(2)}`;
   };
 
   return (
@@ -548,64 +490,18 @@ const ProductsPage: React.FC = () => {
                 />
               </div>
 
-              <div className="space-y-4">
-                <h4 className="font-medium">Prices without print</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Input
-                      type="number"
-                      placeholder="50 pcs"
-                      value={priceWithout50}
-                      onChange={(e) => setPriceWithout50(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      placeholder="100 pcs"
-                      value={priceWithout100}
-                      onChange={(e) => setPriceWithout100(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      placeholder="500 pcs"
-                      value={priceWithout500}
-                      onChange={(e) => setPriceWithout500(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <h4 className="font-medium">Prices with print</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Input
-                      type="number"
-                      placeholder="50 pcs"
-                      value={priceWith50}
-                      onChange={(e) => setPriceWith50(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      placeholder="100 pcs"
-                      value={priceWith100}
-                      onChange={(e) => setPriceWith100(e.target.value)}
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="number"
-                      placeholder="500 pcs"
-                      value={priceWith500}
-                      onChange={(e) => setPriceWith500(e.target.value)}
-                    />
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <Input
+                  name="base_price"
+                  type="number"
+                  step="0.01"
+                  placeholder="Base Price (€)"
+                  value={formData.base_price || ""}
+                  onChange={handleInputChange}
+                />
+                <p className="text-sm text-gray-500">
+                  This is the base price that will be used with quantity multipliers and print costs
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -642,6 +538,32 @@ const ProductsPage: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Sizes</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {selectedSizes.map(size => (
+                    <Badge key={size} variant="secondary" className="flex items-center gap-1">
+                      {size}
+                      <button
+                        onClick={() => handleSizeRemove(size)}
+                        className="ml-1 hover:text-destructive"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                <Input
+                  placeholder="Add size (e.g., 38x42cm)"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSizeAdd(e.currentTarget.value);
+                      e.currentTarget.value = '';
+                    }
+                  }}
+                />
               </div>
 
               <div className="space-y-4">
@@ -703,7 +625,7 @@ const ProductsPage: React.FC = () => {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              <Button variant="outline" onClick={handleDialogClose}>
                 Cancel
               </Button>
               <Button onClick={selectedProduct ? handleEditProduct : handleAddProduct}>
@@ -745,7 +667,7 @@ const ProductsPage: React.FC = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
-                <TableHead>Prices</TableHead>
+                <TableHead>Pricing</TableHead>
                 <TableHead>Popular</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -774,24 +696,9 @@ const ProductsPage: React.FC = () => {
                     </TableCell>
                     <TableCell>{translateProductType(product.type)}</TableCell>
                     <TableCell>
-                      {product.pricing_without_print && Object.keys(product.pricing_without_print).length > 0 ? (
-                        <div className="text-sm">
-                          <p>Without print: {" "}
-                            {Object.entries(product.pricing_without_print)
-                              .map(([qty, price]) => `${qty}pcs: €${price}`)
-                              .join(", ")}
-                          </p>
-                          {product.pricing_with_print && Object.keys(product.pricing_with_print).length > 0 && (
-                            <p>With print: {" "}
-                              {Object.entries(product.pricing_with_print)
-                                .map(([qty, price]) => `${qty}pcs: €${price}`)
-                                .join(", ")}
-                            </p>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">No prices available</span>
-                      )}
+                      <div className="text-sm">
+                        {getPriceDisplay(product)}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <Button
