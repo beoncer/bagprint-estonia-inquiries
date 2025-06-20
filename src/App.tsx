@@ -46,10 +46,23 @@ function App() {
               {/* Public routes with main layout */}
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<Index />} />
+                {/* Estonian product routes */}
+                <Route path="tooted" element={<Products />} />
+                <Route path="riidest-kotid" element={<Products />} />
+                <Route path="paberkotid" element={<Products />} />
+                <Route path="nooriga-kotid" element={<Products />} />
+                <Route path="sussikotid" element={<Products />} />
+                {/* English product routes for backward compatibility */}
                 <Route path="products" element={<Products />} />
                 <Route path="products/:slug" element={<ProductDetail />} />
-                <Route path="contact" element={<Contact />} />
+                {/* Estonian page routes */}
+                <Route path="kontakt" element={<Contact />} />
                 <Route path="meist" element={<Meist />} />
+                <Route path="portfoolio" element={<Portfolio />} />
+                <Route path="blogi" element={<Blog />} />
+                <Route path="blogi/:slug" element={<BlogPost />} />
+                {/* English routes for backward compatibility */}
+                <Route path="contact" element={<Contact />} />
                 <Route path="portfolio" element={<Portfolio />} />
                 <Route path="blog" element={<Blog />} />
                 <Route path="blog/:slug" element={<BlogPost />} />
