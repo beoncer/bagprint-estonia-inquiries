@@ -1,3 +1,4 @@
+
 import { BadgeType } from "@/lib/badge-constants";
 import { ProductColor } from "@/lib/constants";
 
@@ -18,6 +19,4 @@ export interface Product {
   badges: BadgeType[];
   category: string;
   is_popular: boolean;
-  pricing_without_print: Record<string, number>;
-  pricing_with_print: Record<string, number>;
 } 

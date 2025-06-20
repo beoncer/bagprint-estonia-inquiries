@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import EcoBadge from "@/components/product/EcoBadge";
 import { ProductBadge } from "@/components/product/ProductBadge";
 import { BadgeType } from "@/lib/badge-constants";
 import { Textarea } from "@/components/ui/textarea";
+import { usePricing } from "@/hooks/usePricing";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -24,15 +26,16 @@ const ProductDetail = () => {
   // Calculator state
   const [quantity, setQuantity] = useState<string>("50");
   const [printType, setPrintType] = useState<string>("without");
-  const [calculatedPrice, setCalculatedPrice] = useState<number>(0);
-  const [pricePerItem, setPricePerItem] = useState<number>(0);
-  const [withPrint, setWithPrint] = useState(false);
+  const [colorCount, setColorCount] = useState<number>(1);
   
   // Inquiry form state
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  
+  // Use the new pricing system
+  const { calculatePrice, loading: pricingLoading } = usePricing();
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -63,19 +66,13 @@ const ProductDetail = () => {
     fetchProduct();
   }, [slug]);
   
-  useEffect(() => {
-    if (product && quantity) {
-      const pricingField = withPrint ? product.pricing_with_print : product.pricing_without_print;
-      if (pricingField && typeof pricingField === 'object') {
-        const basePrice = pricingField[quantity];
-        if (basePrice) {
-          const total = parseFloat(quantity) * basePrice;
-          setCalculatedPrice(total);
-          setPricePerItem(basePrice);
-        }
-      }
-    }
-  }, [product, quantity, withPrint]);
+  // Calculate price using the new system
+  const priceResult = product ? calculatePrice({
+    basePrice: product.base_price,
+    quantity: parseInt(quantity),
+    colorCount: printType === "with" ? colorCount : 0,
+    withPrint: printType === "with"
+  }) : null;
   
   if (loading) {
     return (
@@ -195,7 +192,9 @@ const ProductDetail = () => {
                   <SelectContent>
                     <SelectItem value="50">50</SelectItem>
                     <SelectItem value="100">100</SelectItem>
+                    <SelectItem value="200">200</SelectItem>
                     <SelectItem value="500">500</SelectItem>
+                    <SelectItem value="1000">1000</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -204,10 +203,7 @@ const ProductDetail = () => {
                 <Label className="text-sm">Trüki tüüp</Label>
                 <Select
                   value={printType}
-                  onValueChange={(value) => {
-                    setPrintType(value);
-                    setWithPrint(value === "with");
-                  }}
+                  onValueChange={(value) => setPrintType(value)}
                 >
                   <SelectTrigger className="w-full bg-white">
                     <SelectValue placeholder="Vali trüki tüüp" />
@@ -219,15 +215,58 @@ const ProductDetail = () => {
                 </Select>
               </div>
 
+              {printType === "with" && (
+                <div className="space-y-2">
+                  <Label className="text-sm">Värvide arv</Label>
+                  <Select
+                    value={colorCount.toString()}
+                    onValueChange={(value) => setColorCount(parseInt(value))}
+                  >
+                    <SelectTrigger className="w-full bg-white">
+                      <SelectValue placeholder="Vali värvide arv" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
+                        <SelectItem key={count} value={count.toString()}>
+                          {count} värv{count > 1 ? 'i' : ''}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div className="pt-3 border-t">
-                <div className="flex justify-between items-center text-sm">
-                  <span>Hind/tk:</span>
-                  <span className="font-semibold">{pricePerItem.toFixed(2)} €</span>
-                </div>
-                <div className="flex justify-between items-center text-lg font-bold mt-1">
-                  <span>Kokku:</span>
-                  <span>{calculatedPrice.toFixed(2)} €</span>
-                </div>
+                {!pricingLoading && priceResult && (
+                  <>
+                    <div className="space-y-1 text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Põhihind:</span>
+                        <span>€{priceResult.basePrice.toFixed(2)}</span>
+                      </div>
+                      {priceResult.breakdown.discount > 0 && (
+                        <div className="flex justify-between text-green-600">
+                          <span>Koguse allahindlus:</span>
+                          <span>-€{priceResult.breakdown.discount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {priceResult.printCost > 0 && (
+                        <div className="flex justify-between">
+                          <span>Trükikulu:</span>
+                          <span>€{priceResult.printCost.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-2 pt-2 border-t">
+                      <span>Hind/tk:</span>
+                      <span className="font-semibold">€{priceResult.pricePerItem.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-lg font-bold mt-1">
+                      <span>Kokku:</span>
+                      <span>€{priceResult.totalPrice.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
                 <p className="text-xs text-gray-500 mt-2">
                   * Hinnad on indikatiivsed ja ei sisalda käibemaksu
                 </p>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { usePricing } from "@/hooks/usePricing";
 
 export interface ProductProps {
   id: string;
@@ -10,16 +11,24 @@ export interface ProductProps {
   description: string;
   image: string;
   category: string;
-  startingPrice?: number;
+  basePrice: number;
   slug: string;
 }
 
-const ProductCard = ({ id, name, description, image, startingPrice, slug }: ProductProps) => {
+const ProductCard = ({ id, name, description, image, basePrice, slug }: ProductProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(image);
+  const { calculatePrice } = usePricing();
   
   // Make sure ID is valid to prevent broken links
   const safeId = id || 'unknown';
+  
+  // Calculate starting price using the new pricing system
+  const startingPriceResult = calculatePrice({
+    basePrice,
+    quantity: 50, // Use 50 as the base quantity for starting price
+    withPrint: false
+  });
   
   // Process image URL if it's from Supabase
   useEffect(() => {
@@ -62,9 +71,9 @@ const ProductCard = ({ id, name, description, image, startingPrice, slug }: Prod
       <CardContent className="p-4 flex-grow">
         <h3 className="text-lg font-semibold mb-2">{name}</h3>
         <p className="text-gray-600 text-sm line-clamp-3">{description}</p>
-        {startingPrice !== undefined ? (
+        {startingPriceResult ? (
           <p className="text-primary font-medium mt-2">
-            Alates {startingPrice.toFixed(2)} €
+            Alates €{startingPriceResult.pricePerItem.toFixed(2)}
           </p>
         ) : (
           <p className="text-gray-400 font-medium mt-2">

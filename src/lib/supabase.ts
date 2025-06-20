@@ -25,8 +25,7 @@ export interface Product {
   description: string;
   image_url: string | null;
   image: string; // Make this required to match ProductProps
-  pricing_without_print: Record<string, number>;
-  pricing_with_print: Record<string, number>;
+  base_price: number;
   slug: string; // Make this required to match ProductProps
   created_at: string;
   updated_at: string;
@@ -35,19 +34,7 @@ export interface Product {
   is_eco?: boolean;
   badges: string[];
   category: string; // Make this required to match ProductProps
-  startingPrice?: number;
   is_popular?: boolean;
-}
-
-function extractStartingPrice(pricing: any): number | undefined {
-  if (!pricing) return undefined;
-  try {
-    const parsed = typeof pricing === "string" ? JSON.parse(pricing) : pricing;
-    const prices = Object.values(parsed).map(Number).filter(n => !isNaN(n));
-    return prices.length ? Math.min(...prices) : undefined;
-  } catch {
-    return undefined;
-  }
 }
 
 export async function getProducts() {
@@ -63,47 +50,24 @@ export async function getProducts() {
     }
 
     console.log('Successfully fetched products:', data);
-    return (data || []).map((item: any) => {
-      // Safely parse pricing data
-      const pricingWithoutPrint = typeof item.pricing_without_print === 'string' 
-        ? JSON.parse(item.pricing_without_print) 
-        : (item.pricing_without_print || {});
-
-      // Calculate starting price safely with validation
-      let startingPrice: number | undefined = undefined;
-      const priceValues = Object.values(pricingWithoutPrint);
-      if (priceValues.length > 0) {
-        const validPrices = priceValues
-          .map(price => typeof price === 'number' ? price : parseFloat(String(price)))
-          .filter(price => !isNaN(price));
-        if (validPrices.length > 0) {
-          startingPrice = Math.min(...validPrices);
-        }
-      }
-
-      return {
-        id: item.id,
-        type: item.type,
-        name: item.name,
-        description: item.description || '',
-        image_url: item.image_url,
-        image: item.image_url || '/placeholder.svg', // Ensure image is always provided
-        pricing_without_print: pricingWithoutPrint,
-        pricing_with_print: typeof item.pricing_with_print === 'string' 
-          ? JSON.parse(item.pricing_with_print) 
-          : (item.pricing_with_print || {}),
-        slug: item.slug || `${item.type}-${item.id}`, // Ensure slug is always provided
-        created_at: item.created_at,
-        updated_at: item.updated_at,
-        colors: item.colors || [],
-        sizes: item.sizes || [], // Include sizes
-        is_eco: item.is_eco || false,
-        badges: item.badges || [],
-        category: item.type, // Ensure category is always provided
-        startingPrice,
-        is_popular: item.is_popular || false,
-      };
-    }) as Product[];
+    return (data || []).map((item: any) => ({
+      id: item.id,
+      type: item.type,
+      name: item.name,
+      description: item.description || '',
+      image_url: item.image_url,
+      image: item.image_url || '/placeholder.svg', // Ensure image is always provided
+      base_price: item.base_price || 0,
+      slug: item.slug || `${item.type}-${item.id}`, // Ensure slug is always provided
+      created_at: item.created_at,
+      updated_at: item.updated_at,
+      colors: item.colors || [],
+      sizes: item.sizes || [], // Include sizes
+      is_eco: item.is_eco || false,
+      badges: item.badges || [],
+      category: item.type, // Ensure category is always provided
+      is_popular: item.is_popular || false,
+    })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
     throw err;
@@ -119,29 +83,16 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
 
   if (error) throw error;
 
-  // Parse pricing data
-  const pricingWithoutPrint = typeof data.pricing_without_print === 'string'
-    ? JSON.parse(data.pricing_without_print)
-    : (data.pricing_without_print || {});
-
-  const pricingWithPrint = typeof data.pricing_with_print === 'string'
-    ? JSON.parse(data.pricing_with_print)
-    : (data.pricing_with_print || {});
-
   // Transform the data to match our interface
   return {
     ...data,
     category: data.type, // Map type to category
-    startingPrice: pricingWithoutPrint ? 
-      Math.min(...Object.values(pricingWithoutPrint).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
-      undefined,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     colors: data.colors || [],
     sizes: data.sizes || [], // Include sizes
     badges: data.badges || [], // Include badges with default empty array
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
-    pricing_without_print: pricingWithoutPrint,
-    pricing_with_print: pricingWithPrint,
+    base_price: data.base_price || 0,
   };
 };
 
@@ -163,12 +114,10 @@ export async function getPopularProducts(): Promise<Product[]> {
   return products.map(data => ({
     ...data,
     category: data.type,
-    startingPrice: data.pricing_without_print ? 
-      Math.min(...Object.values(data.pricing_without_print as Record<string, number>).map(price => typeof price === 'number' ? price : parseFloat(String(price))).filter(price => !isNaN(price))) : 
-      undefined,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     sizes: data.sizes || [], // Include sizes
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
+    base_price: data.base_price || 0,
   })) as Product[];
 }
 
