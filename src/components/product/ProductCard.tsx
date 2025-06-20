@@ -11,11 +11,11 @@ export interface ProductProps {
   description: string;
   image: string;
   category: string;
-  basePrice: number;
+  base_price: number; // Changed from basePrice to base_price
   slug: string;
 }
 
-const ProductCard = ({ id, name, description, image, basePrice, slug }: ProductProps) => {
+const ProductCard = ({ id, name, description, image, base_price, slug }: ProductProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(image);
   const { calculatePrice } = usePricing();
@@ -25,7 +25,7 @@ const ProductCard = ({ id, name, description, image, basePrice, slug }: ProductP
   
   // Calculate starting price using the new pricing system
   const startingPriceResult = calculatePrice({
-    basePrice,
+    basePrice: base_price, // Use base_price instead of basePrice
     quantity: 50, // Use 50 as the base quantity for starting price
     withPrint: false
   });
