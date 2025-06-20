@@ -1,210 +1,153 @@
-import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { PrintPrice, QuantityMultiplier, QUANTITY_RANGES, PRINT_PRICES } from '@/types/pricing';
 
-interface PriceResult {
-  basePrice: number;
-  printPrice: number;
-  totalPrice: number;
-  pricePerItem: number;
-}
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { QuantityMultiplier, PrintPrice, PriceCalculationResult, PriceCalculationInput } from '@/types/pricing';
 
 export function usePricing() {
-  const [printPrices, setPrintPrices] = useState<PrintPrice[]>([]);
   const [quantityMultipliers, setQuantityMultipliers] = useState<QuantityMultiplier[]>([]);
+  const [printPrices, setPrintPrices] = useState<PrintPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch all pricing data
-  const fetchPricingData = useCallback(async () => {
+  const fetchPricingData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch print prices
-      const { data: printPricesData, error: printPricesError } = await supabase
-        .from('print_prices')
-        .select('*')
-        .order('quantity_range_start', { ascending: true })
-        .order('colors_count', { ascending: true });
+      const [multipliersResult, printPricesResult] = await Promise.all([
+        supabase.from('quantity_multipliers').select('*').order('quantity_range_start'),
+        supabase.from('print_prices').select('*').order('quantity_range_start, colors_count')
+      ]);
 
-      if (printPricesError) throw printPricesError;
+      if (multipliersResult.error) throw multipliersResult.error;
+      if (printPricesResult.error) throw printPricesResult.error;
 
-      // Fetch quantity multipliers
-      const { data: multipliersData, error: multipliersError } = await supabase
-        .from('quantity_multipliers')
-        .select('*')
-        .order('quantity_range_start', { ascending: true });
-
-      if (multipliersError) throw multipliersError;
-
-      setPrintPrices(printPricesData);
-      setQuantityMultipliers(multipliersData);
+      setQuantityMultipliers(multipliersResult.data || []);
+      setPrintPrices(printPricesResult.data || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while fetching pricing data');
+      console.error('Error fetching pricing data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch pricing data');
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  // Update print price
-  const updatePrintPrice = async (price: Partial<PrintPrice> & { id: string }) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('print_prices')
-        .update(price)
-        .eq('id', price.id);
-
-      if (error) throw error;
-      await fetchPricingData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while updating print price');
-      throw err;
-    }
-  };
-
-  // Update quantity multiplier
-  const updateQuantityMultiplier = async (multiplier: Partial<QuantityMultiplier> & { id: string }) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('quantity_multipliers')
-        .update(multiplier)
-        .eq('id', multiplier.id);
-
-      if (error) throw error;
-      await fetchPricingData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while updating quantity multiplier');
-      throw err;
-    }
-  };
-
-  // Create print price
-  const createPrintPrice = async (price: Omit<PrintPrice, 'id' | 'created_at' | 'updated_at'>) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('print_prices')
-        .insert(price);
-
-      if (error) throw error;
-      await fetchPricingData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while creating print price');
-      throw err;
-    }
-  };
-
-  // Create quantity multiplier
-  const createQuantityMultiplier = async (multiplier: Omit<QuantityMultiplier, 'id' | 'created_at' | 'updated_at'>) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('quantity_multipliers')
-        .insert(multiplier);
-
-      if (error) throw error;
-      await fetchPricingData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while creating quantity multiplier');
-      throw err;
-    }
-  };
-
-  // Delete print price
-  const deletePrintPrice = async (id: string) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('print_prices')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      await fetchPricingData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while deleting print price');
-      throw err;
-    }
-  };
-
-  // Delete quantity multiplier
-  const deleteQuantityMultiplier = async (id: string) => {
-    try {
-      setError(null);
-      const { error } = await supabase
-        .from('quantity_multipliers')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-      await fetchPricingData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while deleting quantity multiplier');
-      throw err;
-    }
-  };
-
-  // Calculate final price
-  const calculatePrice = (
-    basePrice: number,
-    quantity: number,
-    colorCount?: number
-  ): PriceResult => {
-    // Find the appropriate quantity range and multiplier
-    const range = QUANTITY_RANGES.find(
-      (r) => quantity >= r.start && (r.end === null || quantity <= r.end)
-    );
-
-    if (!range) {
-      throw new Error(`No quantity range found for quantity: ${quantity}`);
-    }
-
-    // Calculate base price with quantity multiplier
-    const basePriceWithMultiplier = basePrice * range.multiplier;
-
-    // Calculate print price if applicable
-    let printPrice = 0;
-    if (colorCount) {
-      const printPriceConfig = PRINT_PRICES.find(
-        (p) => p.colorCount === colorCount
-      );
-      if (!printPriceConfig) {
-        throw new Error(`No print price found for color count: ${colorCount}`);
-      }
-      printPrice = printPriceConfig.price * quantity;
-    }
-
-    // Calculate total price
-    const totalPrice = (basePriceWithMultiplier * quantity) + printPrice;
-    const pricePerItem = totalPrice / quantity;
-
-    return {
-      basePrice: basePriceWithMultiplier * quantity,
-      printPrice,
-      totalPrice,
-      pricePerItem,
-    };
   };
 
   useEffect(() => {
     fetchPricingData();
-  }, [fetchPricingData]);
+  }, []);
+
+  // Find quantity multiplier for a given quantity
+  const getQuantityMultiplier = (quantity: number): number => {
+    const multiplier = quantityMultipliers.find(
+      m => quantity >= m.quantity_range_start && quantity <= m.quantity_range_end
+    );
+    return multiplier ? multiplier.multiplier : 1;
+  };
+
+  // Find print price for a given quantity and color count
+  const getPrintPrice = (quantity: number, colorCount: number): number => {
+    const printPrice = printPrices.find(
+      p => quantity >= p.quantity_range_start && 
+          quantity <= p.quantity_range_end && 
+          p.colors_count === colorCount
+    );
+    return printPrice ? printPrice.price_per_item : 0;
+  };
+
+  // Calculate final price based on business logic
+  const calculatePrice = ({ basePrice, quantity, colorCount = 0, withPrint = false }: PriceCalculationInput): PriceCalculationResult => {
+    // Step 1: Apply quantity discount to base price
+    const quantityMultiplier = getQuantityMultiplier(quantity);
+    const discountedBasePrice = basePrice * quantityMultiplier;
+
+    // Step 2: Add print cost if printing is requested
+    const printCost = withPrint && colorCount > 0 ? getPrintPrice(quantity, colorCount) : 0;
+
+    // Step 3: Calculate final price per item
+    const pricePerItem = discountedBasePrice + printCost;
+    const totalPrice = pricePerItem * quantity;
+
+    return {
+      pricePerItem,
+      totalPrice,
+      basePrice,
+      discountedBasePrice,
+      printCost,
+      quantityMultiplier,
+      breakdown: {
+        basePrice,
+        discount: basePrice - discountedBasePrice,
+        printCost,
+        finalPricePerItem: pricePerItem,
+        quantity,
+        totalPrice
+      }
+    };
+  };
+
+  // Admin functions for updating pricing
+  const updateQuantityMultiplier = async (data: Partial<QuantityMultiplier> & { id: string }) => {
+    const { error } = await supabase
+      .from('quantity_multipliers')
+      .update(data)
+      .eq('id', data.id);
+
+    if (error) throw error;
+    await fetchPricingData(); // Refresh data
+  };
+
+  const createQuantityMultiplier = async (data: Omit<QuantityMultiplier, 'id' | 'created_at' | 'updated_at'>) => {
+    const { error } = await supabase
+      .from('quantity_multipliers')
+      .insert(data);
+
+    if (error) throw error;
+    await fetchPricingData(); // Refresh data
+  };
+
+  const updatePrintPrice = async (data: Partial<PrintPrice> & { id: string }) => {
+    const { error } = await supabase
+      .from('print_prices')
+      .update(data)
+      .eq('id', data.id);
+
+    if (error) throw error;
+    await fetchPricingData(); // Refresh data
+  };
+
+  const createPrintPrice = async (data: Omit<PrintPrice, 'id' | 'created_at' | 'updated_at'>) => {
+    const { error } = await supabase
+      .from('print_prices')
+      .insert(data);
+
+    if (error) throw error;
+    await fetchPricingData(); // Refresh data
+  };
+
+  const deletePrintPrice = async (id: string) => {
+    const { error } = await supabase
+      .from('print_prices')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    await fetchPricingData(); // Refresh data
+  };
 
   return {
-    printPrices,
     quantityMultipliers,
+    printPrices,
     loading,
     error,
-    updatePrintPrice,
-    updateQuantityMultiplier,
-    createPrintPrice,
-    createQuantityMultiplier,
-    deletePrintPrice,
-    deleteQuantityMultiplier,
     calculatePrice,
-    refetch: fetchPricingData
+    getQuantityMultiplier,
+    getPrintPrice,
+    updateQuantityMultiplier,
+    createQuantityMultiplier,
+    updatePrintPrice,
+    createPrintPrice,
+    deletePrintPrice,
+    refresh: fetchPricingData
   };
-} 
+}

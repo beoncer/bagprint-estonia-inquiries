@@ -238,6 +238,36 @@ export type Database = {
         }
         Relationships: []
       }
+      print_prices: {
+        Row: {
+          colors_count: number
+          created_at: string
+          id: string
+          price_per_item: number
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at: string
+        }
+        Insert: {
+          colors_count: number
+          created_at?: string
+          id?: string
+          price_per_item: number
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at?: string
+        }
+        Update: {
+          colors_count?: number
+          created_at?: string
+          id?: string
+          price_per_item?: number
+          quantity_range_end?: number
+          quantity_range_start?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_sizes: {
         Row: {
           created_at: string | null
@@ -262,6 +292,7 @@ export type Database = {
       products: {
         Row: {
           badges: string[] | null
+          base_price: number
           colors: string[] | null
           created_at: string
           description: string | null
@@ -269,8 +300,6 @@ export type Database = {
           image_url: string | null
           is_eco: boolean | null
           name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
           sizes: string[] | null
           slug: string | null
           type: string
@@ -278,6 +307,7 @@ export type Database = {
         }
         Insert: {
           badges?: string[] | null
+          base_price?: number
           colors?: string[] | null
           created_at?: string
           description?: string | null
@@ -285,8 +315,6 @@ export type Database = {
           image_url?: string | null
           is_eco?: boolean | null
           name: string
-          pricing_with_print?: Json
-          pricing_without_print?: Json
           sizes?: string[] | null
           slug?: string | null
           type: string
@@ -294,6 +322,7 @@ export type Database = {
         }
         Update: {
           badges?: string[] | null
+          base_price?: number
           colors?: string[] | null
           created_at?: string
           description?: string | null
@@ -301,11 +330,36 @@ export type Database = {
           image_url?: string | null
           is_eco?: boolean | null
           name?: string
-          pricing_with_print?: Json
-          pricing_without_print?: Json
           sizes?: string[] | null
           slug?: string | null
           type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quantity_multipliers: {
+        Row: {
+          created_at: string
+          id: string
+          multiplier: number
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          multiplier: number
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          multiplier?: number
+          quantity_range_end?: number
+          quantity_range_start?: number
           updated_at?: string
         }
         Relationships: []
@@ -427,6 +481,7 @@ export type Database = {
         Args: { search_colors: string[] }
         Returns: {
           badges: string[] | null
+          base_price: number
           colors: string[] | null
           created_at: string
           description: string | null
@@ -434,8 +489,6 @@ export type Database = {
           image_url: string | null
           is_eco: boolean | null
           name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
           sizes: string[] | null
           slug: string | null
           type: string
@@ -458,6 +511,7 @@ export type Database = {
         Args: { product_id: string; new_status: boolean }
         Returns: {
           badges: string[] | null
+          base_price: number
           colors: string[] | null
           created_at: string
           description: string | null
@@ -465,8 +519,6 @@ export type Database = {
           image_url: string | null
           is_eco: boolean | null
           name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
           sizes: string[] | null
           slug: string | null
           type: string
@@ -477,6 +529,7 @@ export type Database = {
         Args: { product_id: string; new_badges: string[] }
         Returns: {
           badges: string[] | null
+          base_price: number
           colors: string[] | null
           created_at: string
           description: string | null
@@ -484,8 +537,6 @@ export type Database = {
           image_url: string | null
           is_eco: boolean | null
           name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
           sizes: string[] | null
           slug: string | null
           type: string
@@ -496,6 +547,7 @@ export type Database = {
         Args: { product_id: string; new_colors: string[] }
         Returns: {
           badges: string[] | null
+          base_price: number
           colors: string[] | null
           created_at: string
           description: string | null
@@ -503,8 +555,6 @@ export type Database = {
           image_url: string | null
           is_eco: boolean | null
           name: string
-          pricing_with_print: Json
-          pricing_without_print: Json
           sizes: string[] | null
           slug: string | null
           type: string
