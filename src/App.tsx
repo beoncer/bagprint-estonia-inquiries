@@ -48,6 +48,7 @@ function App() {
                 <Route index element={<Index />} />
                 {/* Estonian product routes */}
                 <Route path="tooted" element={<Products />} />
+                <Route path="tooted/:slug" element={<ProductDetail />} />
                 <Route path="riidest-kotid" element={<Products />} />
                 <Route path="paberkotid" element={<Products />} />
                 <Route path="nooriga-kotid" element={<Products />} />
