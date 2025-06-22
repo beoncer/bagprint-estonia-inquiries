@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -35,7 +36,7 @@ import AdminPricing from "./pages/admin/pricing";
 
 const queryClient = new QueryClient();
 
-function App() {
+const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -98,6 +99,6 @@ function App() {
       </TooltipProvider>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;
