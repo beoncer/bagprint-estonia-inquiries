@@ -145,10 +145,14 @@ const ProductsPage: React.FC = () => {
       
       if (error) throw error;
       
-      const materials = [...new Set(data.map(item => item.material).filter(Boolean))];
+      const materials = data && Array.isArray(data) 
+        ? [...new Set(data.map(item => item.material).filter(Boolean))]
+        : [];
+      
       setAvailableMaterials(materials);
     } catch (error: any) {
       console.error("Error fetching materials:", error);
+      setAvailableMaterials([]);
     }
   };
 
@@ -456,24 +460,25 @@ const ProductsPage: React.FC = () => {
   };
 
   const handleMaterialSelect = (material: string) => {
-    setFormData(prev => ({
-      ...prev,
-      material: material
-    }));
-    setMaterialComboOpen(false);
-    setMaterialSearchValue("");
+    if (material) {
+      setFormData(prev => ({
+        ...prev,
+        material: material
+      }));
+      setMaterialComboOpen(false);
+      setMaterialSearchValue("");
+    }
   };
 
   const handleAddNewMaterial = () => {
-    if (materialSearchValue.trim()) {
+    if (materialSearchValue?.trim()) {
       const newMaterial = materialSearchValue.trim();
       setFormData(prev => ({
         ...prev,
         material: newMaterial
       }));
-      // Add to available materials list for future use
-      if (!availableMaterials.includes(newMaterial)) {
-        setAvailableMaterials(prev => [...prev, newMaterial]);
+      if (!availableMaterials?.includes(newMaterial)) {
+        setAvailableMaterials(prev => [...(prev || []), newMaterial]);
       }
       setMaterialComboOpen(false);
       setMaterialSearchValue("");
@@ -584,42 +589,47 @@ const ProductsPage: React.FC = () => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-full p-0">
-                    <Command>
-                      <CommandInput 
-                        placeholder="Search or add material..." 
-                        value={materialSearchValue}
-                        onValueChange={setMaterialSearchValue}
+                    <div className="p-2">
+                      <Input
+                        placeholder="Search or add material..."
+                        value={materialSearchValue || ""}
+                        onChange={(e) => setMaterialSearchValue(e.target.value || "")}
+                        className="mb-2"
                       />
-                      <CommandEmpty>
-                        <div className="p-2">
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start"
+                      <div className="max-h-[200px] overflow-y-auto">
+                        {(availableMaterials || [])
+                          .filter(material => 
+                            material.toLowerCase().includes((materialSearchValue || "").toLowerCase())
+                          )
+                          .map((material) => (
+                            <div
+                              key={material}
+                              className="flex items-center px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-sm"
+                              onClick={() => handleMaterialSelect(material)}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.material === material ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {material}
+                            </div>
+                          ))}
+                        {materialSearchValue?.trim() && 
+                         !(availableMaterials || []).some(m => 
+                           m.toLowerCase() === (materialSearchValue || "").toLowerCase()
+                         ) && (
+                          <div
+                            className="flex items-center px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer rounded-sm"
                             onClick={handleAddNewMaterial}
-                            disabled={!materialSearchValue.trim()}
                           >
+                            <PlusIcon className="mr-2 h-4 w-4" />
                             Add "{materialSearchValue}"
-                          </Button>
-                        </div>
-                      </CommandEmpty>
-                      <CommandGroup>
-                        {availableMaterials.map((material) => (
-                          <CommandItem
-                            key={material}
-                            value={material}
-                            onSelect={() => handleMaterialSelect(material)}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                formData.material === material ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {material}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </PopoverContent>
                 </Popover>
               </div>

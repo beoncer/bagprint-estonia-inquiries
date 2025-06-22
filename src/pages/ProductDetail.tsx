@@ -175,6 +175,8 @@ const ProductDetail = () => {
             )}
           </div>
 
+          <ProductTechnicalDetails product={product} />
+
           {/* Calculator section */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Arvuta hind</h2>
@@ -320,9 +322,6 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-
-      {/* Technical Details Section */}
-      <ProductTechnicalDetails product={product} />
 
       <OrderingFAQSection />
       <OrderingFAQStructuredData />
