@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js'
 import { ProductColor } from './constants'
 
@@ -35,6 +36,7 @@ export interface Product {
   badges: string[];
   category: string; // Make this required to match ProductProps
   is_popular?: boolean;
+  material?: string; // Add material property
 }
 
 export async function getProducts() {
@@ -67,6 +69,7 @@ export async function getProducts() {
       badges: item.badges || [],
       category: item.type, // Ensure category is always provided
       is_popular: item.is_popular || false,
+      material: item.material, // Include material
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -93,6 +96,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     badges: data.badges || [], // Include badges with default empty array
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
     base_price: data.base_price || 0,
+    material: data.material, // Include material
   };
 };
 
@@ -118,6 +122,7 @@ export async function getPopularProducts(): Promise<Product[]> {
     sizes: data.sizes || [], // Include sizes
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
     base_price: data.base_price || 0,
+    material: data.material, // Include material
   })) as Product[];
 }
 
