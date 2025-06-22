@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -37,8 +38,10 @@ const OrderingFAQSection = () => {
   }, []);
 
   return (
-    <div className="mt-16">
-      <h3 className="text-2xl font-bold mb-6">Tellimisprotsessi KKK</h3>
+    <div className="bg-gray-50 rounded-lg p-4 mt-6">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Tellimisprotsessi KKK
+      </h3>
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -51,8 +54,10 @@ const OrderingFAQSection = () => {
       ) : faqs.length > 0 ? (
         <Accordion type="single" collapsible className="w-full">
           {faqs.map((faq, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
+            <AccordionItem key={index} value={`item-${index}`} className="border-gray-200">
+              <AccordionTrigger className="text-left text-gray-900 hover:text-gray-700">
+                {faq.question}
+              </AccordionTrigger>
               <AccordionContent className="text-gray-600">
                 {faq.answer}
               </AccordionContent>
