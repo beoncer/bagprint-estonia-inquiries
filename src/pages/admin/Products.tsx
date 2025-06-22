@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusIcon, Trash2, Edit, Star, StarOff, X } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { PlusIcon, Trash2, Edit, Star, StarOff, X, Check, ChevronsUpDown } from "lucide-react";
 import { PRODUCT_COLORS, ProductColor } from "@/lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -51,6 +62,7 @@ interface Product {
   sizes: string[];
   is_eco?: boolean;
   badges: BadgeType[];
+  material?: string | null;
 }
 
 interface PopularProduct {
@@ -61,6 +73,7 @@ interface PopularProduct {
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<PopularProduct[]>([]);
+  const [availableMaterials, setAvailableMaterials] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -72,17 +85,20 @@ const ProductsPage: React.FC = () => {
     description: "",
     base_price: 0,
     slug: "",
+    material: "",
   });
   const [selectedColors, setSelectedColors] = useState<ProductColor[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [isEco, setIsEco] = useState(false);
   const [selectedBadges, setSelectedBadges] = useState<BadgeType[]>([]);
+  const [materialComboOpen, setMaterialComboOpen] = useState(false);
   
   const { calculatePrice } = usePricing();
 
   useEffect(() => {
     fetchProducts();
     fetchPopularProducts();
+    fetchAvailableMaterials();
   }, []);
 
   useEffect(() => {
@@ -116,6 +132,22 @@ const ProductsPage: React.FC = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAvailableMaterials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("material")
+        .not("material", "is", null);
+      
+      if (error) throw error;
+      
+      const materials = [...new Set(data.map(item => item.material).filter(Boolean))];
+      setAvailableMaterials(materials);
+    } catch (error: any) {
+      console.error("Error fetching materials:", error);
     }
   };
 
@@ -170,6 +202,7 @@ const ProductsPage: React.FC = () => {
         image_url: imageUrl || null,
         base_price: formData.base_price,
         slug: formData.slug || null,
+        material: formData.material || null,
         colors: selectedColors,
         sizes: selectedSizes,
         is_eco: isEco,
@@ -186,6 +219,7 @@ const ProductsPage: React.FC = () => {
 
       handleDialogClose();
       await fetchProducts();
+      await fetchAvailableMaterials();
     } catch (error: any) {
       toast({
         title: "Error adding product",
@@ -229,6 +263,7 @@ const ProductsPage: React.FC = () => {
         image_url: imageUrl,
         base_price: formData.base_price,
         slug: formData.slug || null,
+        material: formData.material || null,
         colors: selectedColors,
         sizes: selectedSizes,
         is_eco: isEco,
@@ -251,6 +286,7 @@ const ProductsPage: React.FC = () => {
 
       handleDialogClose();
       await fetchProducts();
+      await fetchAvailableMaterials();
     } catch (error: any) {
       toast({
         title: "Error updating product",
@@ -296,6 +332,7 @@ const ProductsPage: React.FC = () => {
       description: product.description || "",
       base_price: product.base_price,
       slug: product.slug || "",
+      material: product.material || "",
     });
     setIsDialogOpen(true);
   };
@@ -373,6 +410,7 @@ const ProductsPage: React.FC = () => {
       description: "",
       base_price: 0,
       slug: "",
+      material: "",
     });
     setImageFile(null);
   };
@@ -413,6 +451,14 @@ const ProductsPage: React.FC = () => {
         ? prev.filter(b => b !== badge)
         : [...prev, badge]
     );
+  };
+
+  const handleMaterialSelect = (material: string) => {
+    setFormData(prev => ({
+      ...prev,
+      material: material
+    }));
+    setMaterialComboOpen(false);
   };
 
   const getPriceDisplay = (product: Product) => {
@@ -502,6 +548,61 @@ const ProductsPage: React.FC = () => {
                 <p className="text-sm text-gray-500">
                   This is the base price that will be used with quantity multipliers and print costs
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Material</label>
+                <Popover open={materialComboOpen} onOpenChange={setMaterialComboOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={materialComboOpen}
+                      className="w-full justify-between"
+                    >
+                      {formData.material || "Select or add material..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Search or add material..." 
+                        onValueChange={(value) => {
+                          setFormData(prev => ({ ...prev, material: value }));
+                        }}
+                      />
+                      <CommandEmpty>
+                        <div className="p-2">
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start"
+                            onClick={() => handleMaterialSelect(formData.material || "")}
+                          >
+                            Add "{formData.material}"
+                          </Button>
+                        </div>
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {availableMaterials.map((material) => (
+                          <CommandItem
+                            key={material}
+                            value={material}
+                            onSelect={() => handleMaterialSelect(material)}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                formData.material === material ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {material}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="space-y-2">
@@ -667,6 +768,7 @@ const ProductsPage: React.FC = () => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Material</TableHead>
                 <TableHead>Pricing</TableHead>
                 <TableHead>Popular</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
@@ -675,7 +777,7 @@ const ProductsPage: React.FC = () => {
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                  <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                     No products added
                   </TableCell>
                 </TableRow>
@@ -695,6 +797,7 @@ const ProductsPage: React.FC = () => {
                       </div>
                     </TableCell>
                     <TableCell>{translateProductType(product.type)}</TableCell>
+                    <TableCell>{product.material || "—"}</TableCell>
                     <TableCell>
                       <div className="text-sm">
                         {getPriceDisplay(product)}

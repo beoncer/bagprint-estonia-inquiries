@@ -299,6 +299,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          material: string | null
           name: string
           sizes: string[] | null
           slug: string | null
@@ -314,6 +315,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_eco?: boolean | null
+          material?: string | null
           name: string
           sizes?: string[] | null
           slug?: string | null
@@ -329,6 +331,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_eco?: boolean | null
+          material?: string | null
           name?: string
           sizes?: string[] | null
           slug?: string | null
@@ -488,6 +491,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          material: string | null
           name: string
           sizes: string[] | null
           slug: string | null
@@ -518,6 +522,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          material: string | null
           name: string
           sizes: string[] | null
           slug: string | null
@@ -536,6 +541,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          material: string | null
           name: string
           sizes: string[] | null
           slug: string | null
@@ -554,6 +560,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          material: string | null
           name: string
           sizes: string[] | null
           slug: string | null
