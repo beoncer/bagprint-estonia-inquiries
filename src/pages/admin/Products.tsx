@@ -145,10 +145,13 @@ const ProductsPage: React.FC = () => {
       
       if (error) throw error;
       
-      const materials = [...new Set(data.map(item => item.material).filter(Boolean))];
+      const materials = data 
+        ? [...new Set(data.map(item => item.material).filter(Boolean))]
+        : [];
       setAvailableMaterials(materials);
     } catch (error: any) {
       console.error("Error fetching materials:", error);
+      setAvailableMaterials([]);
     }
   };
 
@@ -472,9 +475,12 @@ const ProductsPage: React.FC = () => {
         material: newMaterial
       }));
       // Add to available materials list for future use
-      if (!availableMaterials.includes(newMaterial)) {
-        setAvailableMaterials(prev => [...prev, newMaterial]);
-      }
+      setAvailableMaterials(prev => {
+        if (!prev.includes(newMaterial)) {
+          return [...prev, newMaterial];
+        }
+        return prev;
+      });
       setMaterialComboOpen(false);
       setMaterialSearchValue("");
     }
@@ -603,7 +609,7 @@ const ProductsPage: React.FC = () => {
                         </div>
                       </CommandEmpty>
                       <CommandGroup>
-                        {availableMaterials.map((material) => (
+                        {(availableMaterials || []).map((material) => (
                           <CommandItem
                             key={material}
                             value={material}
