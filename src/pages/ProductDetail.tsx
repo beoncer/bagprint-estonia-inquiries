@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,6 +13,7 @@ import { ProductBadge } from "@/components/product/ProductBadge";
 import { BadgeType } from "@/lib/badge-constants";
 import { Textarea } from "@/components/ui/textarea";
 import { usePricing } from "@/hooks/usePricing";
+import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetails";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -320,6 +320,9 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Technical Details Section */}
+      <ProductTechnicalDetails product={product} />
 
       <OrderingFAQSection />
       <OrderingFAQStructuredData />
