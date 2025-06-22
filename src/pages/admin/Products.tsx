@@ -92,6 +92,7 @@ const ProductsPage: React.FC = () => {
   const [isEco, setIsEco] = useState(false);
   const [selectedBadges, setSelectedBadges] = useState<BadgeType[]>([]);
   const [materialComboOpen, setMaterialComboOpen] = useState(false);
+  const [materialSearchValue, setMaterialSearchValue] = useState("");
   
   const { calculatePrice } = usePricing();
 
@@ -413,6 +414,7 @@ const ProductsPage: React.FC = () => {
       material: "",
     });
     setImageFile(null);
+    setMaterialSearchValue("");
   };
 
   const translateProductType = (type: string) => {
@@ -459,6 +461,23 @@ const ProductsPage: React.FC = () => {
       material: material
     }));
     setMaterialComboOpen(false);
+    setMaterialSearchValue("");
+  };
+
+  const handleAddNewMaterial = () => {
+    if (materialSearchValue.trim()) {
+      const newMaterial = materialSearchValue.trim();
+      setFormData(prev => ({
+        ...prev,
+        material: newMaterial
+      }));
+      // Add to available materials list for future use
+      if (!availableMaterials.includes(newMaterial)) {
+        setAvailableMaterials(prev => [...prev, newMaterial]);
+      }
+      setMaterialComboOpen(false);
+      setMaterialSearchValue("");
+    }
   };
 
   const getPriceDisplay = (product: Product) => {
@@ -568,18 +587,18 @@ const ProductsPage: React.FC = () => {
                     <Command>
                       <CommandInput 
                         placeholder="Search or add material..." 
-                        onValueChange={(value) => {
-                          setFormData(prev => ({ ...prev, material: value }));
-                        }}
+                        value={materialSearchValue}
+                        onValueChange={setMaterialSearchValue}
                       />
                       <CommandEmpty>
                         <div className="p-2">
                           <Button
                             variant="ghost"
                             className="w-full justify-start"
-                            onClick={() => handleMaterialSelect(formData.material || "")}
+                            onClick={handleAddNewMaterial}
+                            disabled={!materialSearchValue.trim()}
                           >
-                            Add "{formData.material}"
+                            Add "{materialSearchValue}"
                           </Button>
                         </div>
                       </CommandEmpty>
