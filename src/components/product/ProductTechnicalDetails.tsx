@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { Product } from "@/lib/supabase";
@@ -11,7 +10,7 @@ interface ProductTechnicalDetailsProps {
 }
 
 const ProductTechnicalDetails: React.FC<ProductTechnicalDetailsProps> = ({ product }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const getColorLabel = (colorValue: string) => {
     const color = PRODUCT_COLORS.find(c => c.value === colorValue);
