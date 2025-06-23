@@ -1,4 +1,4 @@
-
+// Test sync from GitHub to Lovable
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
