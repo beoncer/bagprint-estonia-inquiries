@@ -37,6 +37,19 @@ const ProductDetail = () => {
   // Use the new pricing system
   const { calculatePrice, loading: pricingLoading } = usePricing();
   
+  // Update selected image when color changes
+  useEffect(() => {
+    if (product && selectedColor && product.color_images) {
+      const colorImage = product.color_images[selectedColor];
+      if (colorImage) {
+        setSelectedImage(colorImage);
+      } else {
+        // Fallback to main product image if no color-specific image
+        setSelectedImage(product.image || null);
+      }
+    }
+  }, [selectedColor, product]);
+  
   useEffect(() => {
     const fetchProduct = async () => {
       try {

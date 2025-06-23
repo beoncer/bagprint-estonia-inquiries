@@ -40,6 +40,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { BadgeType, BADGE_CONFIGS } from "@/lib/badge-constants";
 import { cn } from "@/lib/utils";
 import { usePricing } from "@/hooks/usePricing";
+import ColorImageUpload from "@/components/admin/ColorImageUpload";
 
 interface Product {
   id: string;
@@ -56,6 +57,7 @@ interface Product {
   is_eco?: boolean;
   badges: BadgeType[];
   material?: string | null;
+  color_images?: Record<string, string>;
 }
 
 interface PopularProduct {
@@ -86,6 +88,7 @@ const ProductsPage: React.FC = () => {
   const [selectedBadges, setSelectedBadges] = useState<BadgeType[]>([]);
   const [materialComboOpen, setMaterialComboOpen] = useState(false);
   const [materialSearchValue, setMaterialSearchValue] = useState("");
+  const [colorImages, setColorImages] = useState<Record<string, string>>({});
   
   const { calculatePrice } = usePricing();
 
@@ -101,11 +104,13 @@ const ProductsPage: React.FC = () => {
       setSelectedSizes(selectedProduct.sizes || []);
       setSelectedBadges(selectedProduct.badges || []);
       setIsEco(selectedProduct.is_eco || false);
+      setColorImages(selectedProduct.color_images || {});
     } else {
       setSelectedColors([]);
       setSelectedSizes([]);
       setSelectedBadges([]);
       setIsEco(false);
+      setColorImages({});
     }
   }, [selectedProduct]);
 
@@ -205,6 +210,7 @@ const ProductsPage: React.FC = () => {
         sizes: selectedSizes,
         is_eco: isEco,
         badges: selectedBadges,
+        color_images: colorImages,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -266,6 +272,7 @@ const ProductsPage: React.FC = () => {
         sizes: selectedSizes,
         is_eco: isEco,
         badges: selectedBadges,
+        color_images: colorImages,
         updated_at: new Date().toISOString(),
       };
 
@@ -662,6 +669,17 @@ const ProductsPage: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Color-specific images section */}
+              {selectedColors.length > 0 && (
+                <div className="space-y-4">
+                  <ColorImageUpload
+                    onColorImagesChange={setColorImages}
+                    currentColorImages={colorImages}
+                    availableColors={selectedColors}
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <label className="text-sm font-medium">Sizes</label>

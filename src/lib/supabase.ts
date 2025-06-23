@@ -36,6 +36,7 @@ export interface Product {
   category: string; // Make this required to match ProductProps
   is_popular?: boolean;
   material?: string; // Add material property
+  color_images?: Record<string, string>; // Add color-specific images
 }
 
 export async function getProducts() {
@@ -69,6 +70,7 @@ export async function getProducts() {
       category: item.type, // Ensure category is always provided
       is_popular: item.is_popular || false,
       material: item.material, // Include material
+      color_images: item.color_images || {}, // Include color-specific images
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -96,6 +98,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
     base_price: data.base_price || 0,
     material: data.material, // Include material
+    color_images: data.color_images || {}, // Include color-specific images
   };
 };
 
@@ -122,6 +125,7 @@ export async function getPopularProducts(): Promise<Product[]> {
     slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
     base_price: data.base_price || 0,
     material: data.material, // Include material
+    color_images: data.color_images || {}, // Include color-specific images
   })) as Product[];
 }
 
