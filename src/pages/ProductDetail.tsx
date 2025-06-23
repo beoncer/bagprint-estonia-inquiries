@@ -175,8 +175,6 @@ const ProductDetail = () => {
             )}
           </div>
 
-          <ProductTechnicalDetails product={product} />
-
           {/* Calculator section */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Arvuta hind</h2>
@@ -321,6 +319,10 @@ const ProductDetail = () => {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="my-12">
+        <ProductTechnicalDetails product={product} />
       </div>
 
       <OrderingFAQSection />

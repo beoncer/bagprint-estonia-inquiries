@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js'
 import { ProductColor } from './constants'
 
@@ -89,7 +88,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
   // Transform the data to match our interface
   return {
     ...data,
-    category: data.type, // Map type to category
+    category: data.type,
     image: data.image_url || '/placeholder.svg', // Ensure image is always provided
     colors: data.colors || [],
     sizes: data.sizes || [], // Include sizes

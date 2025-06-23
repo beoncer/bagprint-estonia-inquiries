@@ -47,7 +47,9 @@ const ProductTechnicalDetails: React.FC<ProductTechnicalDetailsProps> = ({ produ
           {product.material && (
             <div className="flex items-start">
               <span className="font-medium text-gray-700 min-w-[100px]">Materjal:</span>
-              <span className="text-gray-600">{product.material}</span>
+              <span className="bg-white px-2 py-1 rounded text-sm border">
+                {product.material}
+              </span>
             </div>
           )}
 
