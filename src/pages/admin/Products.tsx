@@ -41,6 +41,7 @@ import { BadgeType, BADGE_CONFIGS } from "@/lib/badge-constants";
 import { cn } from "@/lib/utils";
 import { usePricing } from "@/hooks/usePricing";
 import ColorImageUpload from "@/components/admin/ColorImageUpload";
+import SizeImageUpload from "@/components/admin/SizeImageUpload";
 
 interface Product {
   id: string;
@@ -58,6 +59,7 @@ interface Product {
   badges: BadgeType[];
   material?: string | null;
   color_images?: Record<string, string>;
+  size_images?: Record<string, string>;
 }
 
 interface PopularProduct {
@@ -89,6 +91,7 @@ const ProductsPage: React.FC = () => {
   const [materialComboOpen, setMaterialComboOpen] = useState(false);
   const [materialSearchValue, setMaterialSearchValue] = useState("");
   const [colorImages, setColorImages] = useState<Record<string, string>>({});
+  const [sizeImages, setSizeImages] = useState<Record<string, string>>({});
   
   const { calculatePrice } = usePricing();
 
@@ -105,12 +108,14 @@ const ProductsPage: React.FC = () => {
       setSelectedBadges(selectedProduct.badges || []);
       setIsEco(selectedProduct.is_eco || false);
       setColorImages(selectedProduct.color_images || {});
+      setSizeImages(selectedProduct.size_images || {});
     } else {
       setSelectedColors([]);
       setSelectedSizes([]);
       setSelectedBadges([]);
       setIsEco(false);
       setColorImages({});
+      setSizeImages({});
     }
   }, [selectedProduct]);
 
@@ -211,6 +216,7 @@ const ProductsPage: React.FC = () => {
         is_eco: isEco,
         badges: selectedBadges,
         color_images: colorImages,
+        size_images: sizeImages,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -273,6 +279,7 @@ const ProductsPage: React.FC = () => {
         is_eco: isEco,
         badges: selectedBadges,
         color_images: colorImages,
+        size_images: sizeImages,
         updated_at: new Date().toISOString(),
       };
 
@@ -706,6 +713,17 @@ const ProductsPage: React.FC = () => {
                   }}
                 />
               </div>
+
+              {/* Size-specific images section */}
+              {selectedSizes.length > 0 && (
+                <div className="space-y-4">
+                  <SizeImageUpload
+                    onSizeImagesChange={setSizeImages}
+                    currentSizeImages={sizeImages}
+                    availableSizes={selectedSizes}
+                  />
+                </div>
+              )}
 
               <div className="space-y-4">
                 <label className="text-sm font-medium">Product Badges</label>

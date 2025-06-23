@@ -1,4 +1,3 @@
-
 import { BadgeType } from "@/lib/badge-constants";
 import { ProductColor } from "@/lib/constants";
 
@@ -19,4 +18,7 @@ export interface Product {
   badges: BadgeType[];
   category: string;
   is_popular: boolean;
+  material?: string | null;
+  color_images?: Record<string, string>;
+  size_images?: Record<string, string>;
 } 

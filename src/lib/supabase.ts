@@ -37,6 +37,7 @@ export interface Product {
   is_popular?: boolean;
   material?: string; // Add material property
   color_images?: Record<string, string>; // Add color-specific images
+  size_images?: Record<string, string>; // Add size-specific images
 }
 
 export async function getProducts() {
@@ -71,6 +72,7 @@ export async function getProducts() {
       is_popular: item.is_popular || false,
       material: item.material, // Include material
       color_images: item.color_images || {}, // Include color-specific images
+      size_images: item.size_images || {}, // Include size-specific images
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -99,6 +101,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     base_price: data.base_price || 0,
     material: data.material, // Include material
     color_images: data.color_images || {}, // Include color-specific images
+    size_images: data.size_images || {}, // Include size-specific images
   };
 };
 
@@ -126,6 +129,7 @@ export async function getPopularProducts(): Promise<Product[]> {
     base_price: data.base_price || 0,
     material: data.material, // Include material
     color_images: data.color_images || {}, // Include color-specific images
+    size_images: data.size_images || {}, // Include size-specific images
   })) as Product[];
 }
 

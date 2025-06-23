@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,23 +39,25 @@ const ProductDetail = () => {
   // Use the new pricing system
   const { calculatePrice, loading: pricingLoading } = usePricing();
   
-  // Update selected image when color changes
+  // Update selected image when color or size changes
   useEffect(() => {
-    if (product && selectedColor) {
-      console.log('Color changed to:', selectedColor);
-      console.log('Available color images:', product.color_images);
+    if (product) {
+      let newImage = product.image || null;
       
-      if (product.color_images && product.color_images[selectedColor]) {
-        const colorImage = product.color_images[selectedColor];
-        console.log('Setting color-specific image:', colorImage);
-        setSelectedImage(colorImage);
+      // Priority: 1. Color-specific image, 2. Size-specific image, 3. Main image
+      if (selectedColor && product.color_images && product.color_images[selectedColor]) {
+        newImage = product.color_images[selectedColor];
+        console.log('Using color-specific image:', newImage);
+      } else if (selectedSize && product.size_images && product.size_images[selectedSize]) {
+        newImage = product.size_images[selectedSize];
+        console.log('Using size-specific image:', newImage);
       } else {
-        // Fallback to main product image if no color-specific image
-        console.log('No color-specific image found, using main image:', product.image);
-        setSelectedImage(product.image || null);
+        console.log('Using main product image:', newImage);
       }
+      
+      setSelectedImage(newImage);
     }
-  }, [selectedColor, product]);
+  }, [selectedColor, selectedSize, product]);
   
   useEffect(() => {
     const fetchProduct = async () => {
@@ -222,6 +223,45 @@ const ProductDetail = () => {
                     </div>
                     {isSelected && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Size thumbnails */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="flex flex-wrap gap-3 justify-center">
+              {product.sizes.map((size) => {
+                const sizeImage = product.size_images?.[size] || product.image;
+                const isSelected = selectedSize === size;
+                
+                return (
+                  <div
+                    key={size}
+                    className={`relative cursor-pointer transition-all duration-200 ${
+                      isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
+                    }`}
+                    onClick={() => setSelectedSize(size)}
+                  >
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                      {sizeImage ? (
+                        <img
+                          src={sizeImage}
+                          alt={`${size} variant`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          <span className="text-xs text-gray-600 font-medium text-center px-1">
+                            {size}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    {isSelected && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white" />
                     )}
                   </div>
                 );
