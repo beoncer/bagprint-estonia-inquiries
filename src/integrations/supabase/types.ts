@@ -293,6 +293,7 @@ export type Database = {
         Row: {
           badges: string[] | null
           base_price: number
+          color_images: Json | null
           colors: string[] | null
           created_at: string
           description: string | null
@@ -309,6 +310,7 @@ export type Database = {
         Insert: {
           badges?: string[] | null
           base_price?: number
+          color_images?: Json | null
           colors?: string[] | null
           created_at?: string
           description?: string | null
@@ -325,6 +327,7 @@ export type Database = {
         Update: {
           badges?: string[] | null
           base_price?: number
+          color_images?: Json | null
           colors?: string[] | null
           created_at?: string
           description?: string | null
@@ -485,6 +488,7 @@ export type Database = {
         Returns: {
           badges: string[] | null
           base_price: number
+          color_images: Json | null
           colors: string[] | null
           created_at: string
           description: string | null
@@ -516,6 +520,7 @@ export type Database = {
         Returns: {
           badges: string[] | null
           base_price: number
+          color_images: Json | null
           colors: string[] | null
           created_at: string
           description: string | null
@@ -535,6 +540,7 @@ export type Database = {
         Returns: {
           badges: string[] | null
           base_price: number
+          color_images: Json | null
           colors: string[] | null
           created_at: string
           description: string | null
@@ -554,6 +560,7 @@ export type Database = {
         Returns: {
           badges: string[] | null
           base_price: number
+          color_images: Json | null
           colors: string[] | null
           created_at: string
           description: string | null

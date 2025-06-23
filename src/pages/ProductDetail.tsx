@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { BadgeType } from "@/lib/badge-constants";
 import { Textarea } from "@/components/ui/textarea";
 import { usePricing } from "@/hooks/usePricing";
 import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetails";
+import { PRODUCT_COLORS } from "@/lib/constants";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -22,6 +24,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
   
   // Calculator state
   const [quantity, setQuantity] = useState<string>("50");
@@ -39,12 +42,17 @@ const ProductDetail = () => {
   
   // Update selected image when color changes
   useEffect(() => {
-    if (product && selectedColor && product.color_images) {
-      const colorImage = product.color_images[selectedColor];
-      if (colorImage) {
+    if (product && selectedColor) {
+      console.log('Color changed to:', selectedColor);
+      console.log('Available color images:', product.color_images);
+      
+      if (product.color_images && product.color_images[selectedColor]) {
+        const colorImage = product.color_images[selectedColor];
+        console.log('Setting color-specific image:', colorImage);
         setSelectedImage(colorImage);
       } else {
         // Fallback to main product image if no color-specific image
+        console.log('No color-specific image found, using main image:', product.image);
         setSelectedImage(product.image || null);
       }
     }
@@ -56,16 +64,22 @@ const ProductDetail = () => {
         setLoading(true);
         if (!slug) throw new Error("No slug provided");
         const productData = await getProductBySlug(slug);
+        console.log('Fetched product data:', productData);
         setProduct(productData);
+        
         // Set initial color if product has colors
         if (productData.colors && productData.colors.length > 0) {
-          setSelectedColor(productData.colors[0]);
+          const initialColor = productData.colors[0];
+          console.log('Setting initial color:', initialColor);
+          setSelectedColor(initialColor);
         }
+        
         // Set initial size if product has sizes
         if (productData.sizes && productData.sizes.length > 0) {
           setSelectedSize(productData.sizes[0]);
         }
-        // Set initial image
+        
+        // Set initial image (this will be updated by the color effect)
         if (productData.image) {
           setSelectedImage(productData.image);
         }
@@ -86,6 +100,41 @@ const ProductDetail = () => {
     colorCount: printType === "with" ? colorCount : 0,
     withPrint: printType === "with"
   }) : null;
+
+  // Get color label for display
+  const getColorLabel = (colorValue: string) => {
+    const colorConfig = PRODUCT_COLORS.find(c => c.value === colorValue);
+    return colorConfig?.label || colorValue;
+  };
+
+  // Get color style for thumbnails
+  const getColorStyle = (colorValue: string) => {
+    const colorStyles: Record<string, React.CSSProperties> = {
+      naturalne: { backgroundColor: '#F5F5DC' },
+      oranz: { backgroundColor: '#FFA500' },
+      pehme_kollane: { backgroundColor: '#F0E68C' },
+      punane: { backgroundColor: '#FF0000' },
+      roosa: { backgroundColor: '#FFC0CB' },
+      royal_sinine: { backgroundColor: '#4169E1' },
+      taevasinine: { backgroundColor: '#87CEEB' },
+      tume_roheline: { backgroundColor: '#006400' },
+      tume_sinine: { backgroundColor: '#000080' },
+      valge: { backgroundColor: '#FFFFFF', border: '2px solid #e5e5e5' },
+      granate: { backgroundColor: '#800020' },
+      hall: { backgroundColor: '#808080' },
+      hele_roheline: { backgroundColor: '#90EE90' },
+      kollane: { backgroundColor: '#FFFF00' },
+      lilla: { backgroundColor: '#800080' },
+      must: { backgroundColor: '#000000' }
+    };
+    return colorStyles[colorValue] || { backgroundColor: '#CCCCCC' };
+  };
+
+  // Handle color thumbnail click
+  const handleColorThumbnailClick = (color: string) => {
+    console.log('Color thumbnail clicked:', color);
+    setSelectedColor(color);
+  };
   
   if (loading) {
     return (
@@ -124,15 +173,61 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
-          <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+          <div 
+            className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
+            onMouseEnter={() => setIsImageZoomed(true)}
+            onMouseLeave={() => setIsImageZoomed(false)}
+          >
             {selectedImage && (
               <img
                 src={selectedImage}
                 alt={product.name}
-                className="object-cover w-full h-full"
+                className={`object-cover w-full h-full transition-transform duration-300 ${
+                  isImageZoomed ? 'scale-110' : 'scale-100'
+                }`}
               />
             )}
           </div>
+
+          {/* Color thumbnails */}
+          {product.colors && product.colors.length > 0 && (
+            <div className="flex flex-wrap gap-3 justify-center">
+              {product.colors.map((color) => {
+                const colorImage = product.color_images?.[color] || product.image;
+                const isSelected = selectedColor === color;
+                
+                return (
+                  <div
+                    key={color}
+                    className={`relative cursor-pointer transition-all duration-200 ${
+                      isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
+                    }`}
+                    onClick={() => handleColorThumbnailClick(color)}
+                  >
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                      {colorImage ? (
+                        <img
+                          src={colorImage}
+                          alt={`${getColorLabel(color)} variant`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div 
+                          className="w-full h-full flex items-center justify-center"
+                          style={getColorStyle(color)}
+                        >
+                          <div className="w-8 h-8 rounded-full border border-white/50" style={getColorStyle(color)} />
+                        </div>
+                      )}
+                    </div>
+                    {isSelected && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Product details section */}
