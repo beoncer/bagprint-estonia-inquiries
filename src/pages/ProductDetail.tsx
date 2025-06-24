@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -173,7 +174,7 @@ const ProductDetail = () => {
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div 
             className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
             onMouseEnter={() => setIsImageZoomed(true)}
@@ -190,7 +191,7 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Color thumbnails */}
+          {/* Color thumbnails in a single row */}
           {product.colors && product.colors.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
               {product.colors.map((color) => {
