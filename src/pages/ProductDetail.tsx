@@ -198,6 +198,12 @@ const ProductDetail = () => {
                 const colorImage = product.color_images?.[color] || product.image;
                 const isSelected = selectedColor === color;
                 
+                // Skip rendering thumbnail if the color image is the same as the main image
+                // and this color is not currently selected
+                if (colorImage === product.image && !isSelected && product.colors.length > 1) {
+                  return null;
+                }
+                
                 return (
                   <div
                     key={color}
