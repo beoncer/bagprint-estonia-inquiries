@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -195,12 +194,11 @@ const ProductDetail = () => {
           {product.colors && product.colors.length > 0 && (
             <div className="flex gap-2 justify-start overflow-x-auto pb-2">
               {product.colors.map((color) => {
-                const colorImage = product.color_images?.[color] || product.image;
+                const colorImage = product.color_images?.[color];
                 const isSelected = selectedColor === color;
                 
-                // Skip rendering thumbnail if the color image is the same as the main image
-                // and this color is not currently selected
-                if (colorImage === product.image && !isSelected && product.colors.length > 1) {
+                // Only show thumbnail if there's a specific color image (different from main image)
+                if (!colorImage) {
                   return null;
                 }
                 
@@ -213,20 +211,11 @@ const ProductDetail = () => {
                     onClick={() => handleColorThumbnailClick(color)}
                   >
                     <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 border">
-                      {colorImage ? (
-                        <img
-                          src={colorImage}
-                          alt={`${getColorLabel(color)} variant`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div 
-                          className="w-full h-full flex items-center justify-center"
-                          style={getColorStyle(color)}
-                        >
-                          <div className="w-8 h-8 rounded-full border border-white/50" style={getColorStyle(color)} />
-                        </div>
-                      )}
+                      <img
+                        src={colorImage}
+                        alt={`${getColorLabel(color)} variant`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     {isSelected && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
