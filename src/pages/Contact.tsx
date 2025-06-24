@@ -105,7 +105,7 @@ const Contact = () => {
       <section className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
               {headerHighlight && header.includes(headerHighlight) ? (
                 <>
                   {header.split(headerHighlight)[0]}
@@ -114,7 +114,7 @@ const Contact = () => {
                 </>
               ) : header}
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
               {description}
             </p>
           </div>
@@ -147,7 +147,7 @@ const Contact = () => {
           </div>
           
           <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm">
-            <h2 className="text-xl md:text-2xl font-bold mb-6 break-words">{formTitle}</h2>
+            <h2 className="text-3xl font-bold mb-6 break-words">{formTitle}</h2>
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
