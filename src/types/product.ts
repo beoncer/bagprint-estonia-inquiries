@@ -21,4 +21,6 @@ export interface Product {
   material?: string | null;
   color_images?: Record<string, string>;
   size_images?: Record<string, string>;
+  additional_images?: string[];
+  main_color?: string;
 } 

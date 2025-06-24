@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,11 +12,18 @@ export interface ProductProps {
   category: string;
   base_price: number; // Changed from basePrice to base_price
   slug: string;
+  color_images?: Record<string, string>;
+  main_color?: string;
+  image_url?: string;
 }
 
-const ProductCard = ({ id, name, description, image, base_price, slug }: ProductProps) => {
+const ProductCard = ({ id, name, description, image, base_price, slug, color_images, main_color, image_url }: ProductProps) => {
   const [imageError, setImageError] = useState(false);
-  const [imageUrl, setImageUrl] = useState(image);
+  // Use main color image if available
+  const mainImage = main_color && color_images && color_images[main_color]
+    ? color_images[main_color]
+    : image || image_url || '/placeholder.svg';
+  const [imageUrl, setImageUrl] = useState(mainImage);
   const { calculatePrice } = usePricing();
   
   // Make sure ID is valid to prevent broken links
@@ -32,28 +38,22 @@ const ProductCard = ({ id, name, description, image, base_price, slug }: Product
   
   // Process image URL if it's from Supabase
   useEffect(() => {
-    if (image) {
-      // Handle any Supabase URL format
-      if (image.includes('supabase.co') || image.startsWith('products/')) {
-        // Handle direct storage paths
-        if (image.startsWith('products/')) {
-          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/products/${image.replace('products/', '')}`);
-        } 
-        // Handle partial URLs
-        else if (!image.startsWith('https://')) {
-          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${image.split('/').slice(1).join('/')}`);
+    if (mainImage) {
+      if (mainImage.includes('supabase.co') || mainImage.startsWith('products/')) {
+        if (mainImage.startsWith('products/')) {
+          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/products/${mainImage.replace('products/', '')}`);
+        } else if (!mainImage.startsWith('https://')) {
+          setImageUrl(`https://ixotpxliaerkzjznyipi.supabase.co/storage/v1/object/public/${mainImage.split('/').slice(1).join('/')}`);
         } else {
-          // Already a full URL
-          setImageUrl(image);
+          setImageUrl(mainImage);
         }
       } else {
-        // Not a Supabase URL, use as is
-        setImageUrl(image);
+        setImageUrl(mainImage);
       }
     }
     
-    console.log("Setting image URL:", imageUrl, "from original:", image);
-  }, [image]);
+    console.log("Setting image URL:", imageUrl, "from original:", mainImage);
+  }, [mainImage]);
   
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow">

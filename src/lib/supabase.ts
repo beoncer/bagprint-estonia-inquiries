@@ -38,6 +38,8 @@ export interface Product {
   material?: string; // Add material property
   color_images?: Record<string, string>; // Add color-specific images
   size_images?: Record<string, string>; // Add size-specific images
+  additional_images?: string[];
+  main_color?: string;
 }
 
 export async function getProducts() {
@@ -73,6 +75,8 @@ export async function getProducts() {
       material: item.material, // Include material
       color_images: item.color_images || {}, // Include color-specific images
       size_images: item.size_images || {}, // Include size-specific images
+      additional_images: item.additional_images || [],
+      main_color: item.main_color || null,
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -93,15 +97,17 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
   return {
     ...data,
     category: data.type,
-    image: data.image_url || '/placeholder.svg', // Ensure image is always provided
+    image: data.color_images && data.main_color ? data.color_images[data.main_color] : (data.image_url || '/placeholder.svg'),
     colors: data.colors || [],
-    sizes: data.sizes || [], // Include sizes
-    badges: data.badges || [], // Include badges with default empty array
-    slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
+    sizes: data.sizes || [],
+    badges: data.badges || [],
+    slug: data.slug || `${data.type}-${data.id}`,
     base_price: data.base_price || 0,
-    material: data.material, // Include material
-    color_images: data.color_images || {}, // Include color-specific images
-    size_images: data.size_images || {}, // Include size-specific images
+    material: data.material,
+    color_images: data.color_images || {},
+    size_images: data.size_images || {},
+    additional_images: data.additional_images || [],
+    main_color: data.main_color || null,
   };
 };
 

@@ -60,6 +60,7 @@ interface Product {
   material?: string | null;
   color_images?: Record<string, string>;
   size_images?: Record<string, string>;
+  main_color?: string | null;
 }
 
 interface PopularProduct {
@@ -92,6 +93,7 @@ const ProductsPage: React.FC = () => {
   const [materialSearchValue, setMaterialSearchValue] = useState("");
   const [colorImages, setColorImages] = useState<Record<string, string>>({});
   const [sizeImages, setSizeImages] = useState<Record<string, string>>({});
+  const [mainColor, setMainColor] = useState<string>("");
   
   const { calculatePrice } = usePricing();
 
@@ -109,6 +111,7 @@ const ProductsPage: React.FC = () => {
       setIsEco(selectedProduct.is_eco || false);
       setColorImages(selectedProduct.color_images || {});
       setSizeImages(selectedProduct.size_images || {});
+      setMainColor(selectedProduct.main_color || "");
     } else {
       setSelectedColors([]);
       setSelectedSizes([]);
@@ -116,6 +119,7 @@ const ProductsPage: React.FC = () => {
       setIsEco(false);
       setColorImages({});
       setSizeImages({});
+      setMainColor("");
     }
   }, [selectedProduct]);
 
@@ -217,6 +221,7 @@ const ProductsPage: React.FC = () => {
         badges: selectedBadges,
         color_images: colorImages,
         size_images: sizeImages,
+        main_color: mainColor,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -281,6 +286,7 @@ const ProductsPage: React.FC = () => {
         color_images: colorImages,
         size_images: sizeImages,
         updated_at: new Date().toISOString(),
+        main_color: mainColor,
       };
 
       const { data, error } = await supabase
@@ -684,6 +690,8 @@ const ProductsPage: React.FC = () => {
                     onColorImagesChange={setColorImages}
                     currentColorImages={colorImages}
                     availableColors={selectedColors}
+                    mainColor={mainColor}
+                    onMainColorChange={setMainColor}
                   />
                 </div>
               )}
@@ -749,24 +757,6 @@ const ProductsPage: React.FC = () => {
                     </button>
                   ))}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-                />
-                {selectedProduct?.image_url && (
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">Current image:</p>
-                    <img
-                      src={selectedProduct.image_url}
-                      alt="Current product"
-                      className="mt-1 max-h-40 rounded"
-                    />
-                  </div>
-                )}
               </div>
 
               <div className="flex items-center space-x-2">

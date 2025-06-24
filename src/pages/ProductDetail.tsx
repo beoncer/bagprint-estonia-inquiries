@@ -42,17 +42,21 @@ const ProductDetail = () => {
   // Update selected image when color or size changes
   useEffect(() => {
     if (product) {
-      let newImage = product.image || null;
+      let newImage = null;
       
-      // Priority: 1. Color-specific image, 2. Size-specific image, 3. Main image
+      // Priority: 1. Selected color image, 2. Main color image, 3. Size image, 4. Fallback
       if (selectedColor && product.color_images && product.color_images[selectedColor]) {
         newImage = product.color_images[selectedColor];
-        console.log('Using color-specific image:', newImage);
+        console.log('Using selected color image:', newImage);
+      } else if (product.main_color && product.color_images && product.color_images[product.main_color]) {
+        newImage = product.color_images[product.main_color];
+        console.log('Using main color image:', newImage);
       } else if (selectedSize && product.size_images && product.size_images[selectedSize]) {
         newImage = product.size_images[selectedSize];
         console.log('Using size-specific image:', newImage);
-      } else {
-        console.log('Using main product image:', newImage);
+      } else if (product.image) {
+        newImage = product.image;
+        console.log('Using fallback image:', newImage);
       }
       
       setSelectedImage(newImage);
@@ -68,11 +72,16 @@ const ProductDetail = () => {
         console.log('Fetched product data:', productData);
         setProduct(productData);
         
-        // Set initial color if product has colors
-        if (productData.colors && productData.colors.length > 0) {
-          const initialColor = productData.colors[0];
-          console.log('Setting initial color:', initialColor);
-          setSelectedColor(initialColor);
+        // Set initial color: main_color if set, else first color
+        const validColors = productData.colors as string[];
+        if (
+          productData.main_color &&
+          validColors.includes(productData.main_color) &&
+          (PRODUCT_COLORS.map(c => c.value) as string[]).includes(productData.main_color)
+        ) {
+          setSelectedColor(productData.main_color as import('@/lib/constants').ProductColor);
+        } else if (productData.colors && productData.colors.length > 0) {
+          setSelectedColor(productData.colors[0]);
         }
         
         // Set initial size if product has sizes
@@ -81,7 +90,9 @@ const ProductDetail = () => {
         }
         
         // Set initial image (this will be updated by the color effect)
-        if (productData.image) {
+        if (productData.main_color && productData.color_images && productData.color_images[productData.main_color]) {
+          setSelectedImage(productData.color_images[productData.main_color]);
+        } else if (productData.image) {
           setSelectedImage(productData.image);
         }
       } catch (error) {
@@ -137,6 +148,32 @@ const ProductDetail = () => {
     setSelectedColor(color);
   };
   
+  // Build unique thumbnail list for color and size images
+  const colorThumbnails: { color: string; url: string }[] = [];
+  const colorUrlSet = new Set<string>();
+  if (product && product.colors && product.color_images) {
+    for (const color of product.colors) {
+      const url = product.color_images[color] || (product.main_color && product.color_images[product.main_color]) || product.image;
+      if (url && !colorUrlSet.has(url)) {
+        colorThumbnails.push({ color, url });
+        colorUrlSet.add(url);
+      }
+    }
+  }
+
+  // Only show size thumbnails if a size-specific image exists
+  const sizeThumbnails: { size: string; url: string }[] = [];
+  const sizeUrlSet = new Set<string>();
+  if (product && product.sizes && product.size_images) {
+    for (const size of product.sizes) {
+      const url = product.size_images[size];
+      if (url && !sizeUrlSet.has(url)) {
+        sizeThumbnails.push({ size, url });
+        sizeUrlSet.add(url);
+      }
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
@@ -191,12 +228,10 @@ const ProductDetail = () => {
           </div>
 
           {/* Color thumbnails */}
-          {product.colors && product.colors.length > 0 && (
+          {colorThumbnails.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
-              {product.colors.map((color) => {
-                const colorImage = product.color_images?.[color] || product.image;
+              {colorThumbnails.map(({ color, url }) => {
                 const isSelected = selectedColor === color;
-                
                 return (
                   <div
                     key={color}
@@ -206,20 +241,11 @@ const ProductDetail = () => {
                     onClick={() => handleColorThumbnailClick(color)}
                   >
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                      {colorImage ? (
-                        <img
-                          src={colorImage}
-                          alt={`${getColorLabel(color)} variant`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div 
-                          className="w-full h-full flex items-center justify-center"
-                          style={getColorStyle(color)}
-                        >
-                          <div className="w-8 h-8 rounded-full border border-white/50" style={getColorStyle(color)} />
-                        </div>
-                      )}
+                      <img
+                        src={url}
+                        alt={`${getColorLabel(color)} variant`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     {isSelected && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
@@ -231,38 +257,23 @@ const ProductDetail = () => {
           )}
 
           {/* Size thumbnails */}
-          {product.sizes && product.sizes.length > 0 && (
+          {sizeThumbnails.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
-              {product.sizes.map((size) => {
-                const sizeImage = product.size_images?.[size] || product.image;
-                const isSelected = selectedSize === size;
-                
+              {sizeThumbnails.map(({ size, url }) => {
+                // No border for selected size
                 return (
                   <div
                     key={size}
-                    className={`relative cursor-pointer transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-blue-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
-                    }`}
+                    className="relative cursor-pointer transition-all duration-200"
                     onClick={() => setSelectedSize(size)}
                   >
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                      {sizeImage ? (
-                        <img
-                          src={sizeImage}
-                          alt={`${size} variant`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                          <span className="text-xs text-gray-600 font-medium text-center px-1">
-                            {size}
-                          </span>
-                        </div>
-                      )}
+                      <img
+                        src={url}
+                        alt={`${size} variant`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    {isSelected && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full border-2 border-white" />
-                    )}
                   </div>
                 );
               })}

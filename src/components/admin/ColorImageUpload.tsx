@@ -12,12 +12,16 @@ interface ColorImageUploadProps {
   onColorImagesChange: (colorImages: Record<string, string>) => void;
   currentColorImages?: Record<string, string>;
   availableColors: ProductColor[];
+  mainColor?: string;
+  onMainColorChange?: (color: string) => void;
 }
 
 const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
   onColorImagesChange,
   currentColorImages = {},
-  availableColors
+  availableColors,
+  mainColor,
+  onMainColorChange
 }) => {
   const [uploading, setUploading] = useState<string | null>(null);
   const { toast } = useToast();
@@ -93,6 +97,9 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
     const updatedColorImages = { ...currentColorImages };
     delete updatedColorImages[color];
     onColorImagesChange(updatedColorImages);
+    if (mainColor === color && onMainColorChange) {
+      onMainColorChange("");
+    }
   };
 
   const getColorLabel = (colorValue: string) => {
@@ -127,7 +134,7 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
     <div className="space-y-4">
       <Label className="text-base font-semibold">Color-Specific Images</Label>
       <p className="text-sm text-gray-600 mb-4">
-        Upload different images for each color variant. This will show the appropriate image when customers select a color.
+        Upload different images for each color variant. Mark one as the main image (shown as default on product page).
       </p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -156,7 +163,19 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
                   </Button>
                 )}
               </div>
-
+              {colorImage && (
+                <div className="flex items-center gap-2 mt-2">
+                  <input
+                    type="radio"
+                    name="mainColor"
+                    checked={mainColor === color}
+                    onChange={() => onMainColorChange && onMainColorChange(color)}
+                    disabled={!colorImage}
+                  />
+                  <span className="text-xs">Set as main image</span>
+                  {mainColor === color && <span className="ml-1 text-blue-600 text-xs font-semibold">(Main)</span>}
+                </div>
+              )}
               {colorImage ? (
                 <div className="relative">
                   <img 
