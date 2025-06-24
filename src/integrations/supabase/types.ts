@@ -302,7 +302,6 @@ export type Database = {
           is_eco: boolean | null
           material: string | null
           name: string
-          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -320,7 +319,6 @@ export type Database = {
           is_eco?: boolean | null
           material?: string | null
           name: string
-          size_images?: Json | null
           sizes?: string[] | null
           slug?: string | null
           type: string
@@ -338,7 +336,6 @@ export type Database = {
           is_eco?: boolean | null
           material?: string | null
           name?: string
-          size_images?: Json | null
           sizes?: string[] | null
           slug?: string | null
           type?: string
@@ -500,7 +497,6 @@ export type Database = {
           is_eco: boolean | null
           material: string | null
           name: string
-          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -533,7 +529,6 @@ export type Database = {
           is_eco: boolean | null
           material: string | null
           name: string
-          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -554,7 +549,6 @@ export type Database = {
           is_eco: boolean | null
           material: string | null
           name: string
-          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -575,7 +569,6 @@ export type Database = {
           is_eco: boolean | null
           material: string | null
           name: string
-          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string

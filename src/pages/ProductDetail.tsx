@@ -173,7 +173,7 @@ const ProductDetail = () => {
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
-        <div className="space-y-4">
+        <div className="space-y-6">
           <div 
             className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
             onMouseEnter={() => setIsImageZoomed(true)}
@@ -190,32 +190,36 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Color thumbnails in a single horizontal row */}
+          {/* Color thumbnails */}
           {product.colors && product.colors.length > 0 && (
-            <div className="flex gap-2 justify-start overflow-x-auto pb-2">
+            <div className="flex flex-wrap gap-3 justify-center">
               {product.colors.map((color) => {
-                const colorImage = product.color_images?.[color];
+                const colorImage = product.color_images?.[color] || product.image;
                 const isSelected = selectedColor === color;
-                
-                // Only show thumbnail if there's a specific color image (different from main image)
-                if (!colorImage) {
-                  return null;
-                }
                 
                 return (
                   <div
                     key={color}
-                    className={`relative cursor-pointer transition-all duration-200 flex-shrink-0 ${
+                    className={`relative cursor-pointer transition-all duration-200 ${
                       isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
                     }`}
                     onClick={() => handleColorThumbnailClick(color)}
                   >
-                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 border">
-                      <img
-                        src={colorImage}
-                        alt={`${getColorLabel(color)} variant`}
-                        className="w-full h-full object-cover"
-                      />
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                      {colorImage ? (
+                        <img
+                          src={colorImage}
+                          alt={`${getColorLabel(color)} variant`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div 
+                          className="w-full h-full flex items-center justify-center"
+                          style={getColorStyle(color)}
+                        >
+                          <div className="w-8 h-8 rounded-full border border-white/50" style={getColorStyle(color)} />
+                        </div>
+                      )}
                     </div>
                     {isSelected && (
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
