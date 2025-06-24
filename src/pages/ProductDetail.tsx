@@ -191,9 +191,9 @@ const ProductDetail = () => {
             )}
           </div>
 
-          {/* Color thumbnails in a single row */}
+          {/* Color thumbnails in a single horizontal row */}
           {product.colors && product.colors.length > 0 && (
-            <div className="flex flex-wrap gap-3 justify-center">
+            <div className="flex gap-2 justify-start overflow-x-auto pb-2">
               {product.colors.map((color) => {
                 const colorImage = product.color_images?.[color] || product.image;
                 const isSelected = selectedColor === color;
@@ -201,12 +201,12 @@ const ProductDetail = () => {
                 return (
                   <div
                     key={color}
-                    className={`relative cursor-pointer transition-all duration-200 ${
+                    className={`relative cursor-pointer transition-all duration-200 flex-shrink-0 ${
                       isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
                     }`}
                     onClick={() => handleColorThumbnailClick(color)}
                   >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                    <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-100 border">
                       {colorImage ? (
                         <img
                           src={colorImage}
