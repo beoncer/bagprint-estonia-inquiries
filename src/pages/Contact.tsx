@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -99,12 +100,12 @@ const Contact = () => {
   };
   
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen overflow-x-hidden">
       {/* Hero Section - matching portfolio style */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
               {headerHighlight && header.includes(headerHighlight) ? (
                 <>
                   {header.split(headerHighlight)[0]}
@@ -113,40 +114,40 @@ const Contact = () => {
                 </>
               ) : header}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
               {description}
             </p>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         <div className="max-w-3xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">E-post</h3>
-                <p className="text-gray-600">{email}</p>
+                <p className="text-gray-600 break-words">{email}</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">Telefon</h3>
-                <p className="text-gray-600">{phone}</p>
+                <p className="text-gray-600 break-words">{phone}</p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
                 <h3 className="font-semibold mb-2">Aadress</h3>
-                <p className="text-gray-600">{address}</p>
+                <p className="text-gray-600 break-words">{address}</p>
               </CardContent>
             </Card>
           </div>
           
-          <div className="bg-white p-8 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-6">{formTitle}</h2>
+          <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+            <h2 className="text-xl md:text-2xl font-bold mb-6 break-words">{formTitle}</h2>
             
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -223,17 +224,20 @@ const Contact = () => {
       
       {/* Map Section */}
       {mapUrl && (
-        <div className="h-[400px] bg-gray-200 w-full">
-          <iframe 
-            src={mapUrl}
-            width="100%" 
-            height="100%" 
-            style={{ border: 0 }} 
-            allowFullScreen={true} 
-            loading="lazy" 
-            referrerPolicy="no-referrer-when-downgrade"
-            title="bagprint.ee location"
-          />
+        <div className="w-full overflow-hidden">
+          <div className="h-[300px] md:h-[400px] bg-gray-200 w-full">
+            <iframe 
+              src={mapUrl}
+              width="100%" 
+              height="100%" 
+              style={{ border: 0 }} 
+              allowFullScreen={true} 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+              title="bagprint.ee location"
+              className="w-full h-full"
+            />
+          </div>
         </div>
       )}
     </div>

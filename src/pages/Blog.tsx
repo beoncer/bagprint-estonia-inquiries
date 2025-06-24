@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -94,7 +95,7 @@ const Blog = () => {
 
   if (isLoading || !header) {
     return (
-      <div className="bg-gray-50 py-16">
+      <div className="bg-gray-50 py-16 overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
@@ -111,7 +112,7 @@ const Blog = () => {
 
   if (error) {
     return (
-      <div className="bg-gray-50 py-16">
+      <div className="bg-gray-50 py-16 overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Viga</h2>
           <p className="text-red-600 mb-8">Blogposte ei õnnestunud laadida. Palun proovige hiljem uuesti.</p>
@@ -121,12 +122,12 @@ const Blog = () => {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 min-h-screen overflow-x-hidden">
       {/* Hero Section - matching portfolio style */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
               {headerHighlight && header.includes(headerHighlight) ? (
                 <>
                   {header.split(headerHighlight)[0]}
@@ -135,14 +136,14 @@ const Blog = () => {
                 </>
               ) : header}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
               {description}
             </p>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
         {/* Search */}
         <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
           <form onSubmit={handleSearch} className="relative max-w-md mx-auto">
@@ -161,7 +162,7 @@ const Blog = () => {
         {filteredPosts.length > 0 ? (
           <>
             <p className="mb-6 text-gray-600">Leitud {filteredPosts.length} artiklit</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {filteredPosts.map((post) => (
                 <article key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                   <Link to={`/blogi/${post.slug}`} className="block">
@@ -185,7 +186,7 @@ const Blog = () => {
                       </div>
                     </div>
                     <Link to={`/blogi/${post.slug}`}>
-                      <h2 className="text-xl font-semibold mb-3 hover:text-primary transition-colors">
+                      <h2 className="text-xl font-semibold mb-3 hover:text-primary transition-colors break-words">
                         {post.title}
                       </h2>
                     </Link>
@@ -212,14 +213,14 @@ const Blog = () => {
 
         {/* CTA Section */}
         {ctaTitle && (
-          <section className="bg-primary text-white py-16 px-8 rounded-lg mt-16 text-center">
-            <h2 className="text-3xl font-bold mb-4">{ctaTitle}</h2>
-            {ctaSubtitle && <h3 className="text-2xl font-medium mb-8">{ctaSubtitle}</h3>}
-            <div className="flex flex-col md:flex-row justify-center items-center gap-8 max-w-4xl mx-auto">
+          <section className="bg-primary text-white py-12 md:py-16 px-6 md:px-8 rounded-lg mt-16 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 break-words">{ctaTitle}</h2>
+            {ctaSubtitle && <h3 className="text-xl md:text-2xl font-medium mb-6 md:mb-8 break-words">{ctaSubtitle}</h3>}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-4xl mx-auto">
               {ctaPhone && (
-                <div className="text-left">
-                  <div className="text-xl font-semibold">{ctaPhone}</div>
-                  {ctaPhoneHours && <div className="text-sm opacity-90">{ctaPhoneHours}</div>}
+                <div className="text-center md:text-left">
+                  <div className="text-lg md:text-xl font-semibold break-words">{ctaPhone}</div>
+                  {ctaPhoneHours && <div className="text-sm opacity-90 break-words">{ctaPhoneHours}</div>}
                 </div>
               )}
               {ctaButton && (

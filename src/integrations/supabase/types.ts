@@ -291,6 +291,7 @@ export type Database = {
       }
       products: {
         Row: {
+          additional_images: string[] | null
           badges: string[] | null
           base_price: number
           color_images: Json | null
@@ -300,14 +301,17 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          main_color: string | null
           material: string | null
           name: string
+          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
           updated_at: string
         }
         Insert: {
+          additional_images?: string[] | null
           badges?: string[] | null
           base_price?: number
           color_images?: Json | null
@@ -317,14 +321,17 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_eco?: boolean | null
+          main_color?: string | null
           material?: string | null
           name: string
+          size_images?: Json | null
           sizes?: string[] | null
           slug?: string | null
           type: string
           updated_at?: string
         }
         Update: {
+          additional_images?: string[] | null
           badges?: string[] | null
           base_price?: number
           color_images?: Json | null
@@ -334,8 +341,10 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_eco?: boolean | null
+          main_color?: string | null
           material?: string | null
           name?: string
+          size_images?: Json | null
           sizes?: string[] | null
           slug?: string | null
           type?: string
@@ -486,6 +495,7 @@ export type Database = {
       search_products_by_colors: {
         Args: { search_colors: string[] }
         Returns: {
+          additional_images: string[] | null
           badges: string[] | null
           base_price: number
           color_images: Json | null
@@ -495,8 +505,10 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          main_color: string | null
           material: string | null
           name: string
+          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -518,6 +530,7 @@ export type Database = {
       toggle_eco_status: {
         Args: { product_id: string; new_status: boolean }
         Returns: {
+          additional_images: string[] | null
           badges: string[] | null
           base_price: number
           color_images: Json | null
@@ -527,8 +540,10 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          main_color: string | null
           material: string | null
           name: string
+          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -538,6 +553,7 @@ export type Database = {
       update_product_badges: {
         Args: { product_id: string; new_badges: string[] }
         Returns: {
+          additional_images: string[] | null
           badges: string[] | null
           base_price: number
           color_images: Json | null
@@ -547,8 +563,10 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          main_color: string | null
           material: string | null
           name: string
+          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -558,6 +576,7 @@ export type Database = {
       update_product_colors: {
         Args: { product_id: string; new_colors: string[] }
         Returns: {
+          additional_images: string[] | null
           badges: string[] | null
           base_price: number
           color_images: Json | null
@@ -567,8 +586,10 @@ export type Database = {
           id: string
           image_url: string | null
           is_eco: boolean | null
+          main_color: string | null
           material: string | null
           name: string
+          size_images: Json | null
           sizes: string[] | null
           slug: string | null
           type: string

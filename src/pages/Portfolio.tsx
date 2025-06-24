@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -92,12 +93,20 @@ const Portfolio: React.FC = () => {
     (item) => activeFilter === "all" || item.category === activeFilter
   );
 
+  // Get grid class based on number of categories
+  const getGridClass = () => {
+    if (categories.length <= 2) return "grid-cols-2";
+    if (categories.length <= 3) return "grid-cols-3";
+    if (categories.length <= 4) return "grid-cols-2 md:grid-cols-4";
+    return "grid-cols-2 md:grid-cols-5";
+  };
+
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
-      <div className="max-w-7xl mx-auto px-4">
+    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-12 md:py-16 overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+        <div className="text-center mb-12 md:mb-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
             {headerHighlight && header.includes(headerHighlight) ? (
               <>
                 {header.split(headerHighlight)[0]}
@@ -106,7 +115,7 @@ const Portfolio: React.FC = () => {
               </>
             ) : header}
           </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
             {description}
           </p>
         </div>
@@ -114,12 +123,12 @@ const Portfolio: React.FC = () => {
         {/* Filter Tabs */}
         <div className="mb-12">
           <Tabs value={activeFilter} onValueChange={setActiveFilter} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1 bg-gray-100">
+            <TabsList className={`grid w-full ${getGridClass()} h-auto p-1 bg-gray-100`}>
               {categories.map((category) => (
                 <TabsTrigger
                   key={category.id}
                   value={category.id}
-                  className="py-3 px-4 text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg transition-all"
+                  className="py-2 md:py-3 px-2 md:px-4 text-xs md:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg transition-all break-words"
                 >
                   {category.name}
                 </TabsTrigger>
@@ -132,7 +141,7 @@ const Portfolio: React.FC = () => {
                 {loading ? (
                   <div className="text-center py-12 text-gray-400">Laadimine...</div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {filteredItems.map((item) => (
                       <Card key={item.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                         <div className="relative overflow-hidden cursor-zoom-in" onClick={() => setZoomedImage(item.image_url || "/placeholder.svg") }>
@@ -144,10 +153,10 @@ const Portfolio: React.FC = () => {
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
                         </div>
                         <CardContent className="p-6">
-                          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors">
+                          <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors break-words">
                             {item.title}
                           </h3>
-                          <p className="text-gray-600 mb-4 leading-relaxed">
+                          <p className="text-gray-600 mb-4 leading-relaxed text-sm md:text-base">
                             {item.description}
                           </p>
                           <div className="flex flex-wrap gap-2 mb-4">
@@ -155,7 +164,7 @@ const Portfolio: React.FC = () => {
                               <Badge
                                 key={tag.trim()}
                                 variant="secondary"
-                                className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors"
+                                className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors text-xs"
                               >
                                 {tag.trim()}
                               </Badge>
@@ -173,16 +182,16 @@ const Portfolio: React.FC = () => {
 
         {/* Stats Section */}
         {achievements.length > 0 && (
-          <div className="bg-white rounded-3xl shadow-xl p-12 mt-20">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">{achievementsTitle}</h2>
-              <p className="text-lg text-gray-600">{achievementsDescription}</p>
+          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mt-16 md:mt-20">
+            <div className="text-center mb-8 md:mb-12">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 break-words">{achievementsTitle}</h2>
+              <p className="text-base md:text-lg text-gray-600 break-words">{achievementsDescription}</p>
             </div>
-            <div className={`grid grid-cols-1 md:grid-cols-${achievements.length > 4 ? 6 : Math.min(achievements.length, 4)} gap-8`}>
+            <div className={`grid grid-cols-2 md:grid-cols-${Math.min(achievements.length, 4)} gap-6 md:gap-8`}>
               {achievements.map((a, idx) => (
                 <div className="text-center" key={idx}>
-                  <div className="text-4xl font-bold text-primary mb-2">{a.value}</div>
-                  <div className="text-gray-600">{a.label}</div>
+                  <div className="text-2xl md:text-4xl font-bold text-primary mb-2 break-words">{a.value}</div>
+                  <div className="text-gray-600 text-sm md:text-base break-words">{a.label}</div>
                 </div>
               ))}
             </div>
@@ -191,14 +200,14 @@ const Portfolio: React.FC = () => {
 
         {/* CTA Section */}
         {ctaTitle && (
-          <div className="text-center mt-20">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+          <div className="text-center mt-16 md:mt-20">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
               {ctaTitle}
             </h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto break-words px-4">
               {ctaText}
             </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-3 text-lg">
+            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-6 md:px-8 py-2 md:py-3 text-base md:text-lg">
               {ctaButton}
             </Button>
           </div>
