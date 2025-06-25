@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,11 +82,11 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
           </p>
         )}
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex justify-between">
-        <Button variant="outline" asChild>
+      <CardFooter className="p-4 pt-0 flex gap-2">
+        <Button variant="outline" size="sm" className="flex-1" asChild>
           <Link to={`/tooted/${slug}`}>Vaata lähemalt</Link>
         </Button>
-        <Button asChild>
+        <Button size="sm" className="flex-1" asChild>
           <Link to={`/inquiry?product=${safeId}`}>Küsi pakkumist</Link>
         </Button>
       </CardFooter>
