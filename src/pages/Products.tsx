@@ -9,6 +9,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import FAQStructuredData from "@/components/seo/FAQStructuredData";
+import SEOHead from "@/components/seo/SEOHead";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -393,7 +395,9 @@ const Products = () => {
     return {
       title: content.title,
       description: content.description,
-      highlight: content.highlight
+      highlight: content.highlight,
+      seoTitle: content.seo_title,
+      seoDescription: content.seo_description
     };
   };
 
@@ -571,8 +575,21 @@ const Products = () => {
       {/* Add FAQ structured data for category pages */}
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
       
+      {/* SEO Meta Tags */}
+      <SEOHead 
+        title={getCategoryContent(activeCategory).seoTitle || `${getCategoryContent(activeCategory).title} - Leatex`}
+        description={getCategoryContent(activeCategory).seoDescription || `Vaata meie ${getCategoryContent(activeCategory).title.toLowerCase()} valikut. Kvaliteetsed tooted, kiire tarne, soodne hind.`}
+        keywords={`${getCategoryContent(activeCategory).title.toLowerCase()}, kotid, ${activeCategory}, personaliseerimine, trükk, Estonia`}
+        url={location.pathname}
+      />
+      
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
         <div className="max-w-7xl mx-auto px-4">
+          {/* Breadcrumb Navigation */}
+          <div className="mb-8">
+            <Breadcrumb />
+          </div>
+          
           {/* Hero Section - matching portfolio style */}
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
