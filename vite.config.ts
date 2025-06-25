@@ -27,27 +27,23 @@ export default defineConfig(({ mode }) => ({
           vendor: ['react', 'react-dom'],
           router: ['react-router-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-          admin: [
-            './src/pages/admin/Dashboard',
-            './src/pages/admin/Products',
-            './src/pages/admin/Blog',
-            './src/pages/admin/Pages'
-          ],
           supabase: ['@supabase/supabase-js'],
           query: ['@tanstack/react-query']
         },
       },
     },
     target: 'es2015',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
+    minify: mode === 'production' ? 'terser' : false,
+    ...(mode === 'production' && {
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true,
+        },
       },
-    },
+    }),
     cssCodeSplit: true,
-    sourcemap: false,
+    sourcemap: mode === 'development',
   },
   // Enable SSR-like optimizations
   ssr: {
