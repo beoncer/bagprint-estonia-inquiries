@@ -16,7 +16,7 @@ export const AdminPages = lazy(() => import("@/pages/admin/Pages"));
 export const AdminContent = lazy(() => import("@/pages/admin/Content"));
 
 // Settings and configuration (separate chunk)
-export const AdminMeist = lazy(() => import("@/pages/admin/Meestal"));
+export const AdminMeist = lazy(() => import("@/pages/admin/Meist"));
 export const AdminAssets = lazy(() => import("@/pages/admin/Assets"));
 export const AdminSEO = lazy(() => import("@/pages/admin/SEO"));
 export const AdminManual = lazy(() => import("@/pages/admin/Manual"));
