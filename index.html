@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="et">
   <head>
@@ -74,10 +75,52 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- Critical CSS for loading state -->
+    <style>
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .loading-skeleton {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+      @keyframes loading {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      .fallback-content {
+        padding: 2rem;
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .fallback-content h1 {
+        color: #dc2626;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+      .fallback-content p {
+        color: #6b7280;
+        margin-bottom: 1rem;
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback content for when JavaScript is disabled or loading -->
+      <noscript>
+        <div class="fallback-content">
+          <h1>Leatex - Kvaliteetsed kotid ja pakendid</h1>
+          <p>Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga.</p>
+          <p>Küsi pakkumist: +372 5919 7172 või info@leatex.ee</p>
+          <p>See veebileht nõuab JavaScripti toimimiseks. Palun lubage JavaScript oma brauseris.</p>
+        </div>
+      </noscript>
+    </div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>

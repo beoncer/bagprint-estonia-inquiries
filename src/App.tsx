@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,7 +6,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { AuthProvider } from "@/hooks/use-auth";
-import { usePerformance, useResourceTiming, useErrorTracking } from "@/hooks/usePerformance";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -35,15 +35,15 @@ import AdminGuarantees from "./pages/admin/Guarantees";
 import AdminProductFAQ from "./pages/admin/ProductFAQ";
 import AdminPricing from "./pages/admin/pricing";
 
-const queryClient = new QueryClient();
-
-// Performance monitoring component
-const PerformanceMonitor: React.FC = () => {
-  usePerformance();
-  useResourceTiming();
-  useErrorTracking();
-  return null;
-};
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes
+      retry: 1,
+    },
+  },
+});
 
 const App: React.FC = () => {
   return (
@@ -51,7 +51,6 @@ const App: React.FC = () => {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          <PerformanceMonitor />
           <BrowserRouter>
             <AuthProvider>
               <Routes>
