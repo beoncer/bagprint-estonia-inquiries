@@ -12,6 +12,7 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import CriticalCSS from "./components/performance/CriticalCSS";
 import PreloadManager from "./components/performance/PreloadManager";
+import CriticalResourcesOptimizer from "./components/performance/CriticalResourcesOptimizer";
 
 // Import lazy components
 import {
@@ -43,16 +44,17 @@ import {
   AdminPricing
 } from "./components/performance/LazyComponents";
 
-// Minimal QueryClient configuration
+// Ultra-minimal QueryClient configuration for better performance
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 10,
+      staleTime: 1000 * 60 * 10, // 10 minutes
+      gcTime: 1000 * 60 * 15, // 15 minutes
       retry: 1,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
-      refetchOnReconnect: false
+      refetchOnReconnect: false,
+      networkMode: 'offlineFirst'
     },
   },
 });
@@ -62,6 +64,7 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <CriticalCSS />
       <PreloadManager />
+      <CriticalResourcesOptimizer />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />

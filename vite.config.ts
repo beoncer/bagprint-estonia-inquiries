@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -10,7 +11,13 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: mode === 'production' ? [
+          ['babel-plugin-react-remove-properties', { properties: ['data-testid'] }]
+        ] : []
+      }
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -23,30 +30,35 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Core React - keep minimal
+          // Absolutely minimal core
           'react-core': ['react', 'react-dom'],
           
-          // Router - separate small chunk
+          // Router separate
           'router': ['react-router-dom'],
           
-          // Essential UI only
-          'ui-core': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          // Only essential UI
+          'ui-essential': ['@radix-ui/react-dialog'],
           
-          // Data layer
-          'data': ['@supabase/supabase-js', '@tanstack/react-query'],
+          // Data layer minimal
+          'data': ['@supabase/supabase-js'],
+          'query': ['@tanstack/react-query'],
           
-          // Split pages into very small chunks
-          'page-home': ['./src/pages/Index'],
-          'page-products': ['./src/pages/Products'],
-          'page-product-detail': ['./src/pages/ProductDetail'],
-          'page-contact': ['./src/pages/Contact'],
-          'page-meist': ['./src/pages/Meist'],
+          // Each page gets its own tiny chunk
+          'home': ['./src/pages/Index'],
+          'products-page': ['./src/pages/Products'],
+          'product-detail': ['./src/pages/ProductDetail'],
+          'contact': ['./src/pages/Contact'],
+          'about': ['./src/pages/Meist'],
           
-          // Admin chunks - only load when needed
-          'admin-auth': ['./src/pages/admin/Login'],
-          'admin-main': ['./src/pages/admin/Dashboard', './src/pages/admin/Products'],
-          'admin-content': ['./src/pages/admin/Content', './src/pages/admin/Pages'],
-          'admin-settings': ['./src/pages/admin/SEO', './src/pages/admin/Assets']
+          // Admin - even more granular
+          'admin-login': ['./src/pages/admin/Login'],
+          'admin-dashboard': ['./src/pages/admin/Dashboard'],
+          'admin-products': ['./src/pages/admin/Products'],
+          'admin-other': [
+            './src/pages/admin/Content', 
+            './src/pages/admin/Pages',
+            './src/pages/admin/SEO'
+          ]
         }
       },
     },
@@ -56,8 +68,8 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
-        passes: 3,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn', 'console.error'],
+        passes: 4, // More aggressive
         unsafe: true,
         unsafe_comps: true,
         unsafe_Function: true,
@@ -67,11 +79,28 @@ export default defineConfig(({ mode }) => ({
         unsafe_proto: true,
         unsafe_regexp: true,
         unsafe_undefined: true,
-        unused: true
+        unused: true,
+        dead_code: true,
+        reduce_vars: true,
+        reduce_funcs: true,
+        collapse_vars: true,
+        inline: true,
+        join_vars: true,
+        loops: true,
+        negate_iife: true,
+        properties: true,
+        sequences: true,
+        side_effects: true,
+        switches: true,
+        top_retain: [],
+        typeofs: true
       },
       mangle: {
         safari10: true,
-        toplevel: true
+        toplevel: true,
+        properties: {
+          regex: /^_/
+        }
       },
       format: {
         comments: false
@@ -79,19 +108,21 @@ export default defineConfig(({ mode }) => ({
     },
     cssCodeSplit: true,
     sourcemap: false,
-    chunkSizeWarningLimit: 500,
-    assetsInlineLimit: 2048,
+    chunkSizeWarningLimit: 300, // Even smaller chunks
+    assetsInlineLimit: 1024, // Inline very small assets
     modulePreload: {
       polyfill: false
-    }
+    },
+    cssMinify: 'esbuild'
   },
   
   optimizeDeps: {
     include: ['react', 'react-dom'],
-    exclude: ['@tanstack/react-query-devtools']
+    exclude: ['@tanstack/react-query-devtools', 'lucide-react']
   },
   
   css: {
-    devSourcemap: false
+    devSourcemap: false,
+    transformer: 'postcss'
   }
 }));
