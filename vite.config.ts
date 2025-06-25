@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -24,113 +23,75 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Core React libraries
-          'react-vendor': ['react', 'react-dom'],
-          'react-router': ['react-router-dom'],
+          // Core React - keep minimal
+          'react-core': ['react', 'react-dom'],
           
-          // UI Libraries (separate from vendor)
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-accordion', '@radix-ui/react-select'],
+          // Router - separate small chunk
+          'router': ['react-router-dom'],
           
-          // Data management
-          'data-vendor': ['@supabase/supabase-js', '@tanstack/react-query'],
+          // Essential UI only
+          'ui-core': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
           
-          // Admin functionality split into smaller chunks
-          'admin-core': [
-            './src/pages/admin/Dashboard',
-            './src/pages/admin/Products',
-            './src/pages/admin/pricing'
-          ],
-          'admin-content': [
-            './src/pages/admin/Blog',
-            './src/pages/admin/Pages',
-            './src/pages/admin/Content',
-            './src/pages/admin/ProductPages'
-          ],
-          'admin-settings': [
-            './src/pages/admin/SEO',
-            './src/pages/admin/Assets',
-            './src/pages/admin/Meist'
-          ],
-          'admin-misc': [
-            './src/pages/admin/Portfolio',
-            './src/pages/admin/Contact',
-            './src/pages/admin/Footer',
-            './src/pages/admin/Guarantees',
-            './src/pages/admin/ProductFAQ',
-            './src/pages/admin/Manual'
-          ],
+          // Data layer
+          'data': ['@supabase/supabase-js', '@tanstack/react-query'],
           
-          // Public pages
-          'pages-main': ['./src/pages/Index', './src/pages/Products'],
-          'pages-secondary': ['./src/pages/ProductDetail', './src/pages/Contact', './src/pages/Meist'],
-          'pages-misc': ['./src/pages/Portfolio', './src/pages/Blog', './src/pages/BlogPost']
-        },
-        
-        // Optimize chunk names
-        chunkFileNames: (chunkInfo) => {
-          const facadeModuleId = chunkInfo.facadeModuleId
-            ? chunkInfo.facadeModuleId.split('/').pop()?.replace('.tsx', '').replace('.ts', '')
-            : 'chunk';
-          return `js/[name]-[hash].js`;
-        },
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name?.endsWith('.css')) {
-            return 'css/[name]-[hash][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
+          // Split pages into very small chunks
+          'page-home': ['./src/pages/Index'],
+          'page-products': ['./src/pages/Products'],
+          'page-product-detail': ['./src/pages/ProductDetail'],
+          'page-contact': ['./src/pages/Contact'],
+          'page-meist': ['./src/pages/Meist'],
+          
+          // Admin chunks - only load when needed
+          'admin-auth': ['./src/pages/admin/Login'],
+          'admin-main': ['./src/pages/admin/Dashboard', './src/pages/admin/Products'],
+          'admin-content': ['./src/pages/admin/Content', './src/pages/admin/Pages'],
+          'admin-settings': ['./src/pages/admin/SEO', './src/pages/admin/Assets']
         }
       },
     },
     target: 'es2020',
-    minify: mode === 'production' ? 'terser' : false,
-    ...(mode === 'production' && {
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-          pure_funcs: ['console.log', 'console.info', 'console.debug'],
-          passes: 2
-        },
-        mangle: {
-          safari10: true
-        }
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+        passes: 3,
+        unsafe: true,
+        unsafe_comps: true,
+        unsafe_Function: true,
+        unsafe_math: true,
+        unsafe_symbols: true,
+        unsafe_methods: true,
+        unsafe_proto: true,
+        unsafe_regexp: true,
+        unsafe_undefined: true,
+        unused: true
       },
-    }),
+      mangle: {
+        safari10: true,
+        toplevel: true
+      },
+      format: {
+        comments: false
+      }
+    },
     cssCodeSplit: true,
-    sourcemap: mode === 'development',
-    chunkSizeWarningLimit: 1000,
-    
-    // Optimize asset processing
-    assetsInlineLimit: 4096,
-  },
-  
-  // Enhanced SSR optimizations
-  ssr: {
-    noExternal: ['@supabase/supabase-js'],
-  },
-  
-  // Aggressive optimization
-  optimizeDeps: {
-    include: [
-      'react', 
-      'react-dom', 
-      'react-router-dom',
-      '@tanstack/react-query'
-    ],
-    exclude: [
-      '@tanstack/react-query-devtools',
-      '@supabase/supabase-js'
-    ],
-    esbuildOptions: {
-      target: 'es2020'
+    sourcemap: false,
+    chunkSizeWarningLimit: 500,
+    assetsInlineLimit: 2048,
+    modulePreload: {
+      polyfill: false
     }
   },
   
-  // Enhanced caching
-  cacheDir: '.vite',
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+    exclude: ['@tanstack/react-query-devtools']
+  },
   
-  // CSS optimization
   css: {
-    devSourcemap: mode === 'development'
+    devSourcemap: false
   }
 }));

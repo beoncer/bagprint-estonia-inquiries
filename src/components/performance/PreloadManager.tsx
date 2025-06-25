@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 const PreloadManager = () => {
   useEffect(() => {
-    // Only preload critical resources for first paint
+    // Only preload absolute essentials
     const preloadResource = (href: string, as: string, type?: string) => {
       const link = document.createElement('link');
       link.rel = 'preload';
@@ -14,27 +14,15 @@ const PreloadManager = () => {
       document.head.appendChild(link);
     };
 
-    // Preload only critical fonts
+    // Preload only critical font
     preloadResource('/fonts/FixelDisplay-Regular.woff2', 'font', 'font/woff2');
     
-    // Preload only critical images (reduce list)
-    const criticalImages = ['/logo.png'];
-    criticalImages.forEach(src => {
-      const img = new Image();
-      img.src = src;
-    });
-
-    // DNS prefetch for external resources
-    const dnsPrefetch = (domain: string) => {
-      const link = document.createElement('link');
-      link.rel = 'dns-prefetch';
-      link.href = domain;
-      document.head.appendChild(link);
-    };
-
-    dnsPrefetch('//ixotpxliaerkzjznyipi.supabase.co');
+    // DNS prefetch only for Supabase
+    const link = document.createElement('link');
+    link.rel = 'dns-prefetch';
+    link.href = '//ixotpxliaerkzjznyipi.supabase.co';
+    document.head.appendChild(link);
     
-    // Remove Google Fonts prefetch as it's not being used
   }, []);
 
   return null;

@@ -12,9 +12,8 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import CriticalCSS from "./components/performance/CriticalCSS";
 import PreloadManager from "./components/performance/PreloadManager";
-import ProductionOptimizer from "./components/performance/ProductionOptimizer";
 
-// Import optimized lazy components
+// Import lazy components
 import {
   Index,
   Products,
@@ -44,12 +43,12 @@ import {
   AdminPricing
 } from "./components/performance/LazyComponents";
 
-// Optimized QueryClient with better defaults
+// Minimal QueryClient configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // Reduced from 15 minutes
-      gcTime: 1000 * 60 * 10, // Reduced from 30 minutes
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 10,
       retry: 1,
       refetchOnWindowFocus: false,
       refetchOnMount: false,
@@ -63,7 +62,6 @@ const App: React.FC = () => {
     <ErrorBoundary>
       <CriticalCSS />
       <PreloadManager />
-      <ProductionOptimizer />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
@@ -72,26 +70,22 @@ const App: React.FC = () => {
               <DynamicSEO />
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
-                  {/* Public routes with main layout */}
+                  {/* Public routes */}
                   <Route path="/" element={<MainLayout />}>
                     <Route index element={<Index />} />
-                    {/* Estonian product routes */}
                     <Route path="tooted" element={<Products />} />
                     <Route path="tooted/:slug" element={<ProductDetail />} />
                     <Route path="riidest-kotid" element={<Products />} />
                     <Route path="paberkotid" element={<Products />} />
                     <Route path="nooriga-kotid" element={<Products />} />
                     <Route path="sussikotid" element={<Products />} />
-                    {/* English product routes for backward compatibility */}
                     <Route path="products" element={<Products />} />
                     <Route path="products/:slug" element={<ProductDetail />} />
-                    {/* Estonian page routes */}
                     <Route path="kontakt" element={<Contact />} />
-                    <Route path="meist" element={<Contact />} />
+                    <Route path="meist" element={<Meist />} />
                     <Route path="portfoolio" element={<Portfolio />} />
                     <Route path="blogi" element={<Blog />} />
                     <Route path="blogi/:slug" element={<BlogPost />} />
-                    {/* English routes for backward compatibility */}
                     <Route path="contact" element={<Contact />} />
                     <Route path="portfolio" element={<Portfolio />} />
                     <Route path="blog" element={<Blog />} />
@@ -119,7 +113,6 @@ const App: React.FC = () => {
                     <Route path="product-faq" element={<AdminProductFAQ />} />
                   </Route>
 
-                  {/* 404 route */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
