@@ -127,14 +127,15 @@ const measurePerformance = () => {
       const loadTime = performance.now() - startTime;
       console.log(`App loaded in ${loadTime.toFixed(2)}ms`);
       
-      // Report Core Web Vitals if available
-      if ('web-vital' in window) {
-        import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-          getCLS(console.log);
-          getFID(console.log);
-          getFCP(console.log);
-          getLCP(console.log);
-          getTTFB(console.log);
+      // Basic performance metrics using native browser APIs
+      const navigationTiming = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigationTiming) {
+        console.log('Performance metrics:', {
+          'DNS Lookup': `${navigationTiming.domainLookupEnd - navigationTiming.domainLookupStart}ms`,
+          'TCP Connection': `${navigationTiming.connectEnd - navigationTiming.connectStart}ms`,
+          'Request/Response': `${navigationTiming.responseEnd - navigationTiming.requestStart}ms`,
+          'DOM Loading': `${navigationTiming.domContentLoadedEventEnd - navigationTiming.domContentLoadedEventStart}ms`,
+          'Total Load Time': `${navigationTiming.loadEventEnd - navigationTiming.loadEventStart}ms`
         });
       }
     }, 1000);
