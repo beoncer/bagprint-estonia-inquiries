@@ -59,7 +59,18 @@ const EnhancedProductGrid: React.FC<EnhancedProductGridProps> = ({
           className="animate-fade-in"
           style={{ animationDelay: `${index * 50}ms` }}
         >
-          <ProductCard product={product} />
+          <ProductCard 
+            id={product.id}
+            name={product.name}
+            description={product.description || ''}
+            image={product.image || product.image_url || ''}
+            category={product.category}
+            base_price={product.base_price}
+            slug={product.slug || ''}
+            color_images={product.color_images}
+            main_color={product.main_color}
+            image_url={product.image_url}
+          />
         </div>
       ))}
     </div>
