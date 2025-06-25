@@ -9,7 +9,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import FAQStructuredData from "@/components/seo/FAQStructuredData";
-import SEOHead from "@/components/seo/SEOHead";
 import Breadcrumb from "@/components/ui/breadcrumb";
 
 const categories = [
@@ -574,14 +573,6 @@ const Products = () => {
     <>
       {/* Add FAQ structured data for category pages */}
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
-      
-      {/* SEO Meta Tags */}
-      <SEOHead 
-        title={getCategoryContent(activeCategory).seoTitle || `${getCategoryContent(activeCategory).title} - Leatex`}
-        description={getCategoryContent(activeCategory).seoDescription || `Vaata meie ${getCategoryContent(activeCategory).title.toLowerCase()} valikut. Kvaliteetsed tooted, kiire tarne, soodne hind.`}
-        keywords={`${getCategoryContent(activeCategory).title.toLowerCase()}, kotid, ${activeCategory}, personaliseerimine, trükk, Estonia`}
-        url={location.pathname}
-      />
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
         <div className="max-w-7xl mx-auto px-4">

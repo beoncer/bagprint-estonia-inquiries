@@ -5,8 +5,6 @@ import ProductGrid from "@/components/product/ProductGrid";
 import { getPopularProducts, Product, supabase } from "@/lib/supabase";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle, DollarSign, Users } from "lucide-react";
-import SEOHead from "@/components/seo/SEOHead";
-import OrganizationStructuredData from "@/components/seo/OrganizationStructuredData";
 
 interface HeroContent {
   title: string | null;
@@ -222,13 +220,6 @@ const Index = () => {
 
   return (
     <>
-      <SEOHead 
-        title={heroContent.title || "Leatex - Kvaliteetsed kotid ja pakendid"}
-        description={heroContent.description || "Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga. Küsi pakkumist juba täna!"}
-        keywords="kotid, puuvillakotid, paberkotid, paelaga kotid, pakendid, trükk, personaliseerimine, Estonia, Tallinn"
-        url="/"
-      />
-      
       {/* Hero Section */}
       <section className="py-6">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">

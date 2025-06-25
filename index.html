@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="et">
   <head>
@@ -75,6 +74,76 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Leatex",
+      "description": "Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga",
+      "url": "https://bagprint.ee",
+      "logo": "https://bagprint.ee/logo.png",
+      "contactPoint": [
+        {
+          "@type": "ContactPoint",
+          "telephone": "+372-5919-7172",
+          "contactType": "customer service",
+          "availableLanguage": ["Estonian", "English"],
+          "areaServed": "EE"
+        },
+        {
+          "@type": "ContactPoint",
+          "email": "info@leatex.ee",
+          "contactType": "customer service"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Laki 7b",
+        "addressLocality": "Tallinn",
+        "addressCountry": "EE"
+      },
+      "sameAs": [
+        "https://www.facebook.com/leatexee",
+        "https://www.instagram.com/leatexee"
+      ]
+    }
+    </script>
+
+    <!-- FAQ Structured Data for Main Page -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Millised kotid on teil saadaval?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Meil on saadaval puuvillakotid, paberkotid, nööriga kotid ja sussikotid. Kõik tooted on saadaval kohandatud trükiga."
+          }
+        },
+        {
+          "@type": "Question", 
+          "name": "Kuidas tellida kotte?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Võta meiega ühendust telefonil +372 5919 7172 või e-mailil info@leatex.ee. Pakume tasuta konsultatsiooni ja hinnaettepanekut."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Milline on minimaalne tellimuse maht?",
+          "acceptedAnswer": {
+            "@type": "Answer", 
+            "text": "Minimaalne tellimuse maht sõltub tootest ja trükist. Tavaliselt alates 50-100 tükist, aga väiksemate koguste puhul võime pakkuda eritingimusi."
+          }
+        }
+      ]
+    }
+    </script>
 
     <!-- Critical CSS for loading state -->
     <style>
