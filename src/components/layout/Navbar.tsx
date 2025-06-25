@@ -30,7 +30,6 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
-  const [navbarLogoUrl, setNavbarLogoUrl] = useState<string>("");
 
   const { data: pages = [], isLoading, isError } = useQuery({
     queryKey: ['pages'],
@@ -38,19 +37,6 @@ const Navbar = () => {
     staleTime: 0,
     gcTime: 0,
   });
-
-  useEffect(() => {
-    const fetchNavbarLogo = async () => {
-      const { data, error } = await supabase
-        .from("website_content")
-        .select("value")
-        .eq("page", "global")
-        .eq("key", "navbar_logo_url")
-        .single();
-      if (!error && data) setNavbarLogoUrl(data.value);
-    };
-    fetchNavbarLogo();
-  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -90,40 +76,28 @@ const Navbar = () => {
   const navNames = new Set(displayPages.map(p => p.name));
   const filteredStaticNavItems = staticNavItems.filter(item => !navNames.has(item.name));
 
-  // Add cache buster to logo URL to prevent old logo from flashing
-  const logoUrlWithCacheBuster = navbarLogoUrl ? `${navbarLogoUrl}?t=${Date.now()}` : "";
-
   return (
     <nav className="w-full z-50">
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-4">
-        <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <Link 
               to="/" 
-              className="text-4xl font-bold text-primary flex items-center gap-2"
+              className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary flex items-center"
               onClick={() => handleLinkClick('/')}
             >
-              {logoUrlWithCacheBuster ? (
-                <img 
-                  src={logoUrlWithCacheBuster} 
-                  alt="Leatex logo" 
-                  className="h-10 w-auto max-w-[180px] object-contain" 
-                  key={logoUrlWithCacheBuster} // Force re-render when URL changes
-                />
-              ) : (
-                <div className="animate-pulse bg-gray-200 h-10 w-24 rounded"></div>
-              )}
+              Leatex<span className="text-black">.</span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-8 items-center">
+            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center">
               {displayPages.map((page) => {
                 const absolutePath = getAbsolutePath(page.url_et);
                 return (
                   <Link 
                     key={page.id}
                     to={absolutePath}
-                    className="text-gray-800 font-medium hover:text-primary transition-colors"
+                    className="text-gray-800 font-medium hover:text-primary transition-colors text-sm lg:text-base"
                     onClick={() => handleLinkClick(absolutePath)}
                   >
                     {page.name}
@@ -134,13 +108,13 @@ const Navbar = () => {
                 <Link
                   key={item.name}
                   to={item.url}
-                  className="text-gray-800 font-medium hover:text-primary transition-colors"
+                  className="text-gray-800 font-medium hover:text-primary transition-colors text-sm lg:text-base"
                   onClick={() => handleLinkClick(item.url)}
                 >
                   {item.name}
                 </Link>
               ))}
-              <Button asChild>
+              <Button asChild size="sm" className="text-sm">
                 <Link 
                   to="/kontakt"
                   onClick={() => handleLinkClick('/kontakt')}
@@ -154,9 +128,9 @@ const Navbar = () => {
             <div className="md:hidden">
               <button 
                 onClick={toggleMenu}
-                className="text-gray-800 hover:text-primary"
+                className="text-gray-800 hover:text-primary p-2"
               >
-                <Menu size={24} />
+                <Menu size={20} />
               </button>
             </div>
           </div>
@@ -164,14 +138,14 @@ const Navbar = () => {
           {/* Mobile Navigation */}
           {isOpen && (
             <div className="md:hidden pt-4 pb-2 animate-fade-in bg-white rounded-lg mt-2">
-              <div className="flex flex-col space-y-3">
+              <div className="flex flex-col space-y-2">
                 {displayPages.map((page) => {
                   const absolutePath = getAbsolutePath(page.url_et);
                   return (
                     <Link 
                       key={page.id}
                       to={absolutePath}
-                      className="py-2 hover:text-primary transition-colors px-4"
+                      className="py-3 px-4 hover:text-primary transition-colors hover:bg-gray-50 rounded text-sm"
                       onClick={() => handleLinkClick(absolutePath)}
                     >
                       {page.name}
@@ -182,13 +156,13 @@ const Navbar = () => {
                   <Link
                     key={item.name}
                     to={item.url}
-                    className="py-2 hover:text-primary transition-colors px-4"
+                    className="py-3 px-4 hover:text-primary transition-colors hover:bg-gray-50 rounded text-sm"
                     onClick={() => handleLinkClick(item.url)}
                   >
                     {item.name}
                   </Link>
                 ))}
-                <Button asChild className="w-full mt-2">
+                <Button asChild className="w-full mt-3 mx-4" size="sm">
                   <Link 
                     to="/kontakt" 
                     onClick={() => handleLinkClick('/kontakt')}

@@ -96,22 +96,26 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-6">Pakkumise küsimine</h2>
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow max-w-4xl mx-auto">
+      <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Pakkumise küsimine</h2>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nimi *</FormLabel>
+                  <FormLabel className="text-sm md:text-base">Nimi *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Teie nimi" {...field} />
+                    <Input 
+                      placeholder="Teie nimi" 
+                      className="h-10 md:h-11 text-sm md:text-base" 
+                      {...field} 
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
             />
@@ -121,27 +125,35 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>E-post *</FormLabel>
+                  <FormLabel className="text-sm md:text-base">E-post *</FormLabel>
                   <FormControl>
-                    <Input placeholder="teie@email.ee" {...field} />
+                    <Input 
+                      placeholder="teie@email.ee" 
+                      className="h-10 md:h-11 text-sm md:text-base" 
+                      {...field} 
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <FormField
               control={form.control}
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Telefon *</FormLabel>
+                  <FormLabel className="text-sm md:text-base">Telefon *</FormLabel>
                   <FormControl>
-                    <Input placeholder="+372 ..." {...field} />
+                    <Input 
+                      placeholder="+372 ..." 
+                      className="h-10 md:h-11 text-sm md:text-base" 
+                      {...field} 
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
             />
@@ -151,14 +163,14 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
               name="product"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Toode *</FormLabel>
+                  <FormLabel className="text-sm md:text-base">Toode *</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                     value={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-10 md:h-11 text-sm md:text-base">
                         <SelectValue placeholder="Valige toode" />
                       </SelectTrigger>
                     </FormControl>
@@ -170,25 +182,25 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <FormField
               control={form.control}
               name="quantity"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kogus *</FormLabel>
+                  <FormLabel className="text-sm md:text-base">Kogus *</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-10 md:h-11 text-sm md:text-base">
                         <SelectValue placeholder="Valige kogus" />
                       </SelectTrigger>
                     </FormControl>
@@ -201,7 +213,7 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
                       <SelectItem value="custom">Muu kogus</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
             />
@@ -211,13 +223,13 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
               name="printRequired"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kas soovite trükki?</FormLabel>
+                  <FormLabel className="text-sm md:text-base">Kas soovite trükki?</FormLabel>
                   <Select 
                     onValueChange={field.onChange} 
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-10 md:h-11 text-sm md:text-base">
                         <SelectValue placeholder="Valige" />
                       </SelectTrigger>
                     </FormControl>
@@ -227,7 +239,7 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
                       <SelectItem value="undecided">Ei ole veel kindel</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
             />
@@ -238,20 +250,24 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
             name="message"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Lisainfo</FormLabel>
+                <FormLabel className="text-sm md:text-base">Lisainfo</FormLabel>
                 <FormControl>
                   <Textarea 
                     placeholder="Siia saate lisada täpsustavat infot (nt trüki detailid, värvid, erikujundus jne)"
-                    className="min-h-[120px]"
+                    className="min-h-[100px] md:min-h-[120px] text-sm md:text-base resize-none"
                     {...field} 
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-xs md:text-sm" />
               </FormItem>
             )}
           />
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button 
+            type="submit" 
+            className="w-full h-11 md:h-12 text-sm md:text-base" 
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Saadan..." : "Saada päring"}
           </Button>
         </form>

@@ -21,7 +21,7 @@ const EnhancedProductGrid: React.FC<EnhancedProductGridProps> = ({
 }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <ProductCardSkeleton key={i} />
         ))}
@@ -31,10 +31,10 @@ const EnhancedProductGrid: React.FC<EnhancedProductGridProps> = ({
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+      <div className="text-center py-8 md:py-12">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 md:p-6 max-w-md mx-auto">
           <h3 className="text-lg font-semibold text-red-800 mb-2">Viga</h3>
-          <p className="text-red-600">{error}</p>
+          <p className="text-red-600 text-sm md:text-base">{error}</p>
         </div>
       </div>
     );
@@ -42,17 +42,17 @@ const EnhancedProductGrid: React.FC<EnhancedProductGridProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 max-w-md mx-auto">
+      <div className="text-center py-8 md:py-12">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 md:p-8 max-w-md mx-auto">
           <h3 className="text-lg font-semibold text-gray-800 mb-2">{emptyStateMessage}</h3>
-          <p className="text-gray-600">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
+          <p className="text-gray-600 text-sm md:text-base">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
       {products.map((product, index) => (
         <div 
           key={product.id} 
