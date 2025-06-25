@@ -57,22 +57,22 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
   }, [mainImage]);
   
   return (
-    <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200" style={{ minHeight: '400px' }}>
-      <div className="aspect-square w-full relative overflow-hidden bg-gray-100" style={{ height: '200px' }}>
+    <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200">
+      <div className="aspect-square w-full relative overflow-hidden bg-gray-100">
         <OptimizedImage
           src={imageUrl}
           alt={name}
           className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
           width={300}
-          height={200}
+          height={300}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           priority={false}
           fallbackSrc="/placeholder.svg"
         />
       </div>
-      <CardContent className="p-4 flex-grow" style={{ minHeight: '120px' }}>
-        <h3 className="text-lg font-semibold mb-2 line-clamp-2" style={{ height: '56px' }}>{name}</h3>
-        <p className="text-gray-600 text-sm line-clamp-3 mb-3" style={{ height: '60px' }}>{description}</p>
+      <CardContent className="p-4 flex-grow">
+        <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
+        <p className="text-gray-600 text-sm line-clamp-3 mb-3">{description}</p>
         {startingPriceResult ? (
           <p className="text-primary font-medium">
             Alates €{startingPriceResult.pricePerItem.toFixed(2)}
@@ -83,7 +83,7 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
           </p>
         )}
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex gap-2" style={{ height: '60px' }}>
+      <CardFooter className="p-4 pt-0 flex gap-2">
         <Button variant="outline" size="sm" className="flex-1" asChild>
           <Link to={`/tooted/${slug}`}>Vaata lähemalt</Link>
         </Button>
