@@ -26,7 +26,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   onLoad,
   onError,
   sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
-  quality = 75
+  quality = 60 // Reduced from 75 for better performance
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -35,7 +35,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const imgRef = useRef<HTMLImageElement>(null);
   const [imageRetryCount, setImageRetryCount] = useState(0);
 
-  // Generate optimized image URLs with better compression
+  // More aggressive image optimization
   const generateImageUrls = (originalSrc: string) => {
     if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.startsWith('blob:')) {
       return { webp: originalSrc, jpeg: originalSrc };
@@ -46,13 +46,14 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     }
 
     const baseUrl = originalSrc.split('?')[0];
-    const webpUrl = `${baseUrl}?format=webp&quality=${quality}&width=${width || 600}&resize=cover`;
-    const jpegUrl = `${baseUrl}?format=jpeg&quality=${quality}&width=${width || 600}&resize=cover`;
+    const targetWidth = width || 400; // Reduced default size
+    const webpUrl = `${baseUrl}?format=webp&quality=${quality}&width=${targetWidth}&resize=cover&optimize=true`;
+    const jpegUrl = `${baseUrl}?format=jpeg&quality=${quality}&width=${targetWidth}&resize=cover&optimize=true`;
     
     return { webp: webpUrl, jpeg: jpegUrl };
   };
 
-  // Optimized Intersection Observer for lazy loading
+  // More efficient Intersection Observer
   useEffect(() => {
     if (priority) return;
 
@@ -64,7 +65,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         }
       },
       {
-        rootMargin: '20px 0px',
+        rootMargin: '10px 0px', // Reduced from 20px
         threshold: 0.01
       }
     );
@@ -138,7 +139,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
           sizes={sizes}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          className={`transition-opacity duration-200 ${
+          className={`transition-opacity duration-150 ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           } w-full h-full object-cover`}
           onLoad={handleLoad}
@@ -150,7 +151,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       </picture>
       
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
+        <div className="absolute inset-0 bg-gray-200" />
       )}
       
       {hasError && currentSrc === fallbackSrc && (

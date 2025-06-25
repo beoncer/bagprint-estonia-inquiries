@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 const PreloadManager = () => {
   useEffect(() => {
-    // Preload critical resources
+    // Only preload critical resources for first paint
     const preloadResource = (href: string, as: string, type?: string) => {
       const link = document.createElement('link');
       link.rel = 'preload';
@@ -14,12 +14,12 @@ const PreloadManager = () => {
       document.head.appendChild(link);
     };
 
-    // Preload critical fonts
+    // Preload only critical fonts
     preloadResource('/fonts/FixelDisplay-Regular.woff2', 'font', 'font/woff2');
     
-    // Preload hero images (if any)
-    const heroImages = ['/hero-bg.jpg', '/logo.png'];
-    heroImages.forEach(src => {
+    // Preload only critical images (reduce list)
+    const criticalImages = ['/logo.png'];
+    criticalImages.forEach(src => {
       const img = new Image();
       img.src = src;
     });
@@ -33,7 +33,8 @@ const PreloadManager = () => {
     };
 
     dnsPrefetch('//ixotpxliaerkzjznyipi.supabase.co');
-    dnsPrefetch('//fonts.googleapis.com');
+    
+    // Remove Google Fonts prefetch as it's not being used
   }, []);
 
   return null;

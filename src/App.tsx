@@ -44,13 +44,16 @@ import {
   AdminPricing
 } from "./components/performance/LazyComponents";
 
+// Optimized QueryClient with better defaults
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 15, // 15 minutes
-      gcTime: 1000 * 60 * 30, // 30 minutes
+      staleTime: 1000 * 60 * 5, // Reduced from 15 minutes
+      gcTime: 1000 * 60 * 10, // Reduced from 30 minutes
       retry: 1,
       refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false
     },
   },
 });
