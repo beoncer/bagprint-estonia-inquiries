@@ -4,66 +4,41 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-// Performance monitoring
+// Simplified performance monitoring
 const startTime = performance.now();
 
-// Register service worker for PWA with better caching
+// Enhanced service worker registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js', {
       scope: '/'
     })
       .then((registration) => {
-        console.log('SW registered: ', registration);
+        console.log('SW registered');
         
-        // Update service worker when new version available
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           if (newWorker) {
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New content available
-                console.log('New content available, please refresh.');
+                console.log('New content available');
               }
             });
           }
         });
       })
-      .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+      .catch(() => {
+        console.log('SW registration failed');
       });
   });
 }
 
-// Preload critical resources
-const preloadCriticalResources = () => {
-  // Preload critical CSS
-  const criticalCSS = document.createElement('link');
-  criticalCSS.rel = 'preload';
-  criticalCSS.href = '/critical.css';
-  criticalCSS.as = 'style';
-  criticalCSS.onload = () => {
-    criticalCSS.rel = 'stylesheet';
-  };
-  document.head.appendChild(criticalCSS);
-
-  // Preload Fixel Display font
-  const fontPreload = document.createElement('link');
-  fontPreload.rel = 'preload';
-  fontPreload.href = '/fonts/FixelDisplay-Regular.woff2';
-  fontPreload.as = 'font';
-  fontPreload.type = 'font/woff2';
-  fontPreload.crossOrigin = 'anonymous';
-  document.head.appendChild(fontPreload);
-};
-
-// Add loading content while React app loads with better styling
+// Optimized loading content
 const rootElement = document.getElementById("root")!;
 
-// Only add loading content if the root is empty (not from SSR)
 if (!rootElement.innerHTML.trim() || rootElement.innerHTML.includes('noscript')) {
   rootElement.innerHTML = `
-    <div class="fallback-content" style="
+    <div style="
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -75,39 +50,28 @@ if (!rootElement.innerHTML.trim() || rootElement.innerHTML.includes('noscript'))
     ">
       <div style="text-align: center; max-width: 600px;">
         <h1 style="
-          font-size: 2rem;
+          font-size: clamp(1.5rem, 4vw, 2rem);
           font-weight: bold;
-          color: #1f2937;
+          color: #dc2626;
           margin-bottom: 1rem;
           line-height: 1.2;
-        ">Leatex - Kvaliteetsed kotid ja pakendid</h1>
+        ">Leatex<span style="color: black;">.</span></h1>
         
-        <div class="loading-skeleton" style="
-          height: 8px;
+        <div style="
+          height: 4px;
           margin: 1rem auto;
-          border-radius: 4px;
+          border-radius: 2px;
           background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
           background-size: 200% 100%;
           animation: loading 1.5s infinite;
           width: 100%;
         "></div>
         
-        <div class="loading-skeleton" style="
-          height: 8px;
-          margin: 1rem auto;
-          border-radius: 4px;
-          background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-          background-size: 200% 100%;
-          animation: loading 1.5s infinite;
-          width: 70%;
-          animation-delay: 0.2s;
-        "></div>
-        
         <p style="
           color: #6b7280;
           margin-top: 1.5rem;
-          font-size: 1rem;
-        ">Laadime veebilehte...</p>
+          font-size: 0.9rem;
+        ">Kvaliteetsed kotid ja pakendid</p>
       </div>
       
       <style>
@@ -120,33 +84,21 @@ if (!rootElement.innerHTML.trim() || rootElement.innerHTML.includes('noscript'))
   `;
 }
 
-// Initialize performance monitoring
+// Simplified performance measurement
 const measurePerformance = () => {
   if (typeof window !== 'undefined' && 'performance' in window) {
     setTimeout(() => {
       const loadTime = performance.now() - startTime;
-      console.log(`App loaded in ${loadTime.toFixed(2)}ms`);
-      
-      // Basic performance metrics using native browser APIs
-      const navigationTiming = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      if (navigationTiming) {
-        console.log('Performance metrics:', {
-          'DNS Lookup': `${navigationTiming.domainLookupEnd - navigationTiming.domainLookupStart}ms`,
-          'TCP Connection': `${navigationTiming.connectEnd - navigationTiming.connectStart}ms`,
-          'Request/Response': `${navigationTiming.responseEnd - navigationTiming.requestStart}ms`,
-          'DOM Loading': `${navigationTiming.domContentLoadedEventEnd - navigationTiming.domContentLoadedEventStart}ms`,
-          'Total Load Time': `${navigationTiming.loadEventEnd - navigationTiming.loadEventStart}ms`
-        });
+      if (import.meta.env.DEV) {
+        console.log(`App loaded in ${loadTime.toFixed(2)}ms`);
       }
     }, 1000);
   }
 };
 
-// Preload resources and measure performance
-preloadCriticalResources();
 measurePerformance();
 
-// Use createRoot for better performance
+// Optimized React root creation
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <App />

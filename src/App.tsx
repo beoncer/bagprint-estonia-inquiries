@@ -10,44 +10,47 @@ import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
+import CriticalCSS from "./components/performance/CriticalCSS";
+import PreloadManager from "./components/performance/PreloadManager";
+import ProductionOptimizer from "./components/performance/ProductionOptimizer";
 
-// Lazy load components to reduce initial bundle size
-const Index = React.lazy(() => import("./pages/Index"));
-const Products = React.lazy(() => import("./pages/Products"));
-const ProductDetail = React.lazy(() => import("./pages/ProductDetail"));
-const Contact = React.lazy(() => import("./pages/Contact"));
-const Meist = React.lazy(() => import("./pages/Meist"));
-const Portfolio = React.lazy(() => import("./pages/Portfolio"));
-const Blog = React.lazy(() => import("./pages/Blog"));
-const BlogPost = React.lazy(() => import("./pages/BlogPost"));
-const NotFound = React.lazy(() => import("./pages/NotFound"));
-
-// Admin components
-const AdminLogin = React.lazy(() => import("./pages/admin/Login"));
-const AdminDashboard = React.lazy(() => import("./pages/admin/Dashboard"));
-const AdminProducts = React.lazy(() => import("./pages/admin/Products"));
-const AdminProductPages = React.lazy(() => import("./pages/admin/ProductPages"));
-const AdminBlog = React.lazy(() => import("./pages/admin/Blog"));
-const AdminPages = React.lazy(() => import("./pages/admin/Pages"));
-const AdminContent = React.lazy(() => import("./pages/admin/Content"));
-const AdminMeist = React.lazy(() => import("./pages/admin/Meist"));
-const AdminAssets = React.lazy(() => import("./pages/admin/Assets"));
-const AdminSEO = React.lazy(() => import("./pages/admin/SEO"));
-const AdminManual = React.lazy(() => import("./pages/admin/Manual"));
-const AdminPortfolio = React.lazy(() => import("./pages/admin/Portfolio"));
-const AdminContact = React.lazy(() => import("./pages/admin/Contact"));
-const AdminFooter = React.lazy(() => import("./pages/admin/Footer"));
-const AdminGuarantees = React.lazy(() => import("./pages/admin/Guarantees"));
-const AdminProductFAQ = React.lazy(() => import("./pages/admin/ProductFAQ"));
-const AdminPricing = React.lazy(() => import("./pages/admin/pricing"));
+// Import optimized lazy components
+import {
+  Index,
+  Products,
+  ProductDetail,
+  Contact,
+  Meist,
+  Portfolio,
+  Blog,
+  BlogPost,
+  NotFound,
+  AdminLogin,
+  AdminDashboard,
+  AdminProducts,
+  AdminProductPages,
+  AdminBlog,
+  AdminPages,
+  AdminContent,
+  AdminMeist,
+  AdminAssets,
+  AdminSEO,
+  AdminManual,
+  AdminPortfolio,
+  AdminContact,
+  AdminFooter,
+  AdminGuarantees,
+  AdminProductFAQ,
+  AdminPricing
+} from "./components/performance/LazyComponents";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 15, // Increased to 15 minutes for better performance
-      gcTime: 1000 * 60 * 30, // Increased to 30 minutes
+      staleTime: 1000 * 60 * 15, // 15 minutes
+      gcTime: 1000 * 60 * 30, // 30 minutes
       retry: 1,
-      refetchOnWindowFocus: false, // Prevent unnecessary refetches
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -55,6 +58,9 @@ const queryClient = new QueryClient({
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
+      <CriticalCSS />
+      <PreloadManager />
+      <ProductionOptimizer />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
@@ -78,7 +84,7 @@ const App: React.FC = () => {
                     <Route path="products/:slug" element={<ProductDetail />} />
                     {/* Estonian page routes */}
                     <Route path="kontakt" element={<Contact />} />
-                    <Route path="meist" element={<Meist />} />
+                    <Route path="meist" element={<Contact />} />
                     <Route path="portfoolio" element={<Portfolio />} />
                     <Route path="blogi" element={<Blog />} />
                     <Route path="blogi/:slug" element={<BlogPost />} />
