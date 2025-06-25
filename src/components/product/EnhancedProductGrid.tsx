@@ -1,0 +1,69 @@
+
+import React from 'react';
+import { Product } from '@/lib/supabase';
+import ProductCard from './ProductCard';
+import ProductCardSkeleton from '@/components/ui/ProductCardSkeleton';
+
+interface EnhancedProductGridProps {
+  products: Product[];
+  loading?: boolean;
+  error?: string | null;
+  emptyStateMessage?: string;
+  skeletonCount?: number;
+}
+
+const EnhancedProductGrid: React.FC<EnhancedProductGridProps> = ({
+  products,
+  loading = false,
+  error = null,
+  emptyStateMessage = "Tooteid ei leitud",
+  skeletonCount = 8
+}) => {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {Array.from({ length: skeletonCount }).map((_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+          <h3 className="text-lg font-semibold text-red-800 mb-2">Viga</h3>
+          <p className="text-red-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 max-w-md mx-auto">
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">{emptyStateMessage}</h3>
+          <p className="text-gray-600">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {products.map((product, index) => (
+        <div 
+          key={product.id} 
+          className="animate-fade-in"
+          style={{ animationDelay: `${index * 50}ms` }}
+        >
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default EnhancedProductGrid;
