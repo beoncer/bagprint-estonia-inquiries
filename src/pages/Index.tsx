@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -331,7 +332,7 @@ const Index = () => {
               const imageWithCacheBuster = cat.image ? `${cat.image}?t=${Date.now()}` : '/placeholder.svg';
               return (
                 <div className="text-center" key={idx}>
-                  <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                  <div className="h-80 md:h-60 mb-4 overflow-hidden rounded-lg">
                     <img
                       src={imageWithCacheBuster}
                       alt={cat.name}

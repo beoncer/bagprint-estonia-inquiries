@@ -467,7 +467,7 @@ const Products = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {productCategories.map((category) => (
                 <Link key={category.id} to={category.link} className="text-center group">
-                  <div className="h-60 mb-4 overflow-hidden rounded-lg">
+                  <div className="h-80 md:h-60 mb-4 overflow-hidden rounded-lg">
                     <img 
                       src={category.image}
                       alt={category.name}
