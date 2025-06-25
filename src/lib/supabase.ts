@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { ProductColor } from './constants'
 
-// Try to get from environment variables first, fallback to hardcoded values
+// Singleton pattern to prevent multiple client instances
 const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co'
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3RweGxpYWVya3pqem55aXBpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc4MTQ1NzUsImV4cCI6MjA2MzM5MDU3NX0.GCIW0R71JBJDvwqdqVSNKNwFuuzOp_Bvpd_ua4VQgtc'
 
@@ -12,11 +12,30 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 console.log('Initializing Supabase client with URL:', supabaseUrl);
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Create single instance
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+});
 
-// For server-side operations that require higher privileges
+// For server-side operations - use same singleton pattern
 const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3RweGxpYWVya3pqem55aXBpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzgxNDU3NSwiZXhwIjoyMDYzMzkwNTc1fQ.2fW1J9z8RQAd3WopZHjQ-rSwaf5exwneU1MfQ_DgJME'
-export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+
+let adminClientInstance: any = null;
+
+export const supabaseAdmin = (() => {
+  if (!adminClientInstance) {
+    adminClientInstance = createClient(supabaseUrl, supabaseServiceKey);
+  }
+  return adminClientInstance;
+})();
 
 export interface Product {
   id: string;
@@ -24,20 +43,20 @@ export interface Product {
   name: string;
   description: string;
   image_url: string | null;
-  image: string; // Make this required to match ProductProps
+  image: string;
   base_price: number;
-  slug: string; // Make this required to match ProductProps
+  slug: string;
   created_at: string;
   updated_at: string;
   colors: ProductColor[];
-  sizes: string[]; // Add sizes property
+  sizes: string[];
   is_eco?: boolean;
   badges: string[];
-  category: string; // Make this required to match ProductProps
+  category: string;
   is_popular?: boolean;
-  material?: string; // Add material property
-  color_images?: Record<string, string>; // Add color-specific images
-  size_images?: Record<string, string>; // Add size-specific images
+  material?: string;
+  color_images?: Record<string, string>;
+  size_images?: Record<string, string>;
   additional_images?: string[];
   main_color?: string;
 }
@@ -61,20 +80,20 @@ export async function getProducts() {
       name: item.name,
       description: item.description || '',
       image_url: item.image_url,
-      image: item.image_url || '/placeholder.svg', // Ensure image is always provided
+      image: item.image_url || '/placeholder.svg',
       base_price: item.base_price || 0,
-      slug: item.slug || `${item.type}-${item.id}`, // Ensure slug is always provided
+      slug: item.slug || `${item.type}-${item.id}`,
       created_at: item.created_at,
       updated_at: item.updated_at,
       colors: item.colors || [],
-      sizes: item.sizes || [], // Include sizes
+      sizes: item.sizes || [],
       is_eco: item.is_eco || false,
       badges: item.badges || [],
-      category: item.type, // Ensure category is always provided
+      category: item.type,
       is_popular: item.is_popular || false,
-      material: item.material, // Include material
-      color_images: item.color_images || {}, // Include color-specific images
-      size_images: item.size_images || {}, // Include size-specific images
+      material: item.material,
+      color_images: item.color_images || {},
+      size_images: item.size_images || {},
       additional_images: item.additional_images || [],
       main_color: item.main_color || null,
     })) as Product[];
@@ -93,7 +112,6 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
 
   if (error) throw error;
 
-  // Transform the data to match our interface
   return {
     ...data,
     category: data.type,
@@ -125,17 +143,16 @@ export async function getPopularProducts(): Promise<Product[]> {
 
   if (error) throw error;
 
-  // Transform the data to match our interface
   return products.map(data => ({
     ...data,
     category: data.type,
-    image: data.image_url || '/placeholder.svg', // Ensure image is always provided
-    sizes: data.sizes || [], // Include sizes
-    slug: data.slug || `${data.type}-${data.id}`, // Ensure slug is always provided
+    image: data.image_url || '/placeholder.svg',
+    sizes: data.sizes || [],
+    slug: data.slug || `${data.type}-${data.id}`,
     base_price: data.base_price || 0,
-    material: data.material, // Include material
-    color_images: data.color_images || {}, // Include color-specific images
-    size_images: data.size_images || {}, // Include size-specific images
+    material: data.material,
+    color_images: data.color_images || {},
+    size_images: data.size_images || {},
   })) as Product[];
 }
 
@@ -155,10 +172,8 @@ export async function getSiteContent() {
     if (contentData && contentData.length > 0) {
       console.log('Fetched website_content data:', contentData);
       
-      // Convert array to object for easier access
       const contentObj: any = {};
       contentData.forEach((item: any) => {
-        // Use value if it exists, otherwise use link (for URLs)
         contentObj[item.key] = item.value || item.link;
       });
       

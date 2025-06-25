@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 
 interface OptimizedImageProps {
@@ -32,6 +33,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isInView, setIsInView] = useState(priority);
   const [currentSrc, setCurrentSrc] = useState<string>('');
   const imgRef = useRef<HTMLImageElement>(null);
+  const [imageRetryCount, setImageRetryCount] = useState(0);
 
   // Generate optimized image URLs
   const generateImageUrls = (originalSrc: string) => {
@@ -46,8 +48,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     // For Supabase images, add optimization parameters
     const baseUrl = originalSrc.split('?')[0];
-    const webpUrl = `${baseUrl}?format=webp&quality=${quality}`;
-    const jpegUrl = `${baseUrl}?format=jpeg&quality=${quality}`;
+    const webpUrl = `${baseUrl}?format=webp&quality=${quality}&width=${width || 800}`;
+    const jpegUrl = `${baseUrl}?format=jpeg&quality=${quality}&width=${width || 800}`;
     
     return { webp: webpUrl, jpeg: jpegUrl };
   };
@@ -82,30 +84,33 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       const urls = generateImageUrls(src);
       setCurrentSrc(urls.webp);
     }
-  }, [isInView, src, quality]);
+  }, [isInView, src, quality, width]);
 
   const handleLoad = () => {
     setIsLoaded(true);
+    setHasError(false);
     onLoad?.();
   };
 
   const handleError = () => {
-    setHasError(true);
-    if (currentSrc.includes('webp')) {
-      // Fallback to JPEG if WebP fails
+    console.log(`Image failed to load: ${currentSrc}, retry count: ${imageRetryCount}`);
+    
+    if (imageRetryCount === 0 && currentSrc.includes('webp')) {
+      // First retry: fallback to JPEG if WebP fails
       const urls = generateImageUrls(src);
       setCurrentSrc(urls.jpeg);
-    } else {
-      // Fallback to placeholder
+      setImageRetryCount(1);
+    } else if (imageRetryCount === 1 && currentSrc !== fallbackSrc) {
+      // Second retry: use fallback image
       setCurrentSrc(fallbackSrc);
+      setImageRetryCount(2);
+      setHasError(true);
+    } else {
+      // Final fallback
+      setHasError(true);
     }
+    
     onError?.();
-  };
-
-  const handleWebPError = () => {
-    // Fallback to JPEG
-    const urls = generateImageUrls(src);
-    setCurrentSrc(urls.jpeg);
   };
 
   if (!isInView && !priority) {
@@ -113,7 +118,11 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       <div 
         ref={imgRef}
         className={`bg-gray-200 animate-pulse ${className}`}
-        style={{ width, height }}
+        style={{ 
+          width: width ? `${width}px` : '100%', 
+          height: height ? `${height}px` : '100%',
+          aspectRatio: width && height ? `${width}/${height}` : undefined
+        }}
         aria-label={alt}
       />
     );
@@ -121,13 +130,14 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {/* WebP version */}
       <picture>
-        <source
-          srcSet={currentSrc}
-          type="image/webp"
-          onError={handleWebPError}
-        />
+        {currentSrc.includes('webp') && (
+          <source
+            srcSet={currentSrc}
+            type="image/webp"
+            sizes={sizes}
+          />
+        )}
         <img
           ref={imgRef}
           src={currentSrc}
@@ -139,12 +149,11 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
           decoding="async"
           className={`transition-opacity duration-300 ${
             isLoaded ? 'opacity-100' : 'opacity-0'
-          } ${className}`}
+          } w-full h-full object-cover`}
           onLoad={handleLoad}
           onError={handleError}
           style={{
-            width: width ? `${width}px` : 'auto',
-            height: height ? `${height}px` : 'auto'
+            aspectRatio: width && height ? `${width}/${height}` : undefined
           }}
         />
       </picture>
@@ -164,4 +173,4 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   );
 };
 
-export default OptimizedImage; 
+export default OptimizedImage;
