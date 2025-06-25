@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
+import DynamicSEO from "@/components/seo/DynamicSEO";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -50,6 +51,7 @@ const App: React.FC = () => {
         <Toaster />
         <BrowserRouter>
           <AuthProvider>
+            <DynamicSEO />
             <Routes>
               {/* Public routes with main layout */}
               <Route path="/" element={<MainLayout />}>
