@@ -1,3 +1,4 @@
+
 const CACHE_NAME = 'bagprint-cache-v1';
 const urlsToCache = [
   '/',
@@ -99,4 +100,4 @@ self.addEventListener('push', (event) => {
   event.waitUntil(
     self.registration.showNotification('Leatex', options)
   );
-}); 
+});

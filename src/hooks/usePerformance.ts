@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 
 // Declare gtag for Google Analytics
@@ -200,4 +201,4 @@ export const useErrorTracking = () => {
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
     };
   }, []);
-}; 
+};
