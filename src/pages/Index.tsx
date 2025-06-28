@@ -233,7 +233,6 @@ const Index = () => {
               minHeight: "520px"
             }}
           >
-            <div className="absolute inset-0 bg-white/45"></div>
             <div className="relative z-10 h-full w-full">
               <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
                 <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
