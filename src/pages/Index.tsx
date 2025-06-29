@@ -264,8 +264,8 @@ const Index = () => {
                             className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
                             asChild
                           >
-                            <Link to={heroContent.button1.link}>
-                              {heroContent.button1.value}
+                            <Link to="/kontakt">
+                              Küsi pakkumist
                             </Link>
                           </Button>
                           <Button 
