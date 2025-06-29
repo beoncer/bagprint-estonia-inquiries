@@ -57,7 +57,7 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
   }, [mainImage]);
   
   return (
-    <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200">
+    <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200 max-w-sm mx-auto">
       <div className="aspect-square w-full relative overflow-hidden bg-gray-100">
         <OptimizedImage
           src={imageUrl}
@@ -83,11 +83,11 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
           </p>
         )}
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex gap-2">
-        <Button variant="outline" size="sm" className="flex-1" asChild>
+      <CardFooter className="p-4 pt-0 flex flex-col sm:flex-row gap-2">
+        <Button variant="outline" size="sm" className="w-full sm:flex-1 text-xs sm:text-sm" asChild>
           <Link to={`/tooted/${slug}`}>Vaata lähemalt</Link>
         </Button>
-        <Button size="sm" className="flex-1" asChild>
+        <Button size="sm" className="w-full sm:flex-1 text-xs sm:text-sm" asChild>
           <Link to={`/inquiry?product=${safeId}`}>Küsi pakkumist</Link>
         </Button>
       </CardFooter>
