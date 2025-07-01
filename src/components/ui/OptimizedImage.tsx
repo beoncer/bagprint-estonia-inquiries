@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 interface OptimizedImageProps {
   src: string;
@@ -26,7 +26,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   onLoad,
   onError,
   sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
-  quality = 60 // Reduced from 75 for better performance
+  quality = 50 // More aggressive compression
 }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -36,7 +36,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [imageRetryCount, setImageRetryCount] = useState(0);
 
   // More aggressive image optimization
-  const generateImageUrls = (originalSrc: string) => {
+  const generateImageUrls = useCallback((originalSrc: string) => {
     if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.startsWith('blob:')) {
       return { webp: originalSrc, jpeg: originalSrc };
     }
@@ -46,14 +46,14 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     }
 
     const baseUrl = originalSrc.split('?')[0];
-    const targetWidth = width || 400; // Reduced default size
-    const webpUrl = `${baseUrl}?format=webp&quality=${quality}&width=${targetWidth}&resize=cover&optimize=true`;
-    const jpegUrl = `${baseUrl}?format=jpeg&quality=${quality}&width=${targetWidth}&resize=cover&optimize=true`;
+    const targetWidth = width || 300; // Smaller default size
+    const webpUrl = `${baseUrl}?format=webp&quality=${quality}&width=${targetWidth}&resize=cover&optimize=true&progressive=true`;
+    const jpegUrl = `${baseUrl}?format=jpeg&quality=${quality}&width=${targetWidth}&resize=cover&optimize=true&progressive=true`;
     
     return { webp: webpUrl, jpeg: jpegUrl };
-  };
+  }, [quality, width]);
 
-  // More efficient Intersection Observer
+  // Optimized Intersection Observer
   useEffect(() => {
     if (priority) return;
 
@@ -65,7 +65,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         }
       },
       {
-        rootMargin: '10px 0px', // Reduced from 20px
+        rootMargin: '20px 0px',
         threshold: 0.01
       }
     );
@@ -82,15 +82,15 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       const urls = generateImageUrls(src);
       setCurrentSrc(urls.webp);
     }
-  }, [isInView, src, quality, width]);
+  }, [isInView, src, generateImageUrls]);
 
-  const handleLoad = () => {
+  const handleLoad = useCallback(() => {
     setIsLoaded(true);
     setHasError(false);
     onLoad?.();
-  };
+  }, [onLoad]);
 
-  const handleError = () => {
+  const handleError = useCallback(() => {
     if (imageRetryCount === 0 && currentSrc.includes('webp')) {
       const urls = generateImageUrls(src);
       setCurrentSrc(urls.jpeg);
@@ -103,13 +103,13 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       setHasError(true);
     }
     onError?.();
-  };
+  }, [imageRetryCount, currentSrc, fallbackSrc, generateImageUrls, src, onError]);
 
   if (!isInView && !priority) {
     return (
       <div 
         ref={imgRef}
-        className={`bg-gray-200 ${className}`}
+        className={`bg-gray-200 animate-pulse ${className}`}
         style={{ 
           width: width ? `${width}px` : '100%', 
           height: height ? `${height}px` : '200px',
@@ -139,7 +139,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
           sizes={sizes}
           loading={priority ? "eager" : "lazy"}
           decoding="async"
-          className={`transition-opacity duration-150 ${
+          className={`transition-opacity duration-200 ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           } w-full h-full object-cover`}
           onLoad={handleLoad}
@@ -151,7 +151,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       </picture>
       
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-gray-200" />
+        <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
       
       {hasError && currentSrc === fallbackSrc && (

@@ -1,8 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -34,15 +34,14 @@ const Navbar = () => {
   const { data: pages = [], isLoading, isError } = useQuery({
     queryKey: ['pages'],
     queryFn: fetchPages,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 15,
   });
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  // Ensure URLs are absolute paths
   const getAbsolutePath = (url: string) => {
     if (url.startsWith('/')) {
       return url;
@@ -51,53 +50,59 @@ const Navbar = () => {
   };
 
   const handleLinkClick = (url: string) => {
-    console.log('Navbar link clicked:', url, 'Current location:', location.pathname);
     setIsOpen(false);
   };
 
-  // Default navigation items that should always appear
-  const defaultNavItems = [
+  // Memoized navigation items
+  const defaultNavItems = useMemo(() => [
     { id: "default-1", name: "Avaleht", url_et: "/", visible: true, sort_order: 1 },
     { id: "default-2", name: "Tooted", url_et: "/tooted", visible: true, sort_order: 2 },
     { id: "default-3", name: "Meist", url_et: "/meist", visible: true, sort_order: 3 },
     { id: "default-4", name: "Kontakt", url_et: "/kontakt", visible: true, sort_order: 4 }
-  ];
+  ], []);
 
-  // Hardcoded navigation items that should always appear
-  const staticNavItems = [
+  const staticNavItems = useMemo(() => [
     { name: "Blogi", url: "/blogi" },
     { name: "Tehtud tööd", url: "/portfoolio" }
-  ];
+  ], []);
 
-  // Use default items if loading or error, otherwise use fetched pages
-  const displayPages = (isLoading || isError || pages.length === 0) ? defaultNavItems : pages;
+  const displayPages = useMemo(() => 
+    (isLoading || isError || pages.length === 0) ? defaultNavItems : pages,
+    [isLoading, isError, pages, defaultNavItems]
+  );
 
-  // Remove duplicates from staticNavItems if they already exist in pages
-  const navNames = new Set(displayPages.map(p => p.name));
-  const filteredStaticNavItems = staticNavItems.filter(item => !navNames.has(item.name));
+  const filteredStaticNavItems = useMemo(() => {
+    const navNames = new Set(displayPages.map(p => p.name));
+    return staticNavItems.filter(item => !navNames.has(item.name));
+  }, [displayPages, staticNavItems]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
 
   return (
     <nav className="w-full z-50">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-4">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-3 md:py-4">
         <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <Link 
               to="/" 
-              className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary flex items-center"
+              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-primary flex items-center"
               onClick={() => handleLinkClick('/')}
             >
               Leatex<span className="text-black">.</span>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center">
+            <div className="hidden md:flex space-x-4 lg:space-x-6 xl:space-x-8 items-center">
               {displayPages.map((page) => {
                 const absolutePath = getAbsolutePath(page.url_et);
                 return (
                   <Link 
                     key={page.id}
                     to={absolutePath}
-                    className="text-gray-800 font-medium hover:text-primary transition-colors text-sm lg:text-base"
+                    className="text-gray-800 font-medium hover:text-primary transition-colors text-sm lg:text-base whitespace-nowrap"
                     onClick={() => handleLinkClick(absolutePath)}
                   >
                     {page.name}
@@ -108,13 +113,13 @@ const Navbar = () => {
                 <Link
                   key={item.name}
                   to={item.url}
-                  className="text-gray-800 font-medium hover:text-primary transition-colors text-sm lg:text-base"
+                  className="text-gray-800 font-medium hover:text-primary transition-colors text-sm lg:text-base whitespace-nowrap"
                   onClick={() => handleLinkClick(item.url)}
                 >
                   {item.name}
                 </Link>
               ))}
-              <Button asChild size="sm" className="text-sm">
+              <Button asChild size="sm" className="text-sm whitespace-nowrap">
                 <Link 
                   to="/kontakt"
                   onClick={() => handleLinkClick('/kontakt')}
@@ -128,24 +133,31 @@ const Navbar = () => {
             <div className="md:hidden">
               <button 
                 onClick={toggleMenu}
-                className="text-gray-800 hover:text-primary p-2"
+                className="text-gray-800 hover:text-primary p-2 transition-all duration-200 hover:bg-gray-50 rounded-lg"
+                aria-label={isOpen ? "Sulge menüü" : "Ava menüü"}
               >
-                <Menu size={20} />
+                {isOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
             </div>
           </div>
 
-          {/* Mobile Navigation */}
-          {isOpen && (
-            <div className="md:hidden pt-4 pb-2 animate-fade-in bg-white rounded-lg mt-2">
-              <div className="flex flex-col space-y-2">
+          {/* Mobile Navigation with smooth animation */}
+          <div 
+            className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+              isOpen 
+                ? 'max-h-96 opacity-100 pt-4 pb-2' 
+                : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="bg-white rounded-lg">
+              <div className="flex flex-col space-y-1">
                 {displayPages.map((page) => {
                   const absolutePath = getAbsolutePath(page.url_et);
                   return (
                     <Link 
                       key={page.id}
                       to={absolutePath}
-                      className="py-3 px-4 hover:text-primary transition-colors hover:bg-gray-50 rounded text-sm"
+                      className="py-3 px-4 hover:text-primary transition-all duration-200 hover:bg-gray-50 rounded-lg text-sm font-medium"
                       onClick={() => handleLinkClick(absolutePath)}
                     >
                       {page.name}
@@ -156,23 +168,25 @@ const Navbar = () => {
                   <Link
                     key={item.name}
                     to={item.url}
-                    className="py-3 px-4 hover:text-primary transition-colors hover:bg-gray-50 rounded text-sm"
+                    className="py-3 px-4 hover:text-primary transition-all duration-200 hover:bg-gray-50 rounded-lg text-sm font-medium"
                     onClick={() => handleLinkClick(item.url)}
                   >
                     {item.name}
                   </Link>
                 ))}
-                <Button asChild className="w-full mt-3 mx-4" size="sm">
-                  <Link 
-                    to="/kontakt" 
-                    onClick={() => handleLinkClick('/kontakt')}
-                  >
-                    Küsi pakkumist
-                  </Link>
-                </Button>
+                <div className="pt-2 px-4">
+                  <Button asChild className="w-full" size="sm">
+                    <Link 
+                      to="/kontakt" 
+                      onClick={() => handleLinkClick('/kontakt')}
+                    >
+                      Küsi pakkumist
+                    </Link>
+                  </Button>
+                </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </nav>

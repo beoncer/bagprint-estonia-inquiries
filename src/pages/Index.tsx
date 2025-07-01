@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -69,7 +70,6 @@ const fetchWhyChooseUsContent = async () => {
 
 const parseWhyChooseUs = (data: any[]) => {
   const title = data.find((item) => item.key === "why_choose_us_title")?.value || "Miks valida meid";
-  // Find all card indexes
   const indexes = Array.from(new Set(
     data
       .map((item) => item.key.match(/^why_choose_us_(\d+)_/))
@@ -85,7 +85,6 @@ const parseWhyChooseUs = (data: any[]) => {
   return { title, cards };
 };
 
-// Add this helper to parse categories from website_content
 const parseProductCategories = (data: any[]) => {
   const categories = [];
   for (let i = 1; i <= 4; i++) {
@@ -99,7 +98,6 @@ const parseProductCategories = (data: any[]) => {
   return categories;
 };
 
-// Add this fetch function
 const fetchProductCategoriesContent = async () => {
   const { data, error } = await supabase
     .from('website_content')
@@ -110,7 +108,6 @@ const fetchProductCategoriesContent = async () => {
   return data;
 };
 
-// Add fetchCtaContent function after fetchProductCategoriesContent
 const fetchCtaContent = async () => {
   const { data, error } = await supabase
     .from("website_content")
@@ -134,7 +131,6 @@ const fetchCtaContent = async () => {
   return content;
 };
 
-// Add a fetch for the homepage banner URL
 const fetchBannerUrl = async () => {
   const { data, error } = await supabase
     .from("website_content")
@@ -150,69 +146,86 @@ const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // Add state for categories
-  const [categories, setCategories] = useState<any[]>([]);
-  const [categoriesTitle, setCategoriesTitle] = useState<string>('Meie tooted');
-  // Add CTA content state
-  const [ctaContent, setCtaContent] = useState({
-    cta_title: "Valmis alustama?",
-    cta_description: "Võta meiega ühendust ja leiame just teile sobiva lahenduse.",
-    cta_button_text: "Küsi pakkumist",
-    cta_button_link: "/inquiry"
-  });
 
-  // Use React Query for hero content with immediate default values
-  const { data: heroContent, isLoading: isHeroLoading, error: heroError } = useQuery({
+  // Memoized queries to prevent re-renders
+  const { data: heroContent, isLoading: isHeroLoading } = useQuery({
     queryKey: ['heroContent'],
     queryFn: fetchHeroContent,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 15,
   });
 
-  const { data: bannerUrl, isLoading: isBannerLoading } = useQuery({
+  const { data: bannerUrl } = useQuery({
     queryKey: ["homepageBannerUrl"],
     queryFn: fetchBannerUrl,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 15,
   });
 
-  const whyChooseUsQuery = useQuery({
+  const { data: whyChooseUsData } = useQuery({
     queryKey: ["whyChooseUsContent"],
     queryFn: fetchWhyChooseUsContent,
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 15,
   });
-  const whyChooseUs = whyChooseUsQuery.data ? parseWhyChooseUs(whyChooseUsQuery.data) : { title: "", cards: [] };
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ["productCategories"],
+    queryFn: fetchProductCategoriesContent,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 15,
+  });
+
+  const { data: ctaData } = useQuery({
+    queryKey: ["ctaContent"],
+    queryFn: fetchCtaContent,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 15,
+  });
+
+  // Memoized parsed data
+  const whyChooseUs = useMemo(() => 
+    whyChooseUsData ? parseWhyChooseUs(whyChooseUsData) : { title: "", cards: [] },
+    [whyChooseUsData]
+  );
+
+  const categories = useMemo(() => 
+    categoriesData ? parseProductCategories(categoriesData) : [],
+    [categoriesData]
+  );
+
+  const categoriesTitle = useMemo(() => 
+    categoriesData?.find((item: any) => item.key === 'product_categories_title')?.value || 'Meie tooted',
+    [categoriesData]
+  );
+
+  const ctaContent = useMemo(() => 
+    ctaData || {
+      cta_title: "Valmis alustama?",
+      cta_description: "Võta meiega ühendust ja leiame just teile sobiva lahenduse.",
+      cta_button_text: "Küsi pakkumist",
+      cta_button_link: "/inquiry"
+    },
+    [ctaData]
+  );
+
+  // Memoized fetch function to prevent re-renders
+  const fetchFeaturedProducts = useCallback(async () => {
+    try {
+      setLoading(true);
+      const products = await getPopularProducts();
+      setFeaturedProducts(products);
+    } catch (err) {
+      setError('Failed to fetch featured products');
+      console.error('Error fetching featured products:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
-      try {
-        setLoading(true);
-        const products = await getPopularProducts();
-        setFeaturedProducts(products);
-      } catch (err) {
-        setError('Failed to fetch featured products');
-        console.error('Error fetching featured products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchFeaturedProducts();
-  }, []);
-
-  useEffect(() => {
-    (async () => {
-      const data = await fetchProductCategoriesContent();
-      setCategories(parseProductCategories(data));
-      const title = data.find((item: any) => item.key === 'product_categories_title')?.value;
-      if (title) setCategoriesTitle(title);
-    })();
-  }, []);
-
-  useEffect(() => {
-    fetchCtaContent().then(setCtaContent);
-  }, []);
+  }, [fetchFeaturedProducts]);
 
   if (isHeroLoading || !heroContent) {
     return <div className="min-h-screen flex items-center justify-center text-xl text-gray-400">Laadimine...</div>;
@@ -220,8 +233,8 @@ const Index = () => {
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="py-6">
+      {/* Hero Section - Enhanced for mobile */}
+      <section className="py-4 md:py-6">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div 
             className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
@@ -230,38 +243,38 @@ const Index = () => {
               backgroundSize: "cover",
               backgroundPosition: "center",
               height: "auto",
-              minHeight: "520px"
+              minHeight: "480px" // Slightly smaller on mobile
             }}
           >
             <div className="relative z-10 h-full w-full">
               <div className="flex flex-col md:flex-row items-center justify-between h-full w-full">
-                <div className="w-full md:w-2/3 lg:w-1/2 mb-8 md:mb-0 flex flex-col justify-between h-full py-8 md:py-12 px-5 md:px-8">
+                <div className="w-full md:w-2/3 lg:w-1/2 mb-6 md:mb-0 flex flex-col justify-between h-full py-6 md:py-12 px-4 md:px-8">
                   <div className="flex flex-col h-full justify-between">
                     {isHeroLoading ? (
                       <div className="animate-pulse space-y-4">
-                        <div className="h-12 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-10 md:h-12 bg-gray-200 rounded w-3/4"></div>
                         <div className="h-4 bg-gray-200 rounded w-full"></div>
                         <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                        <div className="flex gap-4 mt-6">
-                          <div className="h-10 bg-gray-200 rounded w-32"></div>
-                          <div className="h-10 bg-gray-200 rounded w-32"></div>
+                        <div className="flex gap-3 mt-6">
+                          <div className="h-10 bg-gray-200 rounded w-28"></div>
+                          <div className="h-10 bg-gray-200 rounded w-28"></div>
                         </div>
                       </div>
                     ) : (
                       <>
-                        <div className="mt-4 md:mt-8">
-                          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
+                        <div className="mt-2 md:mt-8">
+                          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 md:mb-6 leading-tight">
                             {heroContent.title}
                           </h1>
-                          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6">
+                          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-4 md:mb-6 leading-relaxed">
                             {heroContent.description}
                           </p>
                         </div>
-                        <div className="flex flex-wrap gap-3 md:gap-4 mt-6 mb-6 md:mb-10">
+                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 mt-4 md:mt-6 mb-4 md:mb-10">
                           <Button 
                             variant="default"
-                            size="xl" 
-                            className="text-base md:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md" 
+                            size="lg" 
+                            className="text-sm md:text-base lg:text-lg !bg-red-500 hover:!bg-red-600 text-white font-medium shadow-md w-full sm:w-auto" 
                             asChild
                           >
                             <Link to="/kontakt">
@@ -270,12 +283,12 @@ const Index = () => {
                           </Button>
                           <Button 
                             variant="white" 
-                            size="xl" 
-                            className="text-base md:text-lg border border-gray-200 shadow-sm" 
+                            size="lg" 
+                            className="text-sm md:text-base lg:text-lg border border-gray-200 shadow-sm w-full sm:w-auto" 
                             asChild
                           >
-                            <Link to={heroContent.button2.link}>
-                              {heroContent.button2.value}
+                            <Link to={heroContent.button2.link || '/tooted'}>
+                              {heroContent.button2.value || 'Vaata tooteid'}
                             </Link>
                           </Button>
                         </div>
@@ -293,54 +306,54 @@ const Index = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-12">
+      <section className="py-8 md:py-12">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <h2 className="text-3xl font-bold text-left mb-12">{whyChooseUs.title}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {whyChooseUsQuery.isLoading ? (
+          <h2 className="text-2xl md:text-3xl font-bold text-left mb-8 md:mb-12">{whyChooseUs.title}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            {whyChooseUs.cards.length > 0 ? (
+              whyChooseUs.cards.map((card, i) => (
+                <div key={i} className="bg-white p-4 md:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                  <div className="text-primary mb-3 md:mb-4">
+                    {ICON_MAP[card.icon] || <CheckCircle className="h-10 w-10 md:h-12 md:w-12 text-primary" />}
+                  </div>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-gray-900">{card.title}</h3>
+                  <p className="text-sm md:text-base text-gray-600 leading-relaxed">{card.text}</p>
+                </div>
+              ))
+            ) : (
               Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="bg-white p-6 rounded-lg shadow-sm animate-pulse">
-                  <div className="h-12 w-12 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-6 w-1/2 bg-gray-200 rounded mb-2"></div>
+                <div key={i} className="bg-white p-4 md:p-6 rounded-lg shadow-sm animate-pulse">
+                  <div className="h-10 w-10 md:h-12 md:w-12 bg-gray-200 rounded mb-3 md:mb-4"></div>
+                  <div className="h-5 md:h-6 w-1/2 bg-gray-200 rounded mb-2"></div>
                   <div className="h-4 w-full bg-gray-200 rounded mb-1"></div>
                   <div className="h-4 w-5/6 bg-gray-200 rounded"></div>
                 </div>
               ))
-            ) : whyChooseUs.cards.length > 0 ? (
-              whyChooseUs.cards.map((card, i) => (
-                <div key={i} className="bg-white p-6 rounded-lg shadow-sm">
-                  <div className="text-primary mb-4">
-                    {ICON_MAP[card.icon] || <CheckCircle className="h-12 w-12 text-primary" />}
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-                  <p className="text-gray-600">{card.text}</p>
-                </div>
-              ))
-            ) : null}
+            )}
           </div>
         </div>
       </section>
 
-      {/* Updated Categories Section */}
-      <section className="py-16">
+      {/* Categories Section */}
+      <section className="py-12 md:py-16">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <h2 className="text-3xl font-bold text-left mb-10">{categoriesTitle}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-left mb-8 md:mb-10">{categoriesTitle}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {categories.map((cat, idx) => {
-              // Add cache buster to category images
               const imageWithCacheBuster = cat.image ? `${cat.image}?t=${Date.now()}` : '/placeholder.svg';
               return (
-                <div className="text-center" key={idx}>
-                  <div className="h-80 mb-4 overflow-hidden rounded-lg">
+                <div className="text-center group hover:transform hover:scale-105 transition-all duration-200" key={idx}>
+                  <div className="h-64 md:h-80 mb-3 md:mb-4 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
                     <img
                       src={imageWithCacheBuster}
                       alt={cat.name}
-                      className="w-full h-full object-cover transition-all hover:scale-105"
-                      key={imageWithCacheBuster} // Force re-render when URL changes
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      key={imageWithCacheBuster}
+                      loading="lazy"
                     />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{cat.name}</h3>
-                  <Button variant="link" asChild>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2 text-gray-900">{cat.name}</h3>
+                  <Button variant="link" asChild className="text-sm md:text-base">
                     <Link to={cat.link || '#'}>{cat.button}</Link>
                   </Button>
                 </div>
@@ -351,22 +364,22 @@ const Index = () => {
       </section>
 
       {/* Featured Products Section */}
-      <section className="bg-gray-50 py-16">
+      <section className="bg-gray-50 py-12 md:py-16">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          <h2 className="text-3xl font-bold text-left mb-12">Populaarsed tooted</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-left mb-8 md:mb-12">Populaarsed tooted</h2>
           {loading ? (
             <div className="animate-pulse">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {[...Array(4)].map((_, i) => (
-                  <div key={i} className="bg-gray-200 h-96 rounded"></div>
+                  <div key={i} className="bg-gray-200 h-80 md:h-96 rounded"></div>
                 ))}
               </div>
             </div>
           ) : error ? (
-            <div className="text-center py-10">
+            <div className="text-center py-8 md:py-10">
               <p className="text-red-600 mb-4">{error}</p>
               <Button onClick={() => window.location.reload()}>
-                Try Again
+                Proovi uuesti
               </Button>
             </div>
           ) : (
@@ -376,16 +389,16 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-primary py-16">
+      <section className="bg-primary py-12 md:py-16">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">
             {ctaContent.cta_title}
           </h2>
-          <p className="text-white text-lg mb-8 max-w-2xl mx-auto">
+          <p className="text-white text-base md:text-lg mb-6 md:mb-8 max-w-2xl mx-auto leading-relaxed">
             {ctaContent.cta_description}
           </p>
-          <Button variant="secondary" size="lg" asChild>
-            <Link to={ctaContent.cta_button_link || "/inquiry"}>
+          <Button variant="secondary" size="lg" asChild className="text-sm md:text-base">
+            <Link to={ctaContent.cta_button_link || "/kontakt"}>
               {ctaContent.cta_button_text}
             </Link>
           </Button>

@@ -10,8 +10,6 @@ import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
-import CriticalCSS from "./components/performance/CriticalCSS";
-import PreloadManager from "./components/performance/PreloadManager";
 
 // Import lazy components
 import {
@@ -43,7 +41,7 @@ import {
   AdminPricing
 } from "./components/performance/LazyComponents";
 
-// Minimal QueryClient configuration
+// Optimized QueryClient configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -60,8 +58,6 @@ const queryClient = new QueryClient({
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
-      <CriticalCSS />
-      <PreloadManager />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
