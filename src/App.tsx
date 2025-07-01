@@ -33,6 +33,7 @@ import {
   AdminMeist,
   AdminAssets,
   AdminSEO,
+  AdminSitemap,
   AdminManual,
   AdminPortfolio,
   AdminContact,
@@ -105,6 +106,7 @@ const App: React.FC = () => {
                     <Route path="meist" element={<AdminMeist />} />
                     <Route path="assets" element={<AdminAssets />} />
                     <Route path="seo" element={<AdminSEO />} />
+                    <Route path="sitemap" element={<AdminSitemap />} />
                     <Route path="manual" element={<AdminManual />} />
                     <Route path="portfolio" element={<AdminPortfolio />} />
                     <Route path="contact" element={<AdminContact />} />

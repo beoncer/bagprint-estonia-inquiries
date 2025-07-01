@@ -442,6 +442,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sitemap_entries: {
+        Row: {
+          changefreq: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_dynamic: boolean | null
+          lastmod: string | null
+          priority: number | null
+          source_id: string | null
+          source_table: string | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          changefreq?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_dynamic?: boolean | null
+          lastmod?: string | null
+          priority?: number | null
+          source_id?: string | null
+          source_table?: string | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          changefreq?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_dynamic?: boolean | null
+          lastmod?: string | null
+          priority?: number | null
+          source_id?: string | null
+          source_table?: string | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       website_content: {
         Row: {
           created_at: string
@@ -479,6 +521,10 @@ export type Database = {
     Functions: {
       add_product_size: {
         Args: { size_value: string }
+        Returns: string
+      }
+      generate_sitemap_xml: {
+        Args: Record<PropertyKey, never>
         Returns: string
       }
       gtrgm_compress: {
@@ -535,6 +581,10 @@ export type Database = {
       show_trgm: {
         Args: { "": string }
         Returns: string[]
+      }
+      sync_dynamic_sitemap_entries: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       toggle_eco_status: {
         Args: { product_id: string; new_status: boolean }

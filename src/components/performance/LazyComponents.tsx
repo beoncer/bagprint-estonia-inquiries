@@ -24,6 +24,7 @@ export const AdminContent = lazy(() => import("@/pages/admin/Content"));
 export const AdminMeist = lazy(() => import("@/pages/admin/Meist"));
 export const AdminAssets = lazy(() => import("@/pages/admin/Assets"));
 export const AdminSEO = lazy(() => import("@/pages/admin/SEO"));
+export const AdminSitemap = lazy(() => import("@/pages/admin/Sitemap"));
 export const AdminManual = lazy(() => import("@/pages/admin/Manual"));
 export const AdminPortfolio = lazy(() => import("@/pages/admin/Portfolio"));
 export const AdminContact = lazy(() => import("@/pages/admin/Contact"));
