@@ -10,7 +10,6 @@ import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
-import Sitemap from "./pages/Sitemap";
 
 // Import lazy components
 import {
@@ -67,9 +66,6 @@ const App: React.FC = () => {
               <DynamicSEO />
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
-                  {/* Sitemap route - must be before other routes */}
-                  <Route path="/sitemap.xml" element={<Sitemap />} />
-                  
                   {/* Public routes */}
                   <Route path="/" element={<MainLayout />}>
                     <Route index element={<Index />} />
