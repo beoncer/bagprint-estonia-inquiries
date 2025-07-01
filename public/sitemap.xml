@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -6,7 +5,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://bagprint.ee/</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/"/>
@@ -15,104 +14,99 @@
   <!-- Main Product Categories -->
   <url>
     <loc>https://bagprint.ee/tooted</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/tooted"/>
   </url>
   
   <url>
     <loc>https://bagprint.ee/riidest-kotid</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/riidest-kotid"/>
   </url>
   
   <url>
     <loc>https://bagprint.ee/paberkotid</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/paberkotid"/>
   </url>
   
   <url>
     <loc>https://bagprint.ee/nooriga-kotid</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/nooriga-kotid"/>
   </url>
   
   <url>
     <loc>https://bagprint.ee/sussikotid</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/sussikotid"/>
-  </url>
-  
-  <!-- Individual Product Pages -->
-  <url>
-    <loc>https://bagprint.ee/tooted/puuvillane-kott</loc>
-    <lastmod>2025-01-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://bagprint.ee/tooted/paber-kott</loc>
-    <lastmod>2025-01-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://bagprint.ee/tooted/nooriga-kott</loc>
-    <lastmod>2025-01-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  
-  <url>
-    <loc>https://bagprint.ee/tooted/sussikott</loc>
-    <lastmod>2025-01-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
   
   <!-- Information Pages -->
   <url>
-    <loc>https://bagprint.ee/kontakt</loc>
-    <lastmod>2025-01-07</lastmod>
+    <loc>https://bagprint.ee/meist</loc>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/kontakt"/>
   </url>
   
   <url>
-    <loc>https://bagprint.ee/meist</loc>
-    <lastmod>2025-01-07</lastmod>
+    <loc>https://bagprint.ee/kontakt</loc>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/meist"/>
   </url>
   
   <url>
     <loc>https://bagprint.ee/portfoolio</loc>
-    <lastmod>2025-01-07</lastmod>
-    <changefreq>monthly</changefreq>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/portfoolio"/>
   </url>
   
   <url>
     <loc>https://bagprint.ee/blogi</loc>
-    <lastmod>2025-01-07</lastmod>
+    <lastmod>2024-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
-    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee/blogi"/>
   </url>
   
-</urlset>
+  <!-- English Versions (for backward compatibility) -->
+  <url>
+    <loc>https://bagprint.ee/products</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bagprint.ee/products"/>
+  </url>
+  
+  <url>
+    <loc>https://bagprint.ee/contact</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bagprint.ee/contact"/>
+  </url>
+  
+  <url>
+    <loc>https://bagprint.ee/portfolio</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bagprint.ee/portfolio"/>
+  </url>
+  
+  <url>
+    <loc>https://bagprint.ee/blog</loc>
+    <lastmod>2024-01-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bagprint.ee/blog"/>
+  </url>
+  
+</urlset> 
