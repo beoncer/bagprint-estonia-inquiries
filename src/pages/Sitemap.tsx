@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface SitemapUrl {
@@ -94,42 +94,44 @@ ${allUrls.map(url => `  <url>
 };
 
 const Sitemap = () => {
-  const [sitemapXML, setSitemapXML] = useState<string>('');
-
   useEffect(() => {
-    const fetchSitemap = async () => {
+    const serveSitemap = async () => {
       try {
         const xml = await generateSitemapXML();
-        setSitemapXML(xml);
+        
+        // Set proper XML response
+        const response = new Response(xml, {
+          headers: {
+            'Content-Type': 'application/xml; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600'
+          }
+        });
+        
+        // Replace current page with XML content
+        document.open();
+        document.write(xml);
+        document.close();
+        
+        // Set document content type
+        Object.defineProperty(document, 'contentType', {
+          value: 'application/xml',
+          writable: false
+        });
+        
       } catch (error) {
         console.error('Error generating sitemap:', error);
-        setSitemapXML('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+        const fallbackXml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+        document.open();
+        document.write(fallbackXml);
+        document.close();
       }
     };
 
-    fetchSitemap();
+    serveSitemap();
   }, []);
 
-  // Set proper XML content type
-  useEffect(() => {
-    if (sitemapXML) {
-      // Replace page content with XML
-      document.open();
-      document.write(sitemapXML);
-      document.close();
-      
-      // Set proper content type
-      if (document.contentType !== 'application/xml') {
-        window.location.replace(`data:application/xml;charset=utf-8,${encodeURIComponent(sitemapXML)}`);
-      }
-    }
-  }, [sitemapXML]);
-
-  return (
-    <div style={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', padding: '20px' }}>
-      {sitemapXML || 'Generating sitemap...'}
-    </div>
-  );
+  // This component shouldn't render anything visible as it serves XML
+  return null;
 };
 
 export default Sitemap;
