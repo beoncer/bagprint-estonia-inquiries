@@ -30,14 +30,16 @@ const generateSitemapXML = async (): Promise<string> => {
   let allUrls = [...staticPages];
 
   try {
-    // Fetch dynamic product pages
-    const { data: products } = await supabase
+    // Fetch dynamic product pages - removed the invalid 'visible' filter
+    const { data: products, error: productsError } = await supabase
       .from('products')
       .select('slug, updated_at')
-      .eq('visible', true)
       .not('slug', 'is', null);
 
-    if (products) {
+    if (productsError) {
+      console.error('Error fetching products for sitemap:', productsError);
+    } else if (products && products.length > 0) {
+      console.log(`Found ${products.length} products for sitemap`);
       const productUrls: SitemapUrl[] = products.map(product => ({
         loc: `/tooted/${product.slug}`,
         lastmod: product.updated_at ? new Date(product.updated_at).toISOString().split('T')[0] : currentDate,
@@ -45,16 +47,20 @@ const generateSitemapXML = async (): Promise<string> => {
         priority: 0.7
       }));
       allUrls = [...allUrls, ...productUrls];
+    } else {
+      console.log('No products found for sitemap');
     }
 
     // Fetch dynamic blog posts
-    const { data: blogPosts } = await supabase
+    const { data: blogPosts, error: blogError } = await supabase
       .from('blog_posts')
       .select('slug, updated_at')
-      .eq('published', true)
       .not('slug', 'is', null);
 
-    if (blogPosts) {
+    if (blogError) {
+      console.error('Error fetching blog posts for sitemap:', blogError);
+    } else if (blogPosts && blogPosts.length > 0) {
+      console.log(`Found ${blogPosts.length} blog posts for sitemap`);
       const blogUrls: SitemapUrl[] = blogPosts.map(post => ({
         loc: `/blogi/${post.slug}`,
         lastmod: post.updated_at ? new Date(post.updated_at).toISOString().split('T')[0] : currentDate,
@@ -62,10 +68,14 @@ const generateSitemapXML = async (): Promise<string> => {
         priority: 0.5
       }));
       allUrls = [...allUrls, ...blogUrls];
+    } else {
+      console.log('No blog posts found for sitemap');
     }
   } catch (error) {
     console.error('Error fetching dynamic content for sitemap:', error);
   }
+
+  console.log(`Total URLs in sitemap: ${allUrls.length}`);
 
   // Generate XML
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -103,10 +113,6 @@ const Sitemap = () => {
   // Set proper XML content type
   useEffect(() => {
     if (sitemapXML) {
-      // Create and download XML file
-      const blob = new Blob([sitemapXML], { type: 'application/xml' });
-      const url = URL.createObjectURL(blob);
-      
       // Replace page content with XML
       document.open();
       document.write(sitemapXML);
