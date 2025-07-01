@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface SitemapUrl {
@@ -30,7 +30,7 @@ const generateSitemapXML = async (): Promise<string> => {
   let allUrls = [...staticPages];
 
   try {
-    // Fetch dynamic product pages - removed the invalid 'visible' filter
+    // Fetch dynamic product pages
     const { data: products, error: productsError } = await supabase
       .from('products')
       .select('slug, updated_at')
@@ -94,44 +94,53 @@ ${allUrls.map(url => `  <url>
 };
 
 const Sitemap = () => {
+  const [xmlContent, setXmlContent] = useState<string>('');
+
   useEffect(() => {
-    const serveSitemap = async () => {
+    const loadSitemap = async () => {
       try {
         const xml = await generateSitemapXML();
+        setXmlContent(xml);
         
-        // Set proper XML response
-        const response = new Response(xml, {
-          headers: {
-            'Content-Type': 'application/xml; charset=utf-8',
-            'Cache-Control': 'public, max-age=3600'
+        // Set the proper content type for the document
+        const head = document.querySelector('head');
+        if (head) {
+          // Remove existing content-type meta tags
+          const existingMeta = head.querySelector('meta[http-equiv="Content-Type"]');
+          if (existingMeta) {
+            existingMeta.remove();
           }
-        });
-        
-        // Replace current page with XML content
-        document.open();
-        document.write(xml);
-        document.close();
-        
-        // Set document content type
-        Object.defineProperty(document, 'contentType', {
-          value: 'application/xml',
-          writable: false
-        });
+          
+          // Add XML content type
+          const metaTag = document.createElement('meta');
+          metaTag.setAttribute('http-equiv', 'Content-Type');
+          metaTag.setAttribute('content', 'application/xml; charset=utf-8');
+          head.appendChild(metaTag);
+        }
         
       } catch (error) {
         console.error('Error generating sitemap:', error);
-        const fallbackXml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
-        document.open();
-        document.write(fallbackXml);
-        document.close();
+        setXmlContent('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
       }
     };
 
-    serveSitemap();
+    loadSitemap();
   }, []);
 
-  // This component shouldn't render anything visible as it serves XML
-  return null;
+  // Render the XML content as plain text
+  return (
+    <pre 
+      style={{ 
+        margin: 0, 
+        fontFamily: 'monospace',
+        fontSize: '12px',
+        lineHeight: '1.4',
+        whiteSpace: 'pre-wrap',
+        wordWrap: 'break-word'
+      }}
+      dangerouslySetInnerHTML={{ __html: xmlContent }}
+    />
+  );
 };
 
 export default Sitemap;
