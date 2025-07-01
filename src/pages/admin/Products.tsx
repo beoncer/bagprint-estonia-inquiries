@@ -42,6 +42,7 @@ import { cn } from "@/lib/utils";
 import { usePricing } from "@/hooks/usePricing";
 import ColorImageUpload from "@/components/admin/ColorImageUpload";
 import SizeImageUpload from "@/components/admin/SizeImageUpload";
+import BulkProductUpload from "@/components/admin/BulkProductUpload";
 
 interface Product {
   id: string;
@@ -94,6 +95,7 @@ const ProductsPage: React.FC = () => {
   const [colorImages, setColorImages] = useState<Record<string, string>>({});
   const [sizeImages, setSizeImages] = useState<Record<string, string>>({});
   const [mainColor, setMainColor] = useState<string>("");
+  const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   
   const { calculatePrice } = usePricing();
 
@@ -513,15 +515,20 @@ const ProductsPage: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Products</h1>
+        <div className="flex gap-2">
+          <Button onClick={() => setBulkUploadOpen(true)} variant="outline">Bulk Upload</Button>
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <PlusIcon className="w-4 h-4 mr-2" /> Add New Product
+          </Button>
+        </div>
+      </div>
+      <BulkProductUpload open={bulkUploadOpen} onOpenChange={setBulkUploadOpen} onUploadSuccess={fetchProducts} />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Products</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-red-600 hover:bg-red-700">
-              <PlusIcon className="mr-2 h-4 w-4" /> Add New Product
-            </Button>
-          </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
