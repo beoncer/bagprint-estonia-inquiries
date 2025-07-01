@@ -1,4 +1,3 @@
-
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +9,6 @@ import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
-import Sitemap from "./pages/Sitemap";
 
 // Import lazy components
 import {
@@ -67,8 +65,8 @@ const App: React.FC = () => {
               <DynamicSEO />
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
-                  {/* Sitemap route - must be before other routes */}
-                  <Route path="/sitemap.xml" element={<Sitemap />} />
+                  {/* Removed Sitemap route - now handled by API route */}
+                  {/* <Route path="/sitemap.xml" element={<Sitemap />} /> */}
                   
                   {/* Public routes */}
                   <Route path="/" element={<MainLayout />}>
