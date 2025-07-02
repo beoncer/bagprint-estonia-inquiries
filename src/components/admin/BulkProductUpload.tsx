@@ -191,4 +191,37 @@ const BulkProductUpload: React.FC<{ open: boolean; onOpenChange: (open: boolean)
   );
 };
 
-export default BulkProductUpload; 
+export default BulkProductUpload;
+
+export function exportProductsToCSV(products: any[]) {
+  const CSV_COLUMNS = [
+    "name",
+    "description",
+    "slug",
+    "base_price",
+    "material",
+    "colors",
+    "sizes",
+    "badges",
+    "type"
+  ];
+  const data = products.map((p) => ({
+    name: p.name || "",
+    description: p.description || "",
+    slug: p.slug || "",
+    base_price: p.base_price || "",
+    material: p.material || "",
+    colors: Array.isArray(p.colors) ? p.colors.join("|") : (p.colors || ""),
+    sizes: Array.isArray(p.sizes) ? p.sizes.join("|") : (p.sizes || ""),
+    badges: Array.isArray(p.badges) ? p.badges.join("|") : (p.badges || ""),
+    type: p.type || ""
+  }));
+  const csv = Papa.unparse({ fields: CSV_COLUMNS, data });
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "products_export.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+} 

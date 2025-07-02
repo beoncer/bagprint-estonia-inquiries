@@ -42,7 +42,7 @@ import { cn } from "@/lib/utils";
 import { usePricing } from "@/hooks/usePricing";
 import ColorImageUpload from "@/components/admin/ColorImageUpload";
 import SizeImageUpload from "@/components/admin/SizeImageUpload";
-import BulkProductUpload from "@/components/admin/BulkProductUpload";
+import BulkProductUpload, { exportProductsToCSV } from "@/components/admin/BulkProductUpload";
 
 interface Product {
   id: string;
@@ -519,6 +519,9 @@ const ProductsPage: React.FC = () => {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Products</h1>
         <div className="flex gap-2">
+          {products.length > 0 && (
+            <Button onClick={() => exportProductsToCSV(products)} variant="outline">Export Products</Button>
+          )}
           <Button onClick={() => setBulkUploadOpen(true)} variant="outline">Bulk Upload</Button>
           <Button onClick={() => setIsDialogOpen(true)}>
             <PlusIcon className="w-4 h-4 mr-2" /> Add New Product
