@@ -9,7 +9,7 @@ const ContactAdmin: React.FC = () => {
   const [header, setHeader] = useState("Võta meiega ühendust");
   const [headerHighlight, setHeaderHighlight] = useState("ühendust");
   const [description, setDescription] = useState("Kui sul on küsimusi meie toodete, hindade või muu kohta, siis võta meiega ühendust ja aitame sind parima meelega.");
-  const [email, setEmail] = useState("info@bagprint.ee");
+  const [email, setEmail] = useState("info@leatex.ee");
   const [phone, setPhone] = useState("+372 5919 7172");
   const [address, setAddress] = useState("Laki 7b, Tallinn");
   const [formTitle, setFormTitle] = useState("Saada meile sõnum");
@@ -29,7 +29,7 @@ const ContactAdmin: React.FC = () => {
         setHeader(data.find((row: any) => row.key === "contact_header")?.value || "Võta meiega ühendust");
         setHeaderHighlight(data.find((row: any) => row.key === "contact_header_highlight")?.value || "ühendust");
         setDescription(data.find((row: any) => row.key === "contact_description")?.value || "Kui sul on küsimusi meie toodete, hindade või muu kohta, siis võta meiega ühendust ja aitame sind parima meelega.");
-        setEmail(data.find((row: any) => row.key === "contact_email")?.value || "info@bagprint.ee");
+        setEmail(data.find((row: any) => row.key === "contact_email")?.value || "info@leatex.ee");
         setPhone(data.find((row: any) => row.key === "contact_phone")?.value || "+372 5919 7172");
         setAddress(data.find((row: any) => row.key === "contact_address")?.value || "Laki 7b, Tallinn");
         setFormTitle(data.find((row: any) => row.key === "contact_form_title")?.value || "Saada meile sõnum");
@@ -123,7 +123,7 @@ const ContactAdmin: React.FC = () => {
             <input
               type="email"
               className="w-full border rounded px-3 py-2"
-              placeholder="info@bagprint.ee"
+              placeholder="info@leatex.ee"
               value={email}
               onChange={e => setEmail(e.target.value)}
               disabled={contentLoading || contentSaving}
@@ -195,4 +195,4 @@ const ContactAdmin: React.FC = () => {
   );
 };
 
-export default ContactAdmin; 
+export default ContactAdmin;

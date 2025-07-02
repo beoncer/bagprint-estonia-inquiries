@@ -1,4 +1,5 @@
 
+
 -- Create sitemap_entries table
 CREATE TABLE IF NOT EXISTS sitemap_entries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -79,11 +80,11 @@ BEGIN
         ORDER BY priority DESC, url ASC
     LOOP
         sitemap_xml := sitemap_xml || '  <url>' || E'\n' ||
-                       '    <loc>https://bagprint.ee' || entry.url || '</loc>' || E'\n' ||
+                       '    <loc>https://leatex.ee' || entry.url || '</loc>' || E'\n' ||
                        '    <lastmod>' || entry.lastmod || '</lastmod>' || E'\n' ||
                        '    <changefreq>' || entry.changefreq || '</changefreq>' || E'\n' ||
                        '    <priority>' || entry.priority || '</priority>' || E'\n' ||
-                       '    <xhtml:link rel="alternate" hreflang="et" href="https://bagprint.ee' || entry.url || '"/>' || E'\n' ||
+                       '    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee' || entry.url || '"/>' || E'\n' ||
                        '  </url>' || E'\n';
     END LOOP;
     
@@ -141,3 +142,4 @@ BEGIN
     AND source_id NOT IN (SELECT id FROM blog_posts WHERE slug IS NOT NULL);
 END;
 $$ LANGUAGE plpgsql;
+

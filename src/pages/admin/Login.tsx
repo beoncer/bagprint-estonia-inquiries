@@ -127,7 +127,7 @@ const AdminLogin: React.FC = () => {
           </Tabs>
         </CardContent>
         <CardFooter className="text-center text-sm text-gray-500">
-          Bagprint.ee admin panel
+          Leatex.ee admin panel
         </CardFooter>
       </Card>
     </div>
