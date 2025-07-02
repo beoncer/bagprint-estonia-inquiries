@@ -234,7 +234,7 @@ const Contact = () => {
               allowFullScreen={true} 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
-              title="bagprint.ee location"
+              title="leatex.ee location"
               className="w-full h-full"
             />
           </div>

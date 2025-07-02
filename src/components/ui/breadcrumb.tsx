@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
@@ -63,7 +64,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
         "@type": "ListItem",
         "position": index + 1,
         "name": item.label,
-        "item": item.href ? `https://bagprint.ee${item.href}` : undefined
+        "item": item.href ? `https://leatex.ee${item.href}` : undefined
       }))
     };
     
