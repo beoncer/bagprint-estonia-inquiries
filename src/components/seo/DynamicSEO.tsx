@@ -119,7 +119,7 @@ const DynamicSEO: React.FC = () => {
       // Update canonical URL
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) {
-        const currentUrl = `https://bagprint.ee${location.pathname}`;
+        const currentUrl = `https://leatex.ee${location.pathname}`;
         canonical.setAttribute('href', currentUrl);
       }
     }
@@ -129,4 +129,4 @@ const DynamicSEO: React.FC = () => {
   return null;
 };
 
-export default DynamicSEO; 
+export default DynamicSEO;

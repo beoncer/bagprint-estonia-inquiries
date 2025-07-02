@@ -32,7 +32,7 @@ const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({
         "name": "Leatex"
       },
       "category": product.category,
-      "url": `https://bagprint.ee/tooted/${product.slug}`,
+      "url": `https://leatex.ee/tooted/${product.slug}`,
       "sku": product.id,
       "mpn": product.id,
       "availability": `https://schema.org/${availability}`,
@@ -45,7 +45,7 @@ const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({
           "@type": "Organization",
           "name": "Leatex"
         },
-        "url": `https://bagprint.ee/tooted/${product.slug}`
+        "url": `https://leatex.ee/tooted/${product.slug}`
       },
       "additionalProperty": [
         {
@@ -93,4 +93,4 @@ const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({
   return null;
 };
 
-export default ProductStructuredData; 
+export default ProductStructuredData;

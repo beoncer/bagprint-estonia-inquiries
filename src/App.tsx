@@ -1,4 +1,3 @@
-
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/use-auth";
 import DynamicSEO from "@/components/seo/DynamicSEO";
+import WebSiteStructuredData from "@/components/seo/WebSiteStructuredData";
 import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
@@ -66,6 +66,7 @@ const App: React.FC = () => {
           <BrowserRouter>
             <AuthProvider>
               <DynamicSEO />
+              <WebSiteStructuredData />
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
                   {/* Sitemap route - must be before other routes */}

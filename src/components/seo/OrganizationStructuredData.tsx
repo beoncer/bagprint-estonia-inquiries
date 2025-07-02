@@ -24,10 +24,10 @@ interface OrganizationStructuredDataProps {
 const OrganizationStructuredData: React.FC<OrganizationStructuredDataProps> = ({
   name = "Leatex",
   description = "Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga",
-  url = "https://bagprint.ee",
-  logo = "https://bagprint.ee/logo.png",
+  url = "https://leatex.ee",
+  logo = "https://leatex.ee/logo.png",
   phone = "+372 5555 5555",
-  email = "info@bagprint.ee",
+  email = "info@leatex.ee",
   address = {
     streetAddress: "Tartu mnt 123",
     addressLocality: "Tallinn",
@@ -164,4 +164,4 @@ const OrganizationStructuredData: React.FC<OrganizationStructuredDataProps> = ({
   return null;
 };
 
-export default OrganizationStructuredData; 
+export default OrganizationStructuredData;

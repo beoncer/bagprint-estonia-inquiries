@@ -8,7 +8,7 @@ interface SitemapUrl {
 }
 
 export const generateSitemap = async (): Promise<string> => {
-  const baseUrl = 'https://bagprint.ee';
+  const baseUrl = 'https://leatex.ee';
   const currentDate = new Date().toISOString().split('T')[0];
 
   // Static pages
@@ -150,4 +150,4 @@ export const saveSitemap = async (filePath: string = 'public/sitemap.xml') => {
     console.error('Error saving sitemap:', error);
     throw error;
   }
-}; 
+};

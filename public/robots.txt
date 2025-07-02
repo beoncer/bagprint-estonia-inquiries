@@ -15,7 +15,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://bagprint.ee/sitemap.xml
+Sitemap: https://leatex.ee/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1
