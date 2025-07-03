@@ -4,13 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/supabase";
 import EnhancedProductGrid from "@/components/product/EnhancedProductGrid";
-import { useProductFilter } from "@/hooks/useProductFilter";
-import { ProductFilterControls } from "@/components/product/ProductFilterControls";
-import { ProductSearch } from "@/components/product/ProductSearch";
-import { ProductCategory } from "@/components/product/ProductCategory";
-import { ProductSort } from "@/components/product/ProductSort";
-import { ProductFilters } from "@/components/product/ProductFilters";
-import { DynamicSEO } from "@/components/seo/DynamicSEO";
+import DynamicSEO from "@/components/seo/DynamicSEO";
 import Breadcrumb from "@/components/ui/breadcrumb";
 
 const Products = () => {
@@ -24,32 +18,11 @@ const Products = () => {
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 
-  const {
-    filteredProducts,
-    searchTerm,
-    setSearchTerm,
-    selectedCategory,
-    setSelectedCategory,
-    selectedColors,
-    setSelectedColors,
-    selectedSizes,
-    setSelectedSizes,
-    priceRange,
-    setPriceRange,
-    sortBy,
-    setSortBy,
-    isEcoOnly,
-    setIsEcoOnly,
-    clearFilters,
-    hasActiveFilters
-  } = useProductFilter(products);
-
-  // Set category from URL params
-  React.useEffect(() => {
-    if (currentCategory) {
-      setSelectedCategory(currentCategory);
-    }
-  }, [currentCategory, setSelectedCategory]);
+  // Filter products by category if specified
+  const filteredProducts = React.useMemo(() => {
+    if (!currentCategory) return products;
+    return products.filter(product => product.type === currentCategory);
+  }, [products, currentCategory]);
 
   const categoryDisplayNames: Record<string, string> = {
     'cotton_bag': 'Riidest kotid',
@@ -58,7 +31,7 @@ const Products = () => {
     'shoebag': 'Sussikotid',
   };
 
-  const currentCategoryName = selectedCategory ? categoryDisplayNames[selectedCategory] : null;
+  const currentCategoryName = currentCategory ? categoryDisplayNames[currentCategory] : null;
 
   return (
     <>
@@ -86,37 +59,6 @@ const Products = () => {
           </p>
         </div>
 
-        {/* Search and Category Filter */}
-        <div className="mb-6 space-y-4">
-          <ProductSearch 
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-          />
-          
-          <ProductCategory 
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-        </div>
-
-        {/* Filters and Sort */}
-        <div className="mb-6">
-          <ProductFilterControls 
-            selectedColors={selectedColors}
-            onColorsChange={setSelectedColors}
-            selectedSizes={selectedSizes}
-            onSizesChange={setSelectedSizes}
-            priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-            isEcoOnly={isEcoOnly}
-            onEcoOnlyChange={setIsEcoOnly}
-            onClearFilters={clearFilters}
-            hasActiveFilters={hasActiveFilters}
-          />
-        </div>
-
         {/* Products Grid */}
         <div className="pb-12">
           <EnhancedProductGrid
@@ -124,8 +66,8 @@ const Products = () => {
             loading={isLoading}
             error={error?.message || null}
             emptyStateMessage={
-              hasActiveFilters 
-                ? "Valitud filtritele vastavaid tooteid ei leitud"
+              currentCategory
+                ? "Valitud kategooriasse vastavaid tooteid ei leitud"
                 : "Tooteid ei leitud"
             }
           />
