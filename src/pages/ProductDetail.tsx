@@ -1,10 +1,12 @@
+
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getProductBySlug, Product } from "@/lib/supabase";
+import { getProductBySlug } from "@/lib/supabase";
+import type { Product } from "@/lib/supabase";
 import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
 import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
 import ColorPicker from "@/components/product/ColorPicker";
@@ -255,15 +257,28 @@ const ProductDetail = () => {
       {/* Add breadcrumb navigation */}
       <div className="mb-8">
         <Breadcrumb 
-          productData={product ? {
+          productData={{
             name: product.name,
             category: product.category
-          } : undefined}
+          }}
         />
       </div>
 
       {/* Inject structured data for SEO */}
-      {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
+      {product && <ProductStructuredData product={{
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        image: product.image,
+        category: product.category,
+        type: product.type,
+        colors: product.colors,
+        sizes: product.sizes,
+        is_eco: product.is_eco || false,
+        badges: product.badges,
+        material: product.material,
+        slug: product.slug
+      }} price={lowestPossiblePrice} />}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
