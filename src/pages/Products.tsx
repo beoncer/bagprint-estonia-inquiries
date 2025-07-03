@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -440,11 +441,30 @@ const Products = () => {
 
   // Show category listing only for /tooted page
   if (location.pathname === "/tooted") {
-    // Split heading for colored 'tooted'
+    // Split heading for colored 'tooted' - make it more robust
     const heading = tootedPageContent.heading || "Meie tooted";
-    const split = heading.split(/(tooted)/i);
+    
+    // Look for various forms of "tooted" (case insensitive)
+    const tootedMatch = heading.match(/(tooted?)/i);
+    let splitHeading;
+    
+    if (tootedMatch) {
+      const matchedWord = tootedMatch[0];
+      const parts = heading.split(new RegExp(`(${matchedWord})`, 'i'));
+      splitHeading = parts;
+    } else {
+      // Fallback: if no "tooted" found, try to highlight the last word
+      const words = heading.trim().split(' ');
+      if (words.length > 1) {
+        const lastWord = words[words.length - 1];
+        splitHeading = [heading.substring(0, heading.lastIndexOf(lastWord)), lastWord, ''];
+      } else {
+        splitHeading = [heading];
+      }
+    }
+
     return (
-      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         {/* Standardized Breadcrumb Navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="mb-6">
@@ -454,14 +474,25 @@ const Products = () => {
         
         <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section - Portfolio style */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 py-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              {split.length === 3 ? (
+              {splitHeading.length === 3 ? (
                 <>
-                  {split[0]}
-                  <span className="text-primary">{split[1]}</span>
-                  {split[2]}
+                  {splitHeading[0]}
+                  <span className="text-primary">{splitHeading[1]}</span>
+                  {splitHeading[2]}
                 </>
+              ) : splitHeading.length === 1 ? (
+                // If no split happened, try to highlight the word "tooted" anyway
+                heading.toLowerCase().includes('tooted') ? (
+                  heading.split(/(tooted)/i).map((part, index) => 
+                    part.toLowerCase() === 'tooted' ? 
+                      <span key={index} className="text-primary">{part}</span> : 
+                      part
+                  )
+                ) : (
+                  <span className="text-primary">{heading}</span>
+                )
               ) : (
                 heading
               )}
@@ -581,7 +612,7 @@ const Products = () => {
       {/* Add FAQ structured data for category pages */}
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
       
-      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         {/* Standardized Breadcrumb Navigation */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="mb-6">
@@ -591,7 +622,7 @@ const Products = () => {
         
         <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section - matching portfolio style */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 py-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
                 <>
