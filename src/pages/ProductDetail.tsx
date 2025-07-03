@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -275,10 +274,13 @@ const ProductDetail = () => {
         colors: product.colors,
         sizes: product.sizes,
         is_eco: product.is_eco || false,
-        badges: product.badges,
+        badges: (product.badges || []).filter((badge): badge is BadgeType => 
+          ['eco', 'organic', 'reusable', 'recycled'].includes(badge)
+        ),
         material: product.material,
         slug: product.slug
       }} price={lowestPossiblePrice} />}
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
