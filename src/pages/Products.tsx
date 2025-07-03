@@ -444,129 +444,131 @@ const Products = () => {
     const heading = tootedPageContent.heading || "Meie tooted";
     const split = heading.split(/(tooted)/i);
     return (
-      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Enhanced Breadcrumb Navigation */}
-          <div className="mb-8">
+          {/* Enhanced Breadcrumb Navigation - moved higher up */}
+          <div className="pt-8 mb-8">
             <Breadcrumb />
           </div>
           
-          {/* Hero Section - Portfolio style */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              {split.length === 3 ? (
-                <>
-                  {split[0]}
-                  <span className="text-primary">{split[1]}</span>
-                  {split[2]}
-                </>
-              ) : (
-                heading
-              )}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {tootedPageContent.description}
-            </p>
-          </div>
-
-          {/* Product Categories Section */}
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              {productCategories.map((category) => (
-                <Link key={category.id} to={category.link} className="text-center group">
-                  <div className="h-80 md:h-60 mb-4 overflow-hidden rounded-lg">
-                    <img 
-                      src={category.image}
-                      alt={category.name}
-                      className="w-full h-full object-cover transition-all group-hover:scale-105"
-                      onError={(e) => {
-                        console.log(`Image error for category ${category.id}`);
-                        console.log(`Failed image URL: ${category.image}`);
-                        console.log('Falling back to default image');
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop";
-                      }}
-                      onLoad={() => {
-                        console.log(`Image loaded successfully for category ${category.id}: ${category.image}`);
-                      }}
-                    />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                    {category.name}
-                  </h3>
-                  <Button variant="link" className="p-0">
-                    Vaata tooteid
-                  </Button>
-                </Link>
-              ))}
+          <div className="py-8">
+            {/* Hero Section - Portfolio style */}
+            <div className="text-center mb-16">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                {split.length === 3 ? (
+                  <>
+                    {split[0]}
+                    <span className="text-primary">{split[1]}</span>
+                    {split[2]}
+                  </>
+                ) : (
+                  heading
+                )}
+              </h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                {tootedPageContent.description}
+              </p>
             </div>
-          </section>
 
-          {/* Guarantees Section */}
-          <section className="mb-16">
-            <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
-                <p className="text-gray-600 max-w-4xl mx-auto">
-                  {guaranteesContentLoading ? "..." : guaranteesDescription}
-                </p>
-              </div>
-              {guaranteesLoading ? (
-                <div>Laen garantiiandmeid...</div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {guarantees.map((guarantee, index) => {
-                    const Icon = iconList[index % iconList.length];
-                    return (
-                      <div key={guarantee.id} className="flex items-start gap-4">
-                        <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                          <Icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
-                          <p className="text-gray-600 text-sm">{guarantee.description}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </section>
-
-          {/* Blog Articles Section */}
-          <section className="mb-16">
-            <h2 className="text-2xl font-bold mb-8">{tootedPageContent.blog_section_title}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredBlogPosts && featuredBlogPosts.length > 0 ? (
-                featuredBlogPosts.map((article) => (
-                  <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <div className="h-48 overflow-hidden">
+            {/* Product Categories Section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold mb-8">Tootekategooriad</h2>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                {productCategories.map((category) => (
+                  <Link key={category.id} to={category.link} className="text-center group">
+                    <div className="h-80 md:h-60 mb-4 overflow-hidden rounded-lg">
                       <img 
-                        src={article.image_url}
-                        alt={article.title}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        src={category.image}
+                        alt={category.name}
+                        className="w-full h-full object-cover transition-all group-hover:scale-105"
+                        onError={(e) => {
+                          console.log(`Image error for category ${category.id}`);
+                          console.log(`Failed image URL: ${category.image}`);
+                          console.log('Falling back to default image');
+                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop";
+                        }}
+                        onLoad={() => {
+                          console.log(`Image loaded successfully for category ${category.id}: ${category.image}`);
+                        }}
                       />
                     </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">{article.read_time} lugemist</span>
-                        <Button variant="link" size="sm" className="p-0">
-                          Loe edasi
-                        </Button>
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                      {category.name}
+                    </h3>
+                    <Button variant="link" className="p-0">
+                      Vaata tooteid
+                    </Button>
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            {/* Guarantees Section */}
+            <section className="mb-16">
+              <div className="bg-white rounded-lg shadow-sm p-8">
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
+                  <p className="text-gray-600 max-w-4xl mx-auto">
+                    {guaranteesContentLoading ? "..." : guaranteesDescription}
+                  </p>
+                </div>
+                {guaranteesLoading ? (
+                  <div>Laen garantiiandmeid...</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {guarantees.map((guarantee, index) => {
+                      const Icon = iconList[index % iconList.length];
+                      return (
+                        <div key={guarantee.id} className="flex items-start gap-4">
+                          <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                            <Icon className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                            <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Blog Articles Section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold mb-8">{tootedPageContent.blog_section_title}</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {featuredBlogPosts && featuredBlogPosts.length > 0 ? (
+                  featuredBlogPosts.map((article) => (
+                    <div key={article.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="h-48 overflow-hidden">
+                        <img 
+                          src={article.image_url}
+                          alt={article.title}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-lg font-semibold mb-2">{article.title}</h3>
+                        <p className="text-gray-600 text-sm mb-4">{article.excerpt}</p>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-gray-500">{article.read_time} lugemist</span>
+                          <Button variant="link" size="sm" className="p-0">
+                            Loe edasi
+                          </Button>
+                        </div>
                       </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center py-12">
+                    <p className="text-gray-500">Blogi artikleid pole veel lisatud.</p>
                   </div>
-                ))
-              ) : (
-                <div className="col-span-3 text-center py-12">
-                  <p className="text-gray-500">Blogi artikleid pole veel lisatud.</p>
-                </div>
-              )}
-            </div>
-          </section>
+                )}
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     );
@@ -579,133 +581,135 @@ const Products = () => {
       {/* Add FAQ structured data for category pages */}
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
       
-      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Enhanced Breadcrumb Navigation */}
-          <div className="mb-8">
+          {/* Enhanced Breadcrumb Navigation - moved higher up */}
+          <div className="pt-8 mb-8">
             <Breadcrumb />
           </div>
           
-          {/* Hero Section - matching portfolio style */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
-                <>
-                  {categoryContent.title.split(categoryContent.highlight)[0]}
-                  <span className="text-primary">{categoryContent.highlight}</span>
-                  {categoryContent.title.split(categoryContent.highlight)[1]}
-                </>
-              ) : categoryContent.title}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              {categoryContent.description}
-            </p>
-          </div>
-          
-          {/* Search */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
-            <div className="w-full md:w-auto">
-              <form onSubmit={handleSearch} className="relative">
-                <Input
-                  type="text"
-                  placeholder="Otsi tooteid..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              </form>
+          <div className="py-8">
+            {/* Hero Section - matching portfolio style */}
+            <div className="text-center mb-16">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
+                  <>
+                    {categoryContent.title.split(categoryContent.highlight)[0]}
+                    <span className="text-primary">{categoryContent.highlight}</span>
+                    {categoryContent.title.split(categoryContent.highlight)[1]}
+                  </>
+                ) : categoryContent.title}
+              </h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                {categoryContent.description}
+              </p>
             </div>
-          </div>
-          
-          {/* Results */}
-          {filteredProducts.length > 0 ? (
-            <>
-              <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
-              <ProductGrid products={filteredProducts} />
-            </>
-          ) : (
-            <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
-              <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
-              <Button onClick={() => {
-                setSearchTerm("");
-                handleCategoryChange("all");
-              }}>
-                Näita kõiki tooteid
-              </Button>
+            
+            {/* Search */}
+            <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
+              <div className="w-full md:w-auto">
+                <form onSubmit={handleSearch} className="relative">
+                  <Input
+                    type="text"
+                    placeholder="Otsi tooteid..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 pr-4 py-2"
+                  />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                </form>
+              </div>
             </div>
-          )}
+            
+            {/* Results */}
+            {filteredProducts.length > 0 ? (
+              <>
+                <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
+                <ProductGrid products={filteredProducts} />
+              </>
+            ) : (
+              <div className="text-center py-20">
+                <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
+                <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
+                <Button onClick={() => {
+                  setSearchTerm("");
+                  handleCategoryChange("all");
+                }}>
+                  Näita kõiki tooteid
+                </Button>
+              </div>
+            )}
 
-          {/* FAQ Section - only show if there are FAQs for this category */}
-          {activeCategory !== "all" && (
+            {/* FAQ Section - only show if there are FAQs for this category */}
+            {activeCategory !== "all" && (
+              <section className="mt-20 mb-16">
+                <div className="bg-white rounded-lg shadow-sm p-8">
+                  <h2 className="text-3xl font-bold mb-8 text-center">Korduma kippuvad küsimused</h2>
+                  {faqsLoading ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="animate-pulse">
+                          <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
+                          <div className="h-16 bg-gray-100 rounded w-full"></div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      {getCurrentCategoryFAQs().length > 0 ? (
+                        <Accordion type="single" collapsible className="w-full">
+                          {getCurrentCategoryFAQs().map((faq, index) => (
+                            <AccordionItem key={index} value={`item-${index}`}>
+                              <AccordionTrigger className="text-left">
+                                {faq.question}
+                              </AccordionTrigger>
+                              <AccordionContent className="text-gray-600">
+                                {faq.answer}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      ) : (
+                        <p className="text-center text-gray-500">Sellele kategooriale pole veel KKK-sid lisatud.</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </section>
+            )}
+
+            {/* Guarantees Section */}
             <section className="mt-20 mb-16">
               <div className="bg-white rounded-lg shadow-sm p-8">
-                <h2 className="text-3xl font-bold mb-8 text-center">Korduma kippuvad küsimused</h2>
-                {faqsLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="animate-pulse">
-                        <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
-                        <div className="h-16 bg-gray-100 rounded w-full"></div>
-                      </div>
-                    ))}
-                  </div>
+                <div className="text-center mb-10">
+                  <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
+                  <p className="text-gray-600 max-w-4xl mx-auto">
+                    {guaranteesContentLoading ? "..." : guaranteesDescription}
+                  </p>
+                </div>
+                {guaranteesLoading ? (
+                  <div>Laen garantiiandmeid...</div>
                 ) : (
-                  <>
-                    {getCurrentCategoryFAQs().length > 0 ? (
-                      <Accordion type="single" collapsible className="w-full">
-                        {getCurrentCategoryFAQs().map((faq, index) => (
-                          <AccordionItem key={index} value={`item-${index}`}>
-                            <AccordionTrigger className="text-left">
-                              {faq.question}
-                            </AccordionTrigger>
-                            <AccordionContent className="text-gray-600">
-                              {faq.answer}
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                    ) : (
-                      <p className="text-center text-gray-500">Sellele kategooriale pole veel KKK-sid lisatud.</p>
-                    )}
-                  </>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {guarantees.map((guarantee, index) => {
+                      const Icon = iconList[index % iconList.length];
+                      return (
+                        <div key={guarantee.id} className="flex items-start gap-4">
+                          <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
+                            <Icon className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
+                            <p className="text-gray-600 text-sm">{guarantee.description}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
             </section>
-          )}
-
-          {/* Guarantees Section */}
-          <section className="mt-20 mb-16">
-            <div className="bg-white rounded-lg shadow-sm p-8">
-              <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4">{guaranteesContentLoading ? "..." : guaranteesHeading}</h2>
-                <p className="text-gray-600 max-w-4xl mx-auto">
-                  {guaranteesContentLoading ? "..." : guaranteesDescription}
-                </p>
-              </div>
-              {guaranteesLoading ? (
-                <div>Laen garantiiandmeid...</div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {guarantees.map((guarantee, index) => {
-                    const Icon = iconList[index % iconList.length];
-                    return (
-                      <div key={guarantee.id} className="flex items-start gap-4">
-                        <div className="bg-primary/10 p-3 rounded-full flex-shrink-0">
-                          <Icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-lg mb-2">{guarantee.title}</h3>
-                          <p className="text-gray-600 text-sm">{guarantee.description}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          </section>
+          </div>
         </div>
       </div>
     </>
