@@ -1,50 +1,71 @@
 
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import DynamicSEO from "@/components/seo/DynamicSEO";
+import { useQuery } from "@tanstack/react-query";
+import { getProducts } from "@/lib/supabase";
+import EnhancedProductGrid from "@/components/product/EnhancedProductGrid";
+import { useProductFilter } from "@/hooks/useProductFilter";
+import { ProductFilterControls } from "@/components/product/ProductFilterControls";
+import { ProductSearch } from "@/components/product/ProductSearch";
+import { ProductCategory } from "@/components/product/ProductCategory";
+import { ProductSort } from "@/components/product/ProductSort";
+import { ProductFilters } from "@/components/product/ProductFilters";
+import { DynamicSEO } from "@/components/seo/DynamicSEO";
 import Breadcrumb from "@/components/ui/breadcrumb";
 
 const Products = () => {
   const [searchParams] = useSearchParams();
   const currentCategory = searchParams.get("category");
+  
+  const { data: products = [], isLoading, error } = useQuery({
+    queryKey: ['products'],
+    queryFn: getProducts,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+  });
 
-  // Product categories configuration
-  const productCategories = [
-    {
-      id: 'cotton_bag',
-      name: 'Riidest kotid',
-      description: 'Kvaliteetsed ja vastupidavad riidest kotid',
-      image: '/placeholder.svg',
-      href: '/riidest-kotid'
-    },
-    {
-      id: 'paper_bag',
-      name: 'Paberkotid',
-      description: 'Keskkonnasõbralikud paberkotid',
-      image: '/placeholder.svg',
-      href: '/paberkotid'
-    },
-    {
-      id: 'drawstring_bag',
-      name: 'Nööriga kotid',
-      description: 'Praktilised nööriga kotid',
-      image: '/placeholder.svg',
-      href: '/nooriga-kotid'
-    },
-    {
-      id: 'shoebag',
-      name: 'Sussikotid',
-      description: 'Spetsiaalsed sussikotid',
-      image: '/placeholder.svg',
-      href: '/sussikotid'
+  const {
+    filteredProducts,
+    searchTerm,
+    setSearchTerm,
+    selectedCategory,
+    setSelectedCategory,
+    selectedColors,
+    setSelectedColors,
+    selectedSizes,
+    setSelectedSizes,
+    priceRange,
+    setPriceRange,
+    sortBy,
+    setSortBy,
+    isEcoOnly,
+    setIsEcoOnly,
+    clearFilters,
+    hasActiveFilters
+  } = useProductFilter(products);
+
+  // Set category from URL params
+  React.useEffect(() => {
+    if (currentCategory) {
+      setSelectedCategory(currentCategory);
     }
-  ];
+  }, [currentCategory, setSelectedCategory]);
+
+  const categoryDisplayNames: Record<string, string> = {
+    'cotton_bag': 'Riidest kotid',
+    'paper_bag': 'Paberkotid', 
+    'drawstring_bag': 'Nööriga kotid',
+    'shoebag': 'Sussikotid',
+  };
+
+  const currentCategoryName = selectedCategory ? categoryDisplayNames[selectedCategory] : null;
 
   return (
     <>
-      <DynamicSEO />
+      <DynamicSEO 
+        title={currentCategoryName ? `${currentCategoryName} | Leatex` : "Tooted | Leatex"}
+        description={currentCategoryName ? `${currentCategoryName} - kvaliteetsed ja keskkonnasõbralikud kotid` : "Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"}
+      />
       
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
         {/* Breadcrumb - positioned consistently */}
@@ -55,34 +76,59 @@ const Products = () => {
         {/* Hero Section */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Tooted
+            {currentCategoryName || "Tooted"}
           </h1>
           <p className="text-gray-600 text-lg">
-            Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte
+            {currentCategoryName 
+              ? `Avasta meie ${currentCategoryName.toLowerCase()} kollektsiooni`
+              : "Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"
+            }
           </p>
         </div>
 
-        {/* Product Categories Grid */}
+        {/* Search and Category Filter */}
+        <div className="mb-6 space-y-4">
+          <ProductSearch 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+          />
+          
+          <ProductCategory 
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+        </div>
+
+        {/* Filters and Sort */}
+        <div className="mb-6">
+          <ProductFilterControls 
+            selectedColors={selectedColors}
+            onColorsChange={setSelectedColors}
+            selectedSizes={selectedSizes}
+            onSizesChange={setSelectedSizes}
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            isEcoOnly={isEcoOnly}
+            onEcoOnlyChange={setIsEcoOnly}
+            onClearFilters={clearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </div>
+
+        {/* Products Grid */}
         <div className="pb-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {productCategories.map((category) => (
-              <Link key={category.id} to={category.href}>
-                <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200 cursor-pointer">
-                  <div className="aspect-square w-full relative overflow-hidden bg-gray-100">
-                    <img
-                      src={category.image}
-                      alt={category.name}
-                      className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <CardContent className="p-4 flex-grow">
-                    <h3 className="text-lg font-semibold mb-2">{category.name}</h3>
-                    <p className="text-gray-600 text-sm">{category.description}</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <EnhancedProductGrid
+            products={filteredProducts}
+            loading={isLoading}
+            error={error?.message || null}
+            emptyStateMessage={
+              hasActiveFilters 
+                ? "Valitud filtritele vastavaid tooteid ei leitud"
+                : "Tooteid ei leitud"
+            }
+          />
         </div>
       </div>
     </>
