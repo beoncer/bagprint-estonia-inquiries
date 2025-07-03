@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -5,8 +6,8 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Star, Phone, Mail, Check } from "lucide-react";
-import { ProductProps } from "@/components/product/ProductCard";
-import ProductBadge from "@/components/product/ProductBadge";
+import { Product } from "@/types/product";
+import { ProductBadge } from "@/components/product/ProductBadge";
 import { BadgeType } from "@/lib/badge-constants";
 import { usePricing } from "@/hooks/usePricing";
 import ColorPicker from "@/components/product/ColorPicker";
@@ -20,6 +21,7 @@ import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface ProductDetailParams {
   slug: string;
+  [key: string]: string | undefined;
 }
 
 interface FAQItem {
@@ -27,7 +29,7 @@ interface FAQItem {
   answer: string;
 }
 
-const fetchProduct = async (slug: string): Promise<ProductProps | null> => {
+const fetchProduct = async (slug: string): Promise<Product | null> => {
   const { data, error } = await supabase
     .from('products')
     .select('*')
@@ -191,11 +193,7 @@ const ProductDetail = () => {
   return (
     <>
       <ProductStructuredData product={product} />
-      <DynamicSEO
-        title={product.seo_title || product.name}
-        description={product.seo_description || product.description || ""}
-        keywords={product.seo_keywords || ""}
-      />
+      <DynamicSEO />
       
       <div className="bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -213,7 +211,7 @@ const ProductDetail = () => {
             {/* Product Image */}
             <div className="mb-6 lg:mb-0 lg:w-1/2">
               <img
-                src={product.image_url}
+                src={product.image_url || product.image}
                 alt={product.name}
                 className="w-full h-auto rounded-lg shadow-md"
               />
@@ -225,7 +223,7 @@ const ProductDetail = () => {
 
               <div className="flex items-center space-x-2 mb-4">
                 {product.badges && product.badges.map((badge) => (
-                  <ProductBadge key={badge} badge={badge} />
+                  <ProductBadge key={badge} type={badge as BadgeType} />
                 ))}
                 {product.is_eco && (
                   <Badge variant="outline">
@@ -320,7 +318,6 @@ const ProductDetail = () => {
       {showInquiryForm && (
         <InquiryForm
           productName={product.name}
-          productType={product.type}
           onClose={handleCloseInquiryForm}
         />
       )}
