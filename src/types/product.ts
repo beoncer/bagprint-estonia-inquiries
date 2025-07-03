@@ -16,7 +16,7 @@ export interface Product {
   colors: ProductColor[];
   sizes: string[];
   is_eco?: boolean;
-  badges: BadgeType[];
+  badges: string[];
   category: string;
   is_popular?: boolean;
   material?: string | null;
