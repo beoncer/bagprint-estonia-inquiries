@@ -1,12 +1,11 @@
+
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Calendar, Clock, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Search, Calendar, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
-import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface BlogPost {
   id: string;
@@ -123,122 +122,115 @@ const Blog = () => {
   }
 
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Enhanced Breadcrumb Navigation */}
-        <div className="mb-8">
-          <Breadcrumb />
+    <div className="bg-gray-50 min-h-screen overflow-x-hidden">
+      {/* Hero Section - matching portfolio style */}
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
+              {headerHighlight && header.includes(headerHighlight) ? (
+                <>
+                  {header.split(headerHighlight)[0]}
+                  <span className="text-primary">{headerHighlight}</span>
+                  {header.split(headerHighlight)[1]}
+                </>
+              ) : header}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
+              {description}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {/* Search */}
+        <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
+          <form onSubmit={handleSearch} className="relative max-w-md mx-auto">
+            <Input
+              type="text"
+              placeholder="Otsi artikleid..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-4 py-2"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          </form>
         </div>
 
-        {/* Hero Section - matching portfolio style */}
-        <section className="py-12 md:py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12 md:mb-16">
-              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
-                {headerHighlight && header.includes(headerHighlight) ? (
-                  <>
-                    {header.split(headerHighlight)[0]}
-                    <span className="text-primary">{headerHighlight}</span>
-                    {header.split(headerHighlight)[1]}
-                  </>
-                ) : header}
-              </h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
-                {description}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-          {/* Search */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
-            <form onSubmit={handleSearch} className="relative max-w-md mx-auto">
-              <Input
-                type="text"
-                placeholder="Otsi artikleid..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            </form>
-          </div>
-
-          {/* Blog Posts Grid */}
-          {filteredPosts.length > 0 ? (
-            <>
-              <p className="mb-6 text-gray-600">Leitud {filteredPosts.length} artiklit</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                {filteredPosts.map((post) => (
-                  <article key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <Link to={`/blogi/${post.slug}`} className="block">
-                      <div className="h-48 overflow-hidden">
-                        <img 
-                          src={post.image_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    </Link>
-                    <div className="p-6">
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={14} />
-                          <span>{formatDate(post.created_at)}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Clock size={14} />
-                          <span>{post.read_time} lugemist</span>
-                        </div>
-                      </div>
-                      <Link to={`/blogi/${post.slug}`}>
-                        <h2 className="text-xl font-semibold mb-3 hover:text-primary transition-colors break-words">
-                          {post.title}
-                        </h2>
-                      </Link>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
-                      <Link to={`/blogi/${post.slug}`}>
-                        <Button variant="link" size="sm" className="p-0 text-primary hover:text-primary/80">
-                          Loe edasi →
-                        </Button>
-                      </Link>
+        {/* Blog Posts Grid */}
+        {filteredPosts.length > 0 ? (
+          <>
+            <p className="mb-6 text-gray-600">Leitud {filteredPosts.length} artiklit</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {filteredPosts.map((post) => (
+                <article key={post.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                  <Link to={`/blogi/${post.slug}`} className="block">
+                    <div className="h-48 overflow-hidden">
+                      <img 
+                        src={post.image_url}
+                        alt={post.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
-                  </article>
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">Artikleid ei leitud</h3>
-              <p className="text-gray-600 mb-6">Proovige muuta otsinguterminit</p>
-              <Button onClick={() => setSearchTerm("")}>
-                Näita kõiki artikleid
-              </Button>
-            </div>
-          )}
-
-          {/* CTA Section */}
-          {ctaTitle && (
-            <section className="bg-primary text-white py-12 md:py-16 px-6 md:px-8 rounded-lg mt-16 text-center">
-              <h2 className="text-3xl font-bold mb-4 break-words">{ctaTitle}</h2>
-              {ctaSubtitle && <h3 className="text-2xl font-medium mb-6 md:mb-8 break-words">{ctaSubtitle}</h3>}
-              <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-4xl mx-auto">
-                {ctaPhone && (
-                  <div className="text-center md:text-left">
-                    <div className="text-xl font-semibold break-words">{ctaPhone}</div>
-                    {ctaPhoneHours && <div className="text-sm opacity-90 break-words">{ctaPhoneHours}</div>}
+                  </Link>
+                  <div className="p-6">
+                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                      <div className="flex items-center gap-1">
+                        <Calendar size={14} />
+                        <span>{formatDate(post.created_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock size={14} />
+                        <span>{post.read_time} lugemist</span>
+                      </div>
+                    </div>
+                    <Link to={`/blogi/${post.slug}`}>
+                      <h2 className="text-xl font-semibold mb-3 hover:text-primary transition-colors break-words">
+                        {post.title}
+                      </h2>
+                    </Link>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
+                    <Link to={`/blogi/${post.slug}`}>
+                      <Button variant="link" size="sm" className="p-0 text-primary hover:text-primary/80">
+                        Loe edasi →
+                      </Button>
+                    </Link>
                   </div>
-                )}
-                {ctaButton && (
-                  <Button variant="secondary" size="lg">
-                    {ctaButton}
-                  </Button>
-                )}
-              </div>
-            </section>
-          )}
-        </div>
+                </article>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-center py-20">
+            <h3 className="text-xl font-semibold mb-2">Artikleid ei leitud</h3>
+            <p className="text-gray-600 mb-6">Proovige muuta otsinguterminit</p>
+            <Button onClick={() => setSearchTerm("")}>
+              Näita kõiki artikleid
+            </Button>
+          </div>
+        )}
+
+        {/* CTA Section */}
+        {ctaTitle && (
+          <section className="bg-primary text-white py-12 md:py-16 px-6 md:px-8 rounded-lg mt-16 text-center">
+            <h2 className="text-3xl font-bold mb-4 break-words">{ctaTitle}</h2>
+            {ctaSubtitle && <h3 className="text-2xl font-medium mb-6 md:mb-8 break-words">{ctaSubtitle}</h3>}
+            <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 max-w-4xl mx-auto">
+              {ctaPhone && (
+                <div className="text-center md:text-left">
+                  <div className="text-xl font-semibold break-words">{ctaPhone}</div>
+                  {ctaPhoneHours && <div className="text-sm opacity-90 break-words">{ctaPhoneHours}</div>}
+                </div>
+              )}
+              {ctaButton && (
+                <Button variant="secondary" size="lg">
+                  {ctaButton}
+                </Button>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

@@ -1,230 +1,245 @@
-import { useState, useEffect } from "react";
+
 import { Button } from "@/components/ui/button";
+import { 
+  Card,
+  CardContent,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { 
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import Breadcrumb from "@/components/ui/breadcrumb";
 
-interface ContactInfo {
-  address: string;
-  phone: string;
-  email: string;
-  opening_hours: string;
-}
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Nimi peab olema vähemalt 2 tähemärki pikk.",
+  }),
+  email: z.string().email({
+    message: "Palun sisestage korrektne e-posti aadress.",
+  }),
+  phone: z.string().min(5, {
+    message: "Palun sisestage korrektne telefoninumber.",
+  }),
+  message: z.string().min(10, {
+    message: "Sõnum peab olema vähemalt 10 tähemärki pikk.",
+  }),
+});
 
-const fetchContactInfo = async (): Promise<ContactInfo | null> => {
-  const { data, error } = await supabase
-    .from('contact_info')
-    .select('*')
-    .single();
-
-  if (error) {
-    console.error("Error fetching contact info:", error);
-    return null;
-  }
-
-  return data;
-};
+type FormValues = z.infer<typeof formSchema>;
 
 const Contact = () => {
-  const [name, setName] = useState("");
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Dynamic content state
+  const [header, setHeader] = useState("");
+  const [headerHighlight, setHeaderHighlight] = useState("");
+  const [description, setDescription] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
-  const { toast } = useToast();
-
-  const { data: contactInfo, isLoading, error } = useQuery({
-    queryKey: ['contact-info'],
-    queryFn: fetchContactInfo,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+  const [address, setAddress] = useState("");
+  const [formTitle, setFormTitle] = useState("");
+  const [mapUrl, setMapUrl] = useState("");
+  
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!name || !email || !phone || !message) {
-      toast({
-        title: "Viga",
-        description: "Palun täida kõik väljad."
-      });
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('contact_messages')
-      .insert([
-        {
-          name,
-          email,
-          phone,
-          message,
-        },
-      ]);
-
-    if (error) {
-      toast({
-        title: "Viga",
-        description: "Sõnumi saatmine ebaõnnestus. Palun proovi uuesti."
-      });
-    } else {
-      toast({
-        title: "Saadetud!",
-        description: "Sõnum on saadetud. Võtame sinuga peagi ühendust."
-      });
-
-      setName("");
-      setEmail("");
-      setPhone("");
-      setMessage("");
-    }
-  };
-
+  // Fetch dynamic content
   useEffect(() => {
-    document.title = "Kontakt - Leatex";
-    // Description
-    let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-    if (!metaDesc) {
-      metaDesc = document.createElement('meta');
-      metaDesc.name = "description";
-      document.head.appendChild(metaDesc);
-    }
-    metaDesc.content = "Võta meiega ühendust! Vastame Sinu küsimustele esimesel võimalusel.";
-    // Keywords
-    let metaKeywords = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
-    if (!metaKeywords) {
-      metaKeywords = document.createElement('meta');
-      metaKeywords.name = "keywords";
-      document.head.appendChild(metaKeywords);
-    }
-    metaKeywords.content = "";
-    // Open Graph tags
-    let ogTitle = document.querySelector('meta[property="og:title"]') as HTMLMetaElement | null;
-    if (!ogTitle) {
-      ogTitle = document.createElement('meta');
-      ogTitle.setAttribute('property', 'og:title');
-      document.head.appendChild(ogTitle);
-    }
-    ogTitle.content = "Kontakt - Leatex";
-    let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement | null;
-    if (!ogDesc) {
-      ogDesc = document.createElement('meta');
-      ogDesc.setAttribute('property', 'og:description');
-      document.head.appendChild(ogDesc);
-    }
-    ogDesc.content = "Võta meiega ühendust! Vastame Sinu küsimustele esimesel võimalusel.";
+    const fetchContent = async () => {
+      const { data } = await supabase
+        .from("website_content")
+        .select("key, value")
+        .eq("page", "contact");
+      if (data) {
+        setHeader(data.find((row: any) => row.key === "contact_header")?.value || "");
+        setHeaderHighlight(data.find((row: any) => row.key === "contact_header_highlight")?.value || "");
+        setDescription(data.find((row: any) => row.key === "contact_description")?.value || "");
+        setEmail(data.find((row: any) => row.key === "contact_email")?.value || "");
+        setPhone(data.find((row: any) => row.key === "contact_phone")?.value || "");
+        setAddress(data.find((row: any) => row.key === "contact_address")?.value || "");
+        setFormTitle(data.find((row: any) => row.key === "contact_form_title")?.value || "");
+        setMapUrl(data.find((row: any) => row.key === "contact_map_url")?.value || "");
+      }
+    };
+    fetchContent();
   }, []);
-
+  
+  const onSubmit = async (values: FormValues) => {
+    setIsSubmitting(true);
+    
+    // In a real implementation, this would send data to a backend API
+    // Here we're just simulating a network request
+    setTimeout(() => {
+      console.log("Form values:", values);
+      setIsSubmitting(false);
+      toast({
+        title: "Sõnum saadetud!",
+        description: "Täname teiega ühenduse võtmise eest. Vastame teile peagi.",
+      });
+      form.reset();
+    }, 1000);
+  };
+  
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        {/* Enhanced Breadcrumb Navigation */}
-        <div className="mb-8">
-          <Breadcrumb />
+    <div className="bg-gray-50 min-h-screen overflow-x-hidden">
+      {/* Hero Section - matching portfolio style */}
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
+              {headerHighlight && header.includes(headerHighlight) ? (
+                <>
+                  {header.split(headerHighlight)[0]}
+                  <span className="text-primary">{headerHighlight}</span>
+                  {header.split(headerHighlight)[1]}
+                </>
+              ) : header}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
+              {description}
+            </p>
+          </div>
         </div>
+      </section>
 
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">Saada meile sõnum</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nimi</Label>
-                  <Input
-                    type="text"
-                    id="name"
-                    placeholder="Sinu nimi"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold mb-2">E-post</h3>
+                <p className="text-gray-600 break-words">{email}</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold mb-2">Telefon</h3>
+                <p className="text-gray-600 break-words">{phone}</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="font-semibold mb-2">Aadress</h3>
+                <p className="text-gray-600 break-words">{address}</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+            <h2 className="text-3xl font-bold mb-6 break-words">{formTitle}</h2>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nimi *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Teie nimi" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>E-post *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="teie@email.ee" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="email">E-mail</Label>
-                  <Input
-                    type="email"
-                    id="email"
-                    placeholder="Sinu e-mail"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="phone">Telefon</Label>
-                  <Input
-                    type="tel"
-                    id="phone"
-                    placeholder="Sinu telefoninumber"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="message">Sõnum</Label>
-                  <Textarea
-                    id="message"
-                    placeholder="Kirjuta oma sõnum siia..."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                </div>
-                <Button type="submit" className="w-full">
-                  <Send className="h-4 w-4 mr-2" />
-                  Saada sõnum
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Telefon *</FormLabel>
+                      <FormControl>
+                        <Input placeholder="+372 ..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="message"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sõnum *</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Kuidas saame teid aidata?"
+                          className="min-h-[150px]"
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Saadan..." : "Saada sõnum"}
                 </Button>
               </form>
-            </CardContent>
-          </Card>
-
-          {/* Contact Info */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold">Kontaktinfo</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {isLoading ? (
-                <div className="text-gray-500">Laen kontaktinfot...</div>
-              ) : error ? (
-                <div className="text-red-500">Viga kontaktinfo laadimisel.</div>
-              ) : contactInfo ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-gray-500" />
-                    <p className="text-gray-700">{contactInfo.address}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-gray-500" />
-                    <a href={`tel:${contactInfo.phone}`} className="text-blue-500 hover:underline">
-                      {contactInfo.phone}
-                    </a>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-5 w-5 text-gray-500" />
-                    <a href={`mailto:${contactInfo.email}`} className="text-blue-500 hover:underline">
-                      {contactInfo.email}
-                    </a>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-5 w-5 text-gray-500" />
-                    <p className="text-gray-700">
-                      Avatud: {contactInfo.opening_hours}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-gray-500">Kontaktinfot pole saadaval.</div>
-              )}
-            </CardContent>
-          </Card>
-        </section>
+            </Form>
+          </div>
+        </div>
       </div>
+      
+      {/* Map Section */}
+      {mapUrl && (
+        <div className="w-full overflow-hidden">
+          <div className="h-[300px] md:h-[400px] bg-gray-200 w-full">
+            <iframe 
+              src={mapUrl}
+              width="100%" 
+              height="100%" 
+              style={{ border: 0 }} 
+              allowFullScreen={true} 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+              title="leatex.ee location"
+              className="w-full h-full"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
