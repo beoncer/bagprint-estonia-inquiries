@@ -16,6 +16,7 @@ import { usePricing } from "@/hooks/usePricing";
 import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetails";
 import { PRODUCT_COLORS } from "@/lib/constants";
 import ProductStructuredData from "@/components/seo/ProductStructuredData";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -251,6 +252,16 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
+      {/* Add breadcrumb navigation */}
+      <div className="mb-8">
+        <Breadcrumb 
+          productData={product ? {
+            name: product.name,
+            category: product.category
+          } : undefined}
+        />
+      </div>
+
       {/* Inject structured data for SEO */}
       {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
