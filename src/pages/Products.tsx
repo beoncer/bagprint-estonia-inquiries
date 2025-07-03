@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -413,13 +414,20 @@ const Products = () => {
 
   if (loading) {
     return (
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-gray-200 h-96 rounded"></div>
-            ))}
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="mb-6">
+            <Breadcrumb />
+          </div>
+        </div>
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="bg-gray-200 h-96 rounded"></div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -428,12 +436,19 @@ const Products = () => {
 
   if (error) {
     return (
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
-        <h2 className="text-2xl font-bold mb-4">Error</h2>
-        <p className="text-red-600 mb-8">{error}</p>
-        <Button onClick={handleRetry}>
-          Try Again
-        </Button>
+      <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="mb-6">
+            <Breadcrumb />
+          </div>
+        </div>
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
+          <h2 className="text-2xl font-bold mb-4">Error</h2>
+          <p className="text-red-600 mb-8">{error}</p>
+          <Button onClick={handleRetry}>
+            Try Again
+          </Button>
+        </div>
       </div>
     );
   }
@@ -445,12 +460,14 @@ const Products = () => {
     const split = heading.split(/(tooted)/i);
     return (
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          {/* Breadcrumb Navigation - positioned exactly like /meist page */}
-          <div className="pt-6">
+        {/* Breadcrumb Navigation - matching /meist page style */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="mb-6">
             <Breadcrumb />
           </div>
-          
+        </div>
+        
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div className="py-8">
             {/* Hero Section - Portfolio style */}
             <div className="text-center mb-16">
@@ -582,12 +599,14 @@ const Products = () => {
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-          {/* Breadcrumb Navigation - positioned exactly like /meist page */}
-          <div className="pt-6">
+        {/* Breadcrumb Navigation - matching /meist page style */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="mb-6">
             <Breadcrumb />
           </div>
-          
+        </div>
+        
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div className="py-8">
             {/* Hero Section - matching portfolio style */}
             <div className="text-center mb-16">
