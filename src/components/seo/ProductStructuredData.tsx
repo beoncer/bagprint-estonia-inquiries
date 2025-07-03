@@ -8,6 +8,15 @@ interface ProductStructuredDataProps {
   priceCurrency?: string;
 }
 
+const CATEGORY_LABELS_ET: Record<string, string> = {
+  cotton_bag: "Riidest kotid",
+  paper_bag: "Paberkotid",
+  drawstring_bag: "Nööriga kotid",
+  shoebag: "Sussikotid",
+  packaging: "E-poe pakendid",
+  // Add more as needed
+};
+
 const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({
   product,
   availability = 'InStock',
@@ -31,7 +40,7 @@ const ProductStructuredData: React.FC<ProductStructuredDataProps> = ({
         "@type": "Brand",
         "name": "Leatex"
       },
-      "category": product.category,
+      "category": CATEGORY_LABELS_ET[product.category] || CATEGORY_LABELS_ET[product.type] || product.category,
       "url": `https://leatex.ee/tooted/${product.slug}`,
       "sku": product.id,
       "mpn": product.id,
