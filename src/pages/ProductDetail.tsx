@@ -251,124 +251,194 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+    <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
       {/* Inject structured data for SEO */}
       {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
       
-      {/* Breadcrumb - positioned consistently */}
-      <div className="pt-4 mb-6">
+      {/* Enhanced Breadcrumb Navigation */}
+      <div className="mb-8">
         <Breadcrumb />
       </div>
       
-      <div className="pb-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Image section */}
-          <div className="space-y-6">
-            <div 
-              className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
-              onMouseEnter={() => setIsImageZoomed(true)}
-              onMouseLeave={() => setIsImageZoomed(false)}
-            >
-              {selectedImage && (
-                <img
-                  src={selectedImage}
-                  alt={selectedColor ? `${product.name} ${selectedColor}` : selectedSize ? `${product.name} ${selectedSize}` : product.name}
-                  className={`object-cover w-full h-full transition-transform duration-300 ${
-                    isImageZoomed ? 'scale-110' : 'scale-100'
-                  }`}
-                />
-              )}
-            </div>
-
-            {/* Color thumbnails */}
-            {colorThumbnails.length > 0 && (
-              <div className="flex flex-wrap gap-3 justify-center">
-                {colorThumbnails.map(({ color, url }) => {
-                  const isSelected = selectedColor === color;
-                  return (
-                    <div
-                      key={color}
-                      className={`relative cursor-pointer transition-all duration-200 ${
-                        isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
-                      }`}
-                      onClick={() => handleColorThumbnailClick(color)}
-                    >
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                        <img
-                          src={url}
-                          alt={`${product.name} ${color}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      {isSelected && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        {/* Image section */}
+        <div className="space-y-6">
+          <div 
+            className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
+            onMouseEnter={() => setIsImageZoomed(true)}
+            onMouseLeave={() => setIsImageZoomed(false)}
+          >
+            {selectedImage && (
+              <img
+                src={selectedImage}
+                alt={selectedColor ? `${product.name} ${selectedColor}` : selectedSize ? `${product.name} ${selectedSize}` : product.name}
+                className={`object-cover w-full h-full transition-transform duration-300 ${
+                  isImageZoomed ? 'scale-110' : 'scale-100'
+                }`}
+              />
             )}
+          </div>
 
-            {/* Size thumbnails */}
-            {sizeThumbnails.length > 0 && (
-              <div className="flex flex-wrap gap-3 justify-center">
-                {sizeThumbnails.map(({ size, url }) => {
-                  return (
-                    <div
-                      key={size}
-                      className="relative cursor-pointer transition-all duration-200"
-                      onClick={() => setSelectedSize(size)}
-                    >
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                        <img
-                          src={url}
-                          alt={`${product.name} ${size}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+          {/* Color thumbnails */}
+          {colorThumbnails.length > 0 && (
+            <div className="flex flex-wrap gap-3 justify-center">
+              {colorThumbnails.map(({ color, url }) => {
+                const isSelected = selectedColor === color;
+                return (
+                  <div
+                    key={color}
+                    className={`relative cursor-pointer transition-all duration-200 ${
+                      isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
+                    }`}
+                    onClick={() => handleColorThumbnailClick(color)}
+                  >
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                      <img
+                        src={url}
+                        alt={`${product.name} ${color}`}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  );
-                })}
+                    {isSelected && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Size thumbnails */}
+          {sizeThumbnails.length > 0 && (
+            <div className="flex flex-wrap gap-3 justify-center">
+              {sizeThumbnails.map(({ size, url }) => {
+                return (
+                  <div
+                    key={size}
+                    className="relative cursor-pointer transition-all duration-200"
+                    onClick={() => setSelectedSize(size)}
+                  >
+                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                      <img
+                        src={url}
+                        alt={`${product.name} ${size}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Product details section */}
+        <div className="space-y-6">
+          {/* Title and badges */}
+          <div>
+            <h1 className="text-3xl font-bold">{product.name}</h1>
+            
+            {product.badges && product.badges.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {product.badges.map((badge) => (
+                  <ProductBadge key={badge} type={badge as BadgeType} />
+                ))}
               </div>
             )}
           </div>
 
-          {/* Product details section */}
-          <div className="space-y-6">
-            {/* Title and badges */}
-            <div>
-              <h1 className="text-3xl font-bold">{product.name}</h1>
-              
-              {product.badges && product.badges.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {product.badges.map((badge) => (
-                    <ProductBadge key={badge} type={badge as BadgeType} />
-                  ))}
-                </div>
-              )}
-            </div>
+          <div className="prose max-w-none">
+            <p className="text-sm text-gray-600 break-words whitespace-pre-wrap">{product.description}</p>
+          </div>
 
-            <div className="prose max-w-none">
-              <p className="text-sm text-gray-600 break-words whitespace-pre-wrap">{product.description}</p>
-            </div>
+          {/* Product options section */}
+          <div className="space-y-4">
+            {/* Size selection */}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Suurus</Label>
+                <Select
+                  value={selectedSize || ""}
+                  onValueChange={setSelectedSize}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Vali suurus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {product.sizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
-            {/* Product options section */}
+            {/* Color selection */}
+            {product.colors && product.colors.length > 0 && (
+              <ColorPicker
+                colors={product.colors}
+                selectedColor={selectedColor}
+                onColorSelect={setSelectedColor}
+              />
+            )}
+          </div>
+
+          {/* Calculator section */}
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h2 className="text-lg font-semibold mb-4">Arvuta hind</h2>
+
             <div className="space-y-4">
-              {/* Size selection */}
-              {product.sizes && product.sizes.length > 0 && (
+              <div className="space-y-2">
+                <Label className="text-sm">Kogus</Label>
+                <Select
+                  value={quantity}
+                  onValueChange={(value) => setQuantity(value)}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Vali kogus" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="50">50</SelectItem>
+                    <SelectItem value="100">100</SelectItem>
+                    <SelectItem value="200">200</SelectItem>
+                    <SelectItem value="500">500</SelectItem>
+                    <SelectItem value="1000">1000</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm">Trüki tüüp</Label>
+                <Select
+                  value={printType}
+                  onValueChange={(value) => setPrintType(value)}
+                >
+                  <SelectTrigger className="w-full bg-white">
+                    <SelectValue placeholder="Vali trüki tüüp" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="without">Ilma trükita</SelectItem>
+                    <SelectItem value="with">Trükiga</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {printType === "with" && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Suurus</Label>
+                  <Label className="text-sm">Värvide arv</Label>
                   <Select
-                    value={selectedSize || ""}
-                    onValueChange={setSelectedSize}
+                    value={colorCount.toString()}
+                    onValueChange={(value) => setColorCount(parseInt(value))}
                   >
                     <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Vali suurus" />
+                      <SelectValue placeholder="Vali värvide arv" />
                     </SelectTrigger>
                     <SelectContent>
-                      {product.sizes.map((size) => (
-                        <SelectItem key={size} value={size}>
-                          {size}
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
+                        <SelectItem key={count} value={count.toString()}>
+                          {count} värv{count > 1 ? 'i' : ''}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -376,169 +446,97 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              {/* Color selection */}
-              {product.colors && product.colors.length > 0 && (
-                <ColorPicker
-                  colors={product.colors}
-                  selectedColor={selectedColor}
-                  onColorSelect={setSelectedColor}
-                />
-              )}
-            </div>
-
-            {/* Calculator section */}
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h2 className="text-lg font-semibold mb-4">Arvuta hind</h2>
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-sm">Kogus</Label>
-                  <Select
-                    value={quantity}
-                    onValueChange={(value) => setQuantity(value)}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Vali kogus" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="50">50</SelectItem>
-                      <SelectItem value="100">100</SelectItem>
-                      <SelectItem value="200">200</SelectItem>
-                      <SelectItem value="500">500</SelectItem>
-                      <SelectItem value="1000">1000</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="text-sm">Trüki tüüp</Label>
-                  <Select
-                    value={printType}
-                    onValueChange={(value) => setPrintType(value)}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Vali trüki tüüp" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="without">Ilma trükita</SelectItem>
-                      <SelectItem value="with">Trükiga</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {printType === "with" && (
-                  <div className="space-y-2">
-                    <Label className="text-sm">Värvide arv</Label>
-                    <Select
-                      value={colorCount.toString()}
-                      onValueChange={(value) => setColorCount(parseInt(value))}
-                    >
-                      <SelectTrigger className="w-full bg-white">
-                        <SelectValue placeholder="Vali värvide arv" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-                          <SelectItem key={count} value={count.toString()}>
-                            {count} värv{count > 1 ? 'i' : ''}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                <div className="pt-3 border-t">
-                  {!pricingLoading && priceResult && (
-                    <>
-                      <div className="space-y-1 text-sm text-gray-600">
-                        <div className="flex justify-between">
-                          <span>Põhihind:</span>
-                          <span>€{priceResult.basePrice.toFixed(2)}</span>
+              <div className="pt-3 border-t">
+                {!pricingLoading && priceResult && (
+                  <>
+                    <div className="space-y-1 text-sm text-gray-600">
+                      <div className="flex justify-between">
+                        <span>Põhihind:</span>
+                        <span>€{priceResult.basePrice.toFixed(2)}</span>
+                      </div>
+                      {priceResult.breakdown.discount > 0 && (
+                        <div className="flex justify-between text-green-600">
+                          <span>Koguse allahindlus:</span>
+                          <span>-€{priceResult.breakdown.discount.toFixed(2)}</span>
                         </div>
-                        {priceResult.breakdown.discount > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <span>Koguse allahindlus:</span>
-                            <span>-€{priceResult.breakdown.discount.toFixed(2)}</span>
-                          </div>
-                        )}
-                        {priceResult.printCost > 0 && (
-                          <div className="flex justify-between">
-                            <span>Trükikulu:</span>
-                            <span>€{priceResult.printCost.toFixed(2)}</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex justify-between items-center text-sm mt-2 pt-2 border-t">
-                        <span>Hind/tk:</span>
-                        <span className="font-semibold">€{priceResult.pricePerItem.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-lg font-bold mt-1">
-                        <span>Kokku:</span>
-                        <span>€{priceResult.totalPrice.toFixed(2)}</span>
-                      </div>
-                    </>
-                  )}
-                  <p className="text-xs text-gray-500 mt-2">
-                    * Hinnad on indikatiivsed ja ei sisalda käibemaksu
-                  </p>
-                </div>
+                      )}
+                      {priceResult.printCost > 0 && (
+                        <div className="flex justify-between">
+                          <span>Trükikulu:</span>
+                          <span>€{priceResult.printCost.toFixed(2)}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-center text-sm mt-2 pt-2 border-t">
+                      <span>Hind/tk:</span>
+                      <span className="font-semibold">€{priceResult.pricePerItem.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-lg font-bold mt-1">
+                      <span>Kokku:</span>
+                      <span>€{priceResult.totalPrice.toFixed(2)}</span>
+                    </div>
+                  </>
+                )}
+                <p className="text-xs text-gray-500 mt-2">
+                  * Hinnad on indikatiivsed ja ei sisalda käibemaksu
+                </p>
               </div>
-            </div>
-
-            {/* Inquiry form */}
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Nimi*"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="bg-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    placeholder="E-mail*"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="bg-white"
-                  />
-                </div>
-              </div>
-              
-              <Input
-                placeholder="Telefoninumber*"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="bg-white"
-              />
-              
-              <Textarea
-                placeholder="Lisainformatsioon*"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                className="bg-white min-h-[100px]"
-              />
-
-              <Button className="w-full" size="lg">
-                Küsi pakkumist
-              </Button>
-              
-              <p className="text-xs text-gray-500 text-center">
-                Tellimus läheb töössse ainult peale pakkumise ja digitaalse mustandi kinnitust.
-              </p>
             </div>
           </div>
-        </div>
 
-        <div className="my-12">
-          <ProductTechnicalDetails product={product} />
-        </div>
+          {/* Inquiry form */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Input
+                  placeholder="Nimi*"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Input
+                  placeholder="E-mail*"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-white"
+                />
+              </div>
+            </div>
+            
+            <Input
+              placeholder="Telefoninumber*"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="bg-white"
+            />
+            
+            <Textarea
+              placeholder="Lisainformatsioon*"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="bg-white min-h-[100px]"
+            />
 
-        <OrderingFAQSection />
-        <OrderingFAQStructuredData />
+            <Button className="w-full" size="lg">
+              Küsi pakkumist
+            </Button>
+            
+            <p className="text-xs text-gray-500 text-center">
+              Tellimus läheb töössse ainult peale pakkumise ja digitaalse mustandi kinnitust.
+            </p>
+          </div>
+        </div>
       </div>
+
+      <div className="my-12">
+        <ProductTechnicalDetails product={product} />
+      </div>
+
+      <OrderingFAQSection />
+      <OrderingFAQStructuredData />
     </div>
   );
 };
