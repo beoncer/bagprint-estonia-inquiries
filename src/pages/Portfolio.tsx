@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface PortfolioItem {
   id: string;
@@ -104,11 +104,6 @@ const Portfolio: React.FC = () => {
   return (
     <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-12 md:py-16 overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Add Breadcrumb Navigation */}
-        <div className="mb-6">
-          <Breadcrumb />
-        </div>
-
         {/* Header */}
         <div className="text-center mb-12 md:mb-16">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
