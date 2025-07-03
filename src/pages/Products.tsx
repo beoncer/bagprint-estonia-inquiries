@@ -65,10 +65,7 @@ const Products = () => {
     
     return (
       <>
-        <DynamicSEO 
-          title={currentCategoryName ? `${currentCategoryName} | Leatex` : "Tooted | Leatex"}
-          description={currentCategoryName ? `${currentCategoryName} - kvaliteetsed ja keskkonnasõbralikud kotid` : "Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"}
-        />
+        <DynamicSEO />
         
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           <div className="pt-4 mb-6">
@@ -100,10 +97,7 @@ const Products = () => {
   // Default view - show product categories
   return (
     <>
-      <DynamicSEO 
-        title="Tooted | Leatex"
-        description="Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"
-      />
+      <DynamicSEO />
       
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
         <div className="pt-4 mb-6">
