@@ -1,537 +1,330 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getProductBySlug, Product } from "@/lib/supabase";
-import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
-import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
-import ColorPicker from "@/components/product/ColorPicker";
-import EcoBadge from "@/components/product/EcoBadge";
-import { ProductBadge } from "@/components/product/ProductBadge";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Star, Phone, Mail, Check } from "lucide-react";
+import { ProductProps } from "@/components/product/ProductCard";
+import ProductBadge from "@/components/product/ProductBadge";
 import { BadgeType } from "@/lib/badge-constants";
-import { Textarea } from "@/components/ui/textarea";
 import { usePricing } from "@/hooks/usePricing";
+import ColorPicker from "@/components/product/ColorPicker";
+import { ProductColor } from "@/lib/constants";
+import InquiryForm from "@/components/ui/InquiryForm";
+import { useToast } from "@/hooks/use-toast";
 import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetails";
-import { PRODUCT_COLORS } from "@/lib/constants";
 import ProductStructuredData from "@/components/seo/ProductStructuredData";
+import DynamicSEO from "@/components/seo/DynamicSEO";
+import Breadcrumb from "@/components/ui/breadcrumb";
+
+interface ProductDetailParams {
+  slug: string;
+}
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
+
+const fetchProduct = async (slug: string): Promise<ProductProps | null> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error) {
+    console.error("Supabase error fetching product:", error);
+    throw new Error(error.message);
+  }
+
+  return data;
+};
+
+const fetchFAQs = async (productType: string): Promise<FAQItem[]> => {
+  const { data, error } = await supabase
+    .from('website_content')
+    .select('key, value')
+    .eq('page', 'product_pages')
+    .like('key', `${productType}_faq_%`);
+
+  if (error) {
+    console.error("Supabase error fetching FAQs:", error);
+    return [];
+  }
+
+  const faqs: FAQItem[] = [];
+  if (data) {
+    const questions = data.filter((item: any) => item.key.includes('_question'));
+    const answers = data.filter((item: any) => item.key.includes('_answer'));
+
+    questions.forEach((questionItem: any) => {
+      const index = questionItem.key.split('_')[2];
+      const answerItem = answers.find((answer: any) => answer.key === `${productType}_faq_${index}_answer`);
+
+      if (answerItem) {
+        faqs.push({
+          question: questionItem.value,
+          answer: answerItem.value,
+        });
+      }
+    });
+  }
+
+  return faqs;
+};
 
 const ProductDetail = () => {
-  const { slug } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedSize, setSelectedSize] = useState<string | null>(null);
-  const [isImageZoomed, setIsImageZoomed] = useState(false);
-  
-  // Calculator state
-  const [quantity, setQuantity] = useState<string>("50");
-  const [printType, setPrintType] = useState<string>("without");
-  const [colorCount, setColorCount] = useState<number>(1);
-  
-  // Inquiry form state
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [phone, setPhone] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  
-  // Use the new pricing system
-  const { calculatePrice, loading: pricingLoading, quantityMultipliers } = usePricing();
-  
-  // Update selected image when color or size changes
+  const { slug } = useParams<ProductDetailParams>();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [selectedColor, setSelectedColor] = useState<ProductColor | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
+
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ['product', slug],
+    queryFn: () => fetchProduct(slug!),
+    enabled: !!slug,
+    retry: false,
+  });
+
+  const { data: faqs, isLoading: faqsLoading } = useQuery({
+    queryKey: ['faqs', product?.type],
+    queryFn: () => fetchFAQs(product?.type!),
+    enabled: !!product?.type,
+  });
+
+  const { calculatePrice } = usePricing();
+
   useEffect(() => {
-    if (product) {
-      let newImage = null;
-      
-      // Priority: 1. Selected color image, 2. Main color image, 3. Size image, 4. Fallback
-      if (selectedColor && product.color_images && product.color_images[selectedColor]) {
-        newImage = product.color_images[selectedColor];
-        console.log('Using selected color image:', newImage);
-      } else if (product.main_color && product.color_images && product.color_images[product.main_color]) {
-        newImage = product.color_images[product.main_color];
-        console.log('Using main color image:', newImage);
-      } else if (selectedSize && product.size_images && product.size_images[selectedSize]) {
-        newImage = product.size_images[selectedSize];
-        console.log('Using size-specific image:', newImage);
-      } else if (product.image) {
-        newImage = product.image;
-        console.log('Using fallback image:', newImage);
-      }
-      
-      setSelectedImage(newImage);
-    }
-  }, [selectedColor, selectedSize, product]);
-  
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        if (!slug) throw new Error("No slug provided");
-        const productData = await getProductBySlug(slug);
-        console.log('Fetched product data:', productData);
-        setProduct(productData);
-        
-        // Set initial color: main_color if set, else first color
-        const validColors = productData.colors as string[];
-        if (
-          productData.main_color &&
-          validColors.includes(productData.main_color) &&
-          (PRODUCT_COLORS.map(c => c.value) as string[]).includes(productData.main_color)
-        ) {
-          setSelectedColor(productData.main_color as import('@/lib/constants').ProductColor);
-        } else if (productData.colors && productData.colors.length > 0) {
-          setSelectedColor(productData.colors[0]);
-        }
-        
-        // Set initial size if product has sizes
-        if (productData.sizes && productData.sizes.length > 0) {
-          setSelectedSize(productData.sizes[0]);
-        }
-        
-        // Set initial image (this will be updated by the color effect)
-        if (productData.main_color && productData.color_images && productData.color_images[productData.main_color]) {
-          setSelectedImage(productData.color_images[productData.main_color]);
-        } else if (productData.image) {
-          setSelectedImage(productData.image);
-        }
-      } catch (error) {
-        console.error("Error fetching product:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
-  }, [slug]);
-  
-  // Calculate price using the new system
-  const priceResult = product ? calculatePrice({
-    basePrice: product.base_price,
-    quantity: parseInt(quantity),
-    colorCount: printType === "with" ? colorCount : 0,
-    withPrint: printType === "with"
-  }) : null;
-
-  // Find the lowest multiplier
-  const lowestMultiplier = quantityMultipliers.length > 0 ? Math.min(...quantityMultipliers.map(m => m.multiplier)) : 1;
-  const lowestPossiblePrice = product ? product.base_price * lowestMultiplier : undefined;
-
-  // Get color label for display
-  const getColorLabel = (colorValue: string) => {
-    const colorConfig = PRODUCT_COLORS.find(c => c.value === colorValue);
-    return colorConfig?.label || colorValue;
-  };
-
-  // Get color style for thumbnails
-  const getColorStyle = (colorValue: string) => {
-    const colorStyles: Record<string, React.CSSProperties> = {
-      naturalne: { backgroundColor: '#F5F5DC' },
-      oranz: { backgroundColor: '#FFA500' },
-      pehme_kollane: { backgroundColor: '#F0E68C' },
-      punane: { backgroundColor: '#FF0000' },
-      roosa: { backgroundColor: '#FFC0CB' },
-      royal_sinine: { backgroundColor: '#4169E1' },
-      taevasinine: { backgroundColor: '#87CEEB' },
-      tume_roheline: { backgroundColor: '#006400' },
-      tume_sinine: { backgroundColor: '#000080' },
-      valge: { backgroundColor: '#FFFFFF', border: '2px solid #e5e5e5' },
-      granate: { backgroundColor: '#800020' },
-      hall: { backgroundColor: '#808080' },
-      hele_roheline: { backgroundColor: '#90EE90' },
-      kollane: { backgroundColor: '#FFFF00' },
-      lilla: { backgroundColor: '#800080' },
-      must: { backgroundColor: '#000000' }
-    };
-    return colorStyles[colorValue] || { backgroundColor: '#CCCCCC' };
-  };
-
-  // Handle color thumbnail click
-  const handleColorThumbnailClick = (color: string) => {
-    console.log('Color thumbnail clicked:', color);
-    setSelectedColor(color);
-  };
-  
-  // Build unique thumbnail list for color and size images
-  const colorThumbnails: { color: string; url: string }[] = [];
-  const colorUrlSet = new Set<string>();
-  if (product && product.colors && product.color_images) {
-    for (const color of product.colors) {
-      const url = product.color_images[color] || (product.main_color && product.color_images[product.main_color]) || product.image;
-      if (url && !colorUrlSet.has(url)) {
-        colorThumbnails.push({ color, url });
-        colorUrlSet.add(url);
-      }
-    }
-  }
-
-  // Only show size thumbnails if a size-specific image exists
-  const sizeThumbnails: { size: string; url: string }[] = [];
-  const sizeUrlSet = new Set<string>();
-  if (product && product.sizes && product.size_images) {
-    for (const size of product.sizes) {
-      const url = product.size_images[size];
-      if (url && !sizeUrlSet.has(url)) {
-        sizeThumbnails.push({ size, url });
-        sizeUrlSet.add(url);
-      }
-    }
-  }
-
-  // Set SEO meta tags from product SEO fields
-  useEffect(() => {
-    if (product) {
-      document.title = product.seo_title || product.name;
-      // Description
-      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
-      if (!metaDesc) {
-        metaDesc = document.createElement('meta');
-        metaDesc.name = "description";
-        document.head.appendChild(metaDesc);
-      }
-      metaDesc.content = product.seo_description || product.description || "";
-      // Keywords
-      let metaKeywords = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
-      if (!metaKeywords) {
-        metaKeywords = document.createElement('meta');
-        metaKeywords.name = "keywords";
-        document.head.appendChild(metaKeywords);
-      }
-      metaKeywords.content = product.seo_keywords || "";
-      // Open Graph tags
-      let ogTitle = document.querySelector('meta[property="og:title"]') as HTMLMetaElement | null;
-      if (!ogTitle) {
-        ogTitle = document.createElement('meta');
-        ogTitle.setAttribute('property', 'og:title');
-        document.head.appendChild(ogTitle);
-      }
-      ogTitle.content = product.seo_title || product.name;
-      let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement | null;
-      if (!ogDesc) {
-        ogDesc = document.createElement('meta');
-        ogDesc.setAttribute('property', 'og:description');
-        document.head.appendChild(ogDesc);
-      }
-      ogDesc.content = product.seo_description || product.description || "";
+    if (product && product.colors && product.colors.length > 0) {
+      setSelectedColor(product.colors[0]);
     }
   }, [product]);
 
-  if (loading) {
+  if (!slug) {
     return (
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <h2 className="text-2xl font-semibold">Missing product slug</h2>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="bg-gray-50 min-h-screen flex items-center justify-center">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div className="bg-gray-200 h-96 rounded"></div>
-            <div>
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3 mb-6"></div>
-              <div className="h-10 bg-gray-200 rounded w-1/3 mb-4"></div>
-            </div>
+          <div className="h-8 bg-gray-200 rounded w-64 mb-4"></div>
+          <div className="h-64 bg-gray-200 rounded w-64 mb-4"></div>
+          <div className="h-6 bg-gray-200 rounded w-48 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-32"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Button onClick={() => navigate(-1)} variant="ghost" className="mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Tagasi
+          </Button>
+          <div className="text-center">
+            <h2 className="text-3xl font-semibold mb-4">Product not found</h2>
+            <p className="text-gray-600">Check the URL or browse our other products.</p>
           </div>
         </div>
       </div>
     );
   }
-  
-  if (!product) {
-    return (
-      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16 text-center">
-        <h2 className="text-2xl font-bold mb-4">Toodet ei leitud</h2>
-        <p className="mb-8">Kahjuks ei leidnud me otsitud toodet. Proovige vaadata teisi tooteid.</p>
-        <Button asChild>
-          <Link to="/tooted">Tagasi toodete juurde</Link>
-        </Button>
-      </div>
-    );
-  }
+
+  const handleAddToCart = () => {
+    toast({
+      title: "Lisatud ostukorvi!",
+      description: "Toode on edukalt ostukorvi lisatud.",
+    });
+  };
+
+  const handleIncreaseQuantity = () => {
+    setQuantity(quantity + 1);
+  };
+
+  const handleDecreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+
+  const handleColorSelect = (color: ProductColor) => {
+    setSelectedColor(color);
+  };
+
+  const handleShowInquiryForm = () => {
+    setShowInquiryForm(true);
+  };
+
+  const handleCloseInquiryForm = () => {
+    setShowInquiryForm(false);
+  };
+
+  const getPriceDisplay = () => {
+    if (!product) return null;
+
+    const priceResult = calculatePrice({
+      basePrice: product.base_price,
+      quantity: quantity,
+      withPrint: false
+    });
+
+    if (priceResult) {
+      return `€${priceResult.totalPrice.toFixed(2)}`;
+    }
+
+    return `€${product.base_price.toFixed(2)}`;
+  };
 
   return (
-    <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
-      {/* Inject structured data for SEO */}
-      {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-        {/* Image section */}
-        <div className="space-y-6">
-          <div 
-            className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
-            onMouseEnter={() => setIsImageZoomed(true)}
-            onMouseLeave={() => setIsImageZoomed(false)}
-          >
-            {selectedImage && (
+    <>
+      <ProductStructuredData product={product} />
+      <DynamicSEO
+        title={product.seo_title || product.name}
+        description={product.seo_description || product.description || ""}
+        keywords={product.seo_keywords || ""}
+      />
+      
+      <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Add Breadcrumb Navigation */}
+          <div className="mb-6">
+            <Breadcrumb />
+          </div>
+
+          <Button onClick={() => navigate(-1)} variant="ghost" className="mb-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Tagasi
+          </Button>
+
+          <div className="lg:flex lg:space-x-8">
+            {/* Product Image */}
+            <div className="mb-6 lg:mb-0 lg:w-1/2">
               <img
-                src={selectedImage}
+                src={product.image_url}
                 alt={product.name}
-                className={`object-cover w-full h-full transition-transform duration-300 ${
-                  isImageZoomed ? 'scale-110' : 'scale-100'
-                }`}
+                className="w-full h-auto rounded-lg shadow-md"
               />
-            )}
-          </div>
-
-          {/* Color thumbnails */}
-          {colorThumbnails.length > 0 && (
-            <div className="flex flex-wrap gap-3 justify-center">
-              {colorThumbnails.map(({ color, url }) => {
-                const isSelected = selectedColor === color;
-                return (
-                  <div
-                    key={color}
-                    className={`relative cursor-pointer transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
-                    }`}
-                    onClick={() => handleColorThumbnailClick(color)}
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                      <img
-                        src={url}
-                        alt={`${getColorLabel(color)} variant`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {isSelected && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
-                    )}
-                  </div>
-                );
-              })}
             </div>
-          )}
 
-          {/* Size thumbnails */}
-          {sizeThumbnails.length > 0 && (
-            <div className="flex flex-wrap gap-3 justify-center">
-              {sizeThumbnails.map(({ size, url }) => {
-                // No border for selected size
-                return (
-                  <div
-                    key={size}
-                    className="relative cursor-pointer transition-all duration-200"
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                      <img
-                        src={url}
-                        alt={`${size} variant`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+            {/* Product Details */}
+            <div className="lg:w-1/2">
+              <h1 className="text-3xl font-semibold text-gray-900 mb-4">{product.name}</h1>
 
-        {/* Product details section */}
-        <div className="space-y-6">
-          {/* Title and badges */}
-          <div>
-            <h1 className="text-3xl font-bold">{product.name}</h1>
-            
-            {product.badges && product.badges.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {product.badges.map((badge) => (
-                  <ProductBadge key={badge} type={badge as BadgeType} />
+              <div className="flex items-center space-x-2 mb-4">
+                {product.badges && product.badges.map((badge) => (
+                  <ProductBadge key={badge} badge={badge} />
                 ))}
-              </div>
-            )}
-          </div>
-
-          <div className="prose max-w-none">
-            <p className="text-sm text-gray-600 break-words whitespace-pre-wrap">{product.description}</p>
-          </div>
-
-          {/* Product options section */}
-          <div className="space-y-4">
-            {/* Size selection */}
-            {product.sizes && product.sizes.length > 0 && (
-              <div className="space-y-2">
-                <Label className="text-sm font-medium">Suurus</Label>
-                <Select
-                  value={selectedSize || ""}
-                  onValueChange={setSelectedSize}
-                >
-                  <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Vali suurus" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {product.sizes.map((size) => (
-                      <SelectItem key={size} value={size}>
-                        {size}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            {/* Color selection */}
-            {product.colors && product.colors.length > 0 && (
-              <ColorPicker
-                colors={product.colors}
-                selectedColor={selectedColor}
-                onColorSelect={setSelectedColor}
-              />
-            )}
-          </div>
-
-          {/* Calculator section */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h2 className="text-lg font-semibold mb-4">Arvuta hind</h2>
-
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="text-sm">Kogus</Label>
-                <Select
-                  value={quantity}
-                  onValueChange={(value) => setQuantity(value)}
-                >
-                  <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Vali kogus" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                    <SelectItem value="200">200</SelectItem>
-                    <SelectItem value="500">500</SelectItem>
-                    <SelectItem value="1000">1000</SelectItem>
-                  </SelectContent>
-                </Select>
+                {product.is_eco && (
+                  <Badge variant="outline">
+                    <Check className="h-4 w-4 mr-1" />
+                    Eco
+                  </Badge>
+                )}
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-sm">Trüki tüüp</Label>
-                <Select
-                  value={printType}
-                  onValueChange={(value) => setPrintType(value)}
-                >
-                  <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Vali trüki tüüp" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="without">Ilma trükita</SelectItem>
-                    <SelectItem value="with">Trükiga</SelectItem>
-                  </SelectContent>
-                </Select>
+              <p className="text-gray-600 mb-6">{product.description}</p>
+
+              {/* Pricing */}
+              <div className="flex items-center space-x-4 mb-6">
+                <span className="text-2xl font-bold text-gray-900">{getPriceDisplay()}</span>
+                <span className="text-gray-500">Hind sisaldab KM</span>
               </div>
 
-              {printType === "with" && (
-                <div className="space-y-2">
-                  <Label className="text-sm">Värvide arv</Label>
-                  <Select
-                    value={colorCount.toString()}
-                    onValueChange={(value) => setColorCount(parseInt(value))}
-                  >
-                    <SelectTrigger className="w-full bg-white">
-                      <SelectValue placeholder="Vali värvide arv" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
-                        <SelectItem key={count} value={count.toString()}>
-                          {count} värv{count > 1 ? 'i' : ''}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {/* Color Options */}
+              {product.colors && product.colors.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Värvid</h3>
+                  <ColorPicker
+                    colors={product.colors}
+                    selectedColor={selectedColor}
+                    onColorSelect={handleColorSelect}
+                  />
                 </div>
               )}
 
-              <div className="pt-3 border-t">
-                {!pricingLoading && priceResult && (
-                  <>
-                    <div className="space-y-1 text-sm text-gray-600">
-                      <div className="flex justify-between">
-                        <span>Põhihind:</span>
-                        <span>€{priceResult.basePrice.toFixed(2)}</span>
-                      </div>
-                      {priceResult.breakdown.discount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Koguse allahindlus:</span>
-                          <span>-€{priceResult.breakdown.discount.toFixed(2)}</span>
-                        </div>
-                      )}
-                      {priceResult.printCost > 0 && (
-                        <div className="flex justify-between">
-                          <span>Trükikulu:</span>
-                          <span>€{priceResult.printCost.toFixed(2)}</span>
-                        </div>
-                      )}
+              {/* Quantity */}
+              <div className="flex items-center space-x-4 mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">Kogus</h3>
+                <div className="flex items-center border border-gray-300 rounded-md">
+                  <Button
+                    onClick={handleDecreaseQuantity}
+                    className="px-4 py-2 rounded-l-md"
+                    variant="ghost"
+                  >
+                    -
+                  </Button>
+                  <span className="px-4 py-2">{quantity}</span>
+                  <Button
+                    onClick={handleIncreaseQuantity}
+                    className="px-4 py-2 rounded-r-md"
+                    variant="ghost"
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              {/* Add to Cart Button */}
+              <Button className="w-full mb-4" onClick={handleAddToCart}>
+                Lisa ostukorvi
+              </Button>
+
+              {/* Inquiry Button */}
+              <Button variant="secondary" className="w-full" onClick={handleShowInquiryForm}>
+                Küsi pakkumist
+              </Button>
+            </div>
+          </div>
+
+          {/* Technical Details */}
+          <section className="mt-12">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">Tehnilised detailid</h2>
+            <ProductTechnicalDetails product={product} />
+          </section>
+
+          {/* FAQ Section */}
+          {faqs && faqs.length > 0 && (
+            <section className="mt-12">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-6">Korduma Kippuvad Küsimused</h2>
+              <div className="space-y-4">
+                {faqsLoading ? (
+                  <div>Loading FAQs...</div>
+                ) : (
+                  faqs.map((faq, index) => (
+                    <div key={index} className="border border-gray-300 rounded-md p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2">{faq.question}</h3>
+                      <p className="text-gray-600">{faq.answer}</p>
                     </div>
-                    <div className="flex justify-between items-center text-sm mt-2 pt-2 border-t">
-                      <span>Hind/tk:</span>
-                      <span className="font-semibold">€{priceResult.pricePerItem.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-lg font-bold mt-1">
-                      <span>Kokku:</span>
-                      <span>€{priceResult.totalPrice.toFixed(2)}</span>
-                    </div>
-                  </>
+                  ))
                 )}
-                <p className="text-xs text-gray-500 mt-2">
-                  * Hinnad on indikatiivsed ja ei sisalda käibemaksu
-                </p>
               </div>
-            </div>
-          </div>
-
-          {/* Inquiry form */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Input
-                  placeholder="Nimi*"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Input
-                  placeholder="E-mail*"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white"
-                />
-              </div>
-            </div>
-            
-            <Input
-              placeholder="Telefoninumber*"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="bg-white"
-            />
-            
-            <Textarea
-              placeholder="Lisainformatsioon*"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="bg-white min-h-[100px]"
-            />
-
-            <Button className="w-full" size="lg">
-              Küsi pakkumist
-            </Button>
-            
-            <p className="text-xs text-gray-500 text-center">
-              Tellimus läheb töössse ainult peale pakkumise ja digitaalse mustandi kinnitust.
-            </p>
-          </div>
+            </section>
+          )}
         </div>
       </div>
 
-      <div className="my-12">
-        <ProductTechnicalDetails product={product} />
-      </div>
-
-      <OrderingFAQSection />
-      <OrderingFAQStructuredData />
-    </div>
+      {/* Inquiry Form Modal */}
+      {showInquiryForm && (
+        <InquiryForm
+          productName={product.name}
+          productType={product.type}
+          onClose={handleCloseInquiryForm}
+        />
+      )}
+    </>
   );
 };
 

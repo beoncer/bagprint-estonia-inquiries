@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface BlogPost {
   id: string;
@@ -166,6 +167,11 @@ const BlogPost = () => {
   return (
     <div className="bg-gray-50 py-10">
       <div className="max-w-4xl mx-auto px-4 md:px-8">
+        {/* Add Breadcrumb Navigation */}
+        <div className="mb-6">
+          <Breadcrumb />
+        </div>
+
         {/* Back Button */}
         <Link to="/blogi" className="inline-flex items-center text-gray-600 hover:text-primary mb-8">
           <ArrowLeft className="h-4 w-4 mr-2" />
