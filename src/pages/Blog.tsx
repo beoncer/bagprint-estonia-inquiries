@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Calendar, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface BlogPost {
   id: string;
@@ -126,6 +126,11 @@ const Blog = () => {
       {/* Hero Section - matching portfolio style */}
       <section className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Add Breadcrumb Navigation */}
+          <div className="mb-6">
+            <Breadcrumb />
+          </div>
+
           <div className="text-center mb-12 md:mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
               {headerHighlight && header.includes(headerHighlight) ? (
