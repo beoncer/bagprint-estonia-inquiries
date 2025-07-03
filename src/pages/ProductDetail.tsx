@@ -271,7 +271,7 @@ const ProductDetail = () => {
             {selectedImage && (
               <img
                 src={selectedImage}
-                alt={product.name}
+                alt={selectedColor ? `${product.name} ${selectedColor}` : selectedSize ? `${product.name} ${selectedSize}` : product.name}
                 className={`object-cover w-full h-full transition-transform duration-300 ${
                   isImageZoomed ? 'scale-110' : 'scale-100'
                 }`}
@@ -295,7 +295,7 @@ const ProductDetail = () => {
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
                       <img
                         src={url}
-                        alt={`${getColorLabel(color)} variant`}
+                        alt={`${product.name} ${color}`}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -321,7 +321,7 @@ const ProductDetail = () => {
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
                       <img
                         src={url}
-                        alt={`${size} variant`}
+                        alt={`${product.name} ${size}`}
                         className="w-full h-full object-cover"
                       />
                     </div>

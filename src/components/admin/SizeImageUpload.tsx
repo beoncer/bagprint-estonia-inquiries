@@ -11,12 +11,24 @@ interface SizeImageUploadProps {
   onSizeImagesChange: (sizeImages: Record<string, string>) => void;
   currentSizeImages?: Record<string, string>;
   availableSizes: string[];
+  productTitle: string;
+}
+
+function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/\-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 const SizeImageUpload: React.FC<SizeImageUploadProps> = ({
   onSizeImagesChange,
   currentSizeImages = {},
-  availableSizes
+  availableSizes,
+  productTitle
 }) => {
   const [uploading, setUploading] = useState<string | null>(null);
   const { toast } = useToast();
@@ -44,7 +56,7 @@ const SizeImageUpload: React.FC<SizeImageUploadProps> = ({
     
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${size.replace(/[^a-zA-Z0-9]/g, '-')}-${Date.now()}.${fileExt}`;
+      const fileName = `${slugify(productTitle)}-${size}.${fileExt}`;
       const filePath = `products/size-images/${fileName}`;
 
       const { data, error } = await supabase.storage
@@ -105,6 +117,7 @@ const SizeImageUpload: React.FC<SizeImageUploadProps> = ({
         {availableSizes.map((size) => {
           const sizeImage = currentSizeImages[size];
           const isUploading = uploading === size;
+          const altText = `${productTitle} ${size}`;
           
           return (
             <div key={size} className="border rounded-lg p-4 space-y-3">
@@ -129,7 +142,7 @@ const SizeImageUpload: React.FC<SizeImageUploadProps> = ({
                 <div className="relative">
                   <img 
                     src={sizeImage} 
-                    alt={`${size} product`} 
+                    alt={altText}
                     className="w-full h-32 object-cover rounded border"
                   />
                   <div className="mt-2">

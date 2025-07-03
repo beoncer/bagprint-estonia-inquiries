@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,12 +55,14 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
     }
   }, [mainImage]);
   
+  const altText = main_color ? `${name} ${main_color}` : name;
+  
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200">
       <div className="aspect-square w-full relative overflow-hidden bg-gray-100">
         <OptimizedImage
           src={imageUrl}
-          alt={name}
+          alt={altText}
           className="object-cover w-full h-full hover:scale-105 transition-transform duration-300"
           width={300}
           height={300}

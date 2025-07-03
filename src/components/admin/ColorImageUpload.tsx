@@ -14,6 +14,17 @@ interface ColorImageUploadProps {
   availableColors: ProductColor[];
   mainColor?: string;
   onMainColorChange?: (color: string) => void;
+  productTitle: string;
+}
+
+function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9\-]/g, '')
+    .replace(/\-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
@@ -21,7 +32,8 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
   currentColorImages = {},
   availableColors,
   mainColor,
-  onMainColorChange
+  onMainColorChange,
+  productTitle
 }) => {
   const [uploading, setUploading] = useState<string | null>(null);
   const { toast } = useToast();
@@ -49,7 +61,7 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
     
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${color}-${Date.now()}.${fileExt}`;
+      const fileName = `${slugify(productTitle)}-${color}.${fileExt}`;
       const filePath = `products/color-images/${fileName}`;
 
       const { data, error } = await supabase.storage
@@ -141,6 +153,7 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
         {availableColors.map((color) => {
           const colorImage = currentColorImages[color];
           const isUploading = uploading === color;
+          const altText = `${productTitle} ${color}`;
           
           return (
             <div key={color} className="border rounded-lg p-4 space-y-3">
@@ -180,7 +193,7 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
                 <div className="relative">
                   <img 
                     src={colorImage} 
-                    alt={`${getColorLabel(color)} product`} 
+                    alt={altText}
                     className="w-full h-32 object-cover rounded border"
                   />
                   <div className="mt-2">

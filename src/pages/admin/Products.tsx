@@ -717,6 +717,7 @@ const ProductsPage: React.FC = () => {
                     availableColors={selectedColors}
                     mainColor={mainColor}
                     onMainColorChange={setMainColor}
+                    productTitle={formData.name}
                   />
                 </div>
               )}
@@ -754,6 +755,7 @@ const ProductsPage: React.FC = () => {
                     onSizeImagesChange={setSizeImages}
                     currentSizeImages={sizeImages}
                     availableSizes={selectedSizes}
+                    productTitle={formData.name}
                   />
                 </div>
               )}
