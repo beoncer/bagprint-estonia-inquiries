@@ -1,8 +1,10 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Users, Globe, Heart, Star, ThumbsUp } from "lucide-react";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 const ICON_MAP: Record<string, React.ElementType> = {
   check: CheckCircle,
@@ -96,6 +98,13 @@ const Meist: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="mb-6">
+          <Breadcrumb />
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4">

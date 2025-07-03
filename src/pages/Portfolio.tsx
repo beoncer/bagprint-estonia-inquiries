@@ -1,52 +1,52 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import OptimizedImage from "@/components/ui/OptimizedImage";
+import { Eye, ExternalLink, Filter } from "lucide-react";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface PortfolioItem {
   id: string;
   title: string;
   category: string;
   image_url: string;
-  description: string;
-  tags: string; // comma separated
+  website_url?: string;
+  details_url?: string;
+  created_at: string;
 }
 
-const Portfolio: React.FC = () => {
-  const [items, setItems] = useState<PortfolioItem[]>([]);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [loading, setLoading] = useState(true);
-  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+const fetchPortfolioItems = async (): Promise<PortfolioItem[]> => {
+  const { data, error } = await supabase
+    .from('portfolio_items')
+    .select('*')
+    .order('created_at', { ascending: false });
 
+  if (error) throw error;
+  return data || [];
+};
+
+const Portfolio = () => {
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>([]);
+  
   // Dynamic content state
   const [header, setHeader] = useState("");
   const [headerHighlight, setHeaderHighlight] = useState("");
   const [description, setDescription] = useState("");
-  const [achievementsTitle, setAchievementsTitle] = useState("");
-  const [achievementsDescription, setAchievementsDescription] = useState("");
-  const [achievements, setAchievements] = useState<{ value: string; label: string }[]>([]);
   const [ctaTitle, setCtaTitle] = useState("");
-  const [ctaText, setCtaText] = useState("");
+  const [ctaSubtitle, setCtaSubtitle] = useState("");
   const [ctaButton, setCtaButton] = useState("");
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("portfolio")
-        .select("id, title, category, image_url, description, tags")
-        .eq("visible", true)
-        .order("order", { ascending: true });
-      if (!error && data) setItems(data);
-      setLoading(false);
-    };
-    fetchItems();
-  }, []);
+  const { data: portfolioItems = [], isLoading, error } = useQuery({
+    queryKey: ['portfolio-items'],
+    queryFn: fetchPortfolioItems,
+    staleTime: 1000 * 60 * 5,
+  });
 
+  // Fetch dynamic content
   useEffect(() => {
     const fetchContent = async () => {
       const { data } = await supabase
@@ -57,170 +57,168 @@ const Portfolio: React.FC = () => {
         setHeader(data.find((row: any) => row.key === "portfolio_header")?.value || "");
         setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
         setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
-        setAchievementsTitle(data.find((row: any) => row.key === "portfolio_achievements_title")?.value || "");
-        setAchievementsDescription(data.find((row: any) => row.key === "portfolio_achievements_description")?.value || "");
-        // Achievements
-        const achArr = [];
-        for (let i = 1; i <= 6; i++) {
-          const value = data.find((row: any) => row.key === `portfolio_achievement_${i}_value`)?.value || "";
-          const label = data.find((row: any) => row.key === `portfolio_achievement_${i}_label`)?.value || "";
-          if (value || label) achArr.push({ value, label });
-        }
-        setAchievements(achArr);
         setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "");
-        setCtaText(data.find((row: any) => row.key === "portfolio_cta_text")?.value || "");
+        setCtaSubtitle(data.find((row: any) => row.key === "portfolio_cta_subtitle")?.value || "");
         setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "");
       }
     };
     fetchContent();
   }, []);
 
-  if (loading || !header) {
-    return <div className="py-32 text-center text-gray-500">Laadimine...</div>;
-  }
+  useEffect(() => {
+    if (categoryFilter === "all") {
+      setFilteredItems(portfolioItems);
+    } else {
+      const filtered = portfolioItems.filter(item => item.category === categoryFilter);
+      setFilteredItems(filtered);
+    }
+  }, [categoryFilter, portfolioItems]);
 
-  // Get unique categories from data
-  const categories = [
-    { id: "all", name: "Kõik projektid", slug: "all" },
-    ...Array.from(
-      new Map(
-        items.map((item) => [item.category, { id: item.category, name: item.category, slug: item.category }])
-      ).values()
-    ),
-  ];
-
-  const filteredItems = items.filter(
-    (item) => activeFilter === "all" || item.category === activeFilter
-  );
-
-  // Get grid class based on number of categories
-  const getGridClass = () => {
-    if (categories.length <= 2) return "grid-cols-2";
-    if (categories.length <= 3) return "grid-cols-3";
-    if (categories.length <= 4) return "grid-cols-2 md:grid-cols-4";
-    return "grid-cols-2 md:grid-cols-5";
+  const handleCategoryFilter = (category: string) => {
+    setCategoryFilter(category);
   };
 
+  if (isLoading || !header) {
+    return (
+      <div className="bg-gray-50 py-16 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-gray-200 h-64 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-gray-50 py-16 overflow-x-hidden">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-2xl font-bold mb-4">Viga</h2>
+          <p className="text-red-600 mb-8">Portfoolio elemente ei õnnestunud laadida. Palun proovige hiljem uuesti.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-12 md:py-16 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
-            {headerHighlight && header.includes(headerHighlight) ? (
-              <>
-                {header.split(headerHighlight)[0]}
-                <span className="text-primary">{headerHighlight}</span>
-                {header.split(headerHighlight)[1]}
-              </>
-            ) : header}
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4">
-            {description}
-          </p>
+    <div className="bg-gray-50 min-h-screen overflow-x-hidden">
+      {/* Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="mb-6">
+          <Breadcrumb />
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <section className="py-12 md:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 md:mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
+              {headerHighlight && header.includes(headerHighlight) ? (
+                <>
+                  {header.split(headerHighlight)[0]}
+                  <span className="text-primary">{headerHighlight}</span>
+                  {header.split(headerHighlight)[1]}
+                </>
+              ) : header}
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
+              {description}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {/* Filter Section */}
+        <div className="flex flex-wrap justify-center gap-3 mb-10">
+          <Button
+            variant={categoryFilter === "all" ? "default" : "outline"}
+            onClick={() => handleCategoryFilter("all")}
+          >
+            <Filter className="mr-2 h-4 w-4" />
+            Kõik
+          </Button>
+          {[...new Set(portfolioItems.map(item => item.category))].map((category) => (
+            <Button
+              key={category}
+              variant={categoryFilter === category ? "default" : "outline"}
+              onClick={() => handleCategoryFilter(category)}
+            >
+              {category}
+            </Button>
+          ))}
         </div>
 
-        {/* Filter Tabs */}
-        <div className="mb-12">
-          <Tabs value={activeFilter} onValueChange={setActiveFilter} className="w-full">
-            <TabsList className={`grid w-full ${getGridClass()} h-auto p-1 bg-gray-100`}>
-              {categories.map((category) => (
-                <TabsTrigger
-                  key={category.id}
-                  value={category.id}
-                  className="py-2 md:py-3 px-2 md:px-4 text-xs md:text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg transition-all break-words"
-                >
-                  {category.name}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
-            {/* Portfolio Grid */}
-            <div className="mt-12">
-              <TabsContent value={activeFilter} className="m-0">
-                {loading ? (
-                  <div className="text-center py-12 text-gray-400">Laadimine...</div>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                    {filteredItems.map((item) => (
-                      <Card key={item.id} className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="relative overflow-hidden cursor-zoom-in" onClick={() => setZoomedImage(item.image_url || "/placeholder.svg") }>
-                          <img
-                            src={item.image_url || "/placeholder.svg"}
-                            alt={item.title}
-                            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300"></div>
-                        </div>
-                        <CardContent className="p-6">
-                          <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 group-hover:text-primary transition-colors break-words">
-                            {item.title}
-                          </h3>
-                          <p className="text-gray-600 mb-4 leading-relaxed text-sm md:text-base">
-                            {item.description}
-                          </p>
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {item.tags && item.tags.split(",").map((tag) => (
-                              <Badge
-                                key={tag.trim()}
-                                variant="secondary"
-                                className="bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors text-xs"
-                              >
-                                {tag.trim()}
-                              </Badge>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+        {/* Portfolio Grid */}
+        {filteredItems.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredItems.map((item) => (
+              <Card key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                <div className="relative">
+                  <OptimizedImage
+                    src={item.image_url}
+                    alt={item.title}
+                    className="w-full h-48 object-cover"
+                    width={600}
+                    height={300}
+                  />
+                  <div className="absolute top-2 left-2">
+                    <Badge>{item.category}</Badge>
                   </div>
-                )}
-              </TabsContent>
-            </div>
-          </Tabs>
-        </div>
-
-        {/* Stats Section */}
-        {achievements.length > 0 && (
-          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mt-16 md:mt-20">
-            <div className="text-center mb-8 md:mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4 break-words">{achievementsTitle}</h2>
-              <p className="text-xl text-gray-600 break-words">{achievementsDescription}</p>
-            </div>
-            <div className={`grid grid-cols-2 md:grid-cols-${Math.min(achievements.length, 4)} gap-6 md:gap-8`}>
-              {achievements.map((a, idx) => (
-                <div className="text-center" key={idx}>
-                  <div className="text-4xl md:text-5xl font-bold text-primary mb-2 break-words">{a.value}</div>
-                  <div className="text-gray-600 text-lg break-words">{a.label}</div>
                 </div>
-              ))}
-            </div>
+                <CardContent className="p-6">
+                  <h2 className="text-xl font-semibold mb-2 break-words">{item.title}</h2>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {item.website_url && (
+                      <Button asChild variant="outline" size="sm">
+                        <a href={item.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Veebileht
+                        </a>
+                      </Button>
+                    )}
+                    {item.details_url && (
+                      <Button asChild variant="outline" size="sm">
+                        <a href={item.details_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                          <Eye className="mr-2 h-4 w-4" />
+                          Vaata lähemalt
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+            <h3 className="text-xl font-semibold mb-2">Portfoolio elemente ei leitud</h3>
+            <p className="text-gray-600 mb-6">Proovige muuta filtrit</p>
+            <Button onClick={() => setCategoryFilter("all")}>
+              Näita kõiki
+            </Button>
           </div>
         )}
 
         {/* CTA Section */}
         {ctaTitle && (
-          <div className="text-center mt-16 md:mt-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
-              {ctaTitle}
-            </h2>
-            <p className="text-xl text-gray-600 mb-6 md:mb-8 max-w-2xl mx-auto break-words px-4">
-              {ctaText}
-            </p>
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-6 md:px-8 py-2 md:py-3 text-lg">
-              {ctaButton}
-            </Button>
-          </div>
-        )}
-
-        {/* Image Zoom Modal */}
-        <Dialog open={!!zoomedImage} onOpenChange={() => setZoomedImage(null)}>
-          <DialogContent className="max-w-2xl flex flex-col items-center">
-            {zoomedImage && (
-              <img src={zoomedImage} alt="Zoomed" className="w-full h-auto rounded-lg" />
+          <section className="bg-primary text-white py-12 md:py-16 px-6 md:px-8 rounded-lg mt-16 text-center">
+            <h2 className="text-3xl font-bold mb-4 break-words">{ctaTitle}</h2>
+            {ctaSubtitle && <h3 className="text-2xl font-medium mb-6 md:mb-8 break-words">{ctaSubtitle}</h3>}
+            {ctaButton && (
+              <Button variant="secondary" size="lg">
+                {ctaButton}
+              </Button>
             )}
-          </DialogContent>
-        </Dialog>
+          </section>
+        )}
       </div>
     </div>
   );
