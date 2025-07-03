@@ -83,8 +83,7 @@ const Navbar = () => {
 
   return (
     <nav className="w-full z-50">
-      {/* Consistent spacing container matching /meist page */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-4">
+      <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-3 md:py-4">
         <div className="bg-white rounded-lg p-3 md:p-4 shadow-sm">
           <div className="flex justify-between items-center">
             <Link 
