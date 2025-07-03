@@ -445,12 +445,14 @@ const Products = () => {
     const split = heading.split(/(tooted)/i);
     return (
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Enhanced Breadcrumb Navigation */}
-          <div className="mb-8">
+        {/* Standardized Breadcrumb Navigation */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="mb-6">
             <Breadcrumb />
           </div>
-          
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section - Portfolio style */}
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -580,12 +582,14 @@ const Products = () => {
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Enhanced Breadcrumb Navigation */}
-          <div className="mb-8">
+        {/* Standardized Breadcrumb Navigation */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+          <div className="mb-6">
             <Breadcrumb />
           </div>
-          
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section - matching portfolio style */}
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">

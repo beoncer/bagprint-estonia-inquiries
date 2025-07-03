@@ -1,3 +1,4 @@
+
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -166,12 +167,14 @@ const BlogPost = () => {
 
   return (
     <div className="bg-gray-50 py-10">
-      <div className="max-w-4xl mx-auto px-4 md:px-8">
-        {/* Enhanced Breadcrumb Navigation */}
-        <div className="mb-8">
+      {/* Standardized Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="mb-6">
           <Breadcrumb />
         </div>
-        
+      </div>
+      
+      <div className="max-w-4xl mx-auto px-4 md:px-8">
         {/* Back Button */}
         <Link to="/blogi" className="inline-flex items-center text-gray-600 hover:text-primary mb-8">
           <ArrowLeft className="h-4 w-4 mr-2" />

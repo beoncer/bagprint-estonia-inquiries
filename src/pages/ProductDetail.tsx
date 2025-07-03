@@ -255,9 +255,11 @@ const ProductDetail = () => {
       {/* Inject structured data for SEO */}
       {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
       
-      {/* Enhanced Breadcrumb Navigation */}
-      <div className="mb-8">
-        <Breadcrumb />
+      {/* Standardized Breadcrumb Navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="mb-6">
+          <Breadcrumb />
+        </div>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
