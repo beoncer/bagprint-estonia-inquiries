@@ -18,7 +18,9 @@ interface ProductFilter {
 }
 
 interface ProductWithCategory extends Product {
-  category_name?: string;
+  product_categories?: {
+    name: string;
+  };
 }
 
 const fetchProducts = async (category?: string): Promise<ProductWithCategory[]> => {
@@ -95,7 +97,7 @@ const Products = () => {
   };
 
   const getCategoryName = (product: ProductWithCategory): string => {
-    return product.product_categories?.name || 'Unknown Category';
+    return product.product_categories?.name || product.type || 'Unknown Category';
   };
 
   const getProductsTitle = (): string => {
