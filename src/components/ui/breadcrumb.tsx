@@ -173,7 +173,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
             </Link>
           ) : (
             <span 
-              className="text-gray-900 font-medium" 
+              className="text-gray-900 font-bold" 
               aria-current={item.isCurrentPage ? "page" : undefined}
             >
               {item.label}
