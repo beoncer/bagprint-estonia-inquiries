@@ -1,17 +1,12 @@
 
 import React from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/supabase";
 import EnhancedProductGrid from "@/components/product/EnhancedProductGrid";
-import { useProductFilter } from "@/hooks/useProductFilter";
-import { ProductFilterControls } from "@/components/product/ProductFilterControls";
-import { ProductSearch } from "@/components/product/ProductSearch";
-import { ProductCategory } from "@/components/product/ProductCategory";
-import { ProductSort } from "@/components/product/ProductSort";
-import { ProductFilters } from "@/components/product/ProductFilters";
-import { DynamicSEO } from "@/components/seo/DynamicSEO";
+import DynamicSEO from "@/components/seo/DynamicSEO";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import { Card, CardContent } from "@/components/ui/card";
 
 const Products = () => {
   const [searchParams] = useSearchParams();
@@ -24,33 +19,6 @@ const Products = () => {
     gcTime: 1000 * 60 * 10, // 10 minutes
   });
 
-  const {
-    filteredProducts,
-    searchTerm,
-    setSearchTerm,
-    selectedCategory,
-    setSelectedCategory,
-    selectedColors,
-    setSelectedColors,
-    selectedSizes,
-    setSelectedSizes,
-    priceRange,
-    setPriceRange,
-    sortBy,
-    setSortBy,
-    isEcoOnly,
-    setIsEcoOnly,
-    clearFilters,
-    hasActiveFilters
-  } = useProductFilter(products);
-
-  // Set category from URL params
-  React.useEffect(() => {
-    if (currentCategory) {
-      setSelectedCategory(currentCategory);
-    }
-  }, [currentCategory, setSelectedCategory]);
-
   const categoryDisplayNames: Record<string, string> = {
     'cotton_bag': 'Riidest kotid',
     'paper_bag': 'Paberkotid', 
@@ -58,77 +26,117 @@ const Products = () => {
     'shoebag': 'Sussikotid',
   };
 
-  const currentCategoryName = selectedCategory ? categoryDisplayNames[selectedCategory] : null;
+  const categories = [
+    {
+      id: 'cotton_bag',
+      name: 'Riidest kotid',
+      description: 'Keskkonnasõbralikud riidest kotid igapäevaseks kasutamiseks',
+      href: '/riidest-kotid',
+      image: '/placeholder.svg'
+    },
+    {
+      id: 'paper_bag',
+      name: 'Paberkotid',
+      description: 'Kvaliteetsed paberkotid erinevate sündmuste jaoks',
+      href: '/paberkotid',
+      image: '/placeholder.svg'
+    },
+    {
+      id: 'drawstring_bag',
+      name: 'Nööriga kotid',
+      description: 'Praktilised nööriga kotid spordiks ja reisimiseks',
+      href: '/nooriga-kotid',
+      image: '/placeholder.svg'
+    },
+    {
+      id: 'shoebag',
+      name: 'Sussikotid',
+      description: 'Mugavad sussikotid jalanõude hoiustamiseks',
+      href: '/sussikotid',
+      image: '/placeholder.svg'
+    }
+  ];
 
+  const currentCategoryName = currentCategory ? categoryDisplayNames[currentCategory] : null;
+
+  // If a category is selected, show products for that category
+  if (currentCategory) {
+    const filteredProducts = products.filter(product => product.type === currentCategory);
+    
+    return (
+      <>
+        <DynamicSEO 
+          title={currentCategoryName ? `${currentCategoryName} | Leatex` : "Tooted | Leatex"}
+          description={currentCategoryName ? `${currentCategoryName} - kvaliteetsed ja keskkonnasõbralikud kotid` : "Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"}
+        />
+        
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
+          <div className="pt-4 mb-6">
+            <Breadcrumb />
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              {currentCategoryName}
+            </h1>
+            <p className="text-gray-600 text-lg">
+              Avasta meie {currentCategoryName?.toLowerCase()} kollektsiooni
+            </p>
+          </div>
+
+          <div className="pb-12">
+            <EnhancedProductGrid
+              products={filteredProducts}
+              loading={isLoading}
+              error={error?.message || null}
+              emptyStateMessage="Valitud kategoorias tooteid ei leitud"
+            />
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // Default view - show product categories
   return (
     <>
       <DynamicSEO 
-        title={currentCategoryName ? `${currentCategoryName} | Leatex` : "Tooted | Leatex"}
-        description={currentCategoryName ? `${currentCategoryName} - kvaliteetsed ja keskkonnasõbralikud kotid` : "Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"}
+        title="Tooted | Leatex"
+        description="Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"
       />
       
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
-        {/* Breadcrumb - positioned consistently */}
         <div className="pt-4 mb-6">
           <Breadcrumb />
         </div>
 
-        {/* Hero Section */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            {currentCategoryName || "Tooted"}
+            Tooted
           </h1>
           <p className="text-gray-600 text-lg">
-            {currentCategoryName 
-              ? `Avasta meie ${currentCategoryName.toLowerCase()} kollektsiooni`
-              : "Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte"
-            }
+            Avasta meie laia valikut kvaliteetseid ja keskkonnasõbralikke kotte
           </p>
         </div>
 
-        {/* Search and Category Filter */}
-        <div className="mb-6 space-y-4">
-          <ProductSearch 
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-          />
-          
-          <ProductCategory 
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-          />
-        </div>
-
-        {/* Filters and Sort */}
-        <div className="mb-6">
-          <ProductFilterControls 
-            selectedColors={selectedColors}
-            onColorsChange={setSelectedColors}
-            selectedSizes={selectedSizes}
-            onSizesChange={setSelectedSizes}
-            priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-            isEcoOnly={isEcoOnly}
-            onEcoOnlyChange={setIsEcoOnly}
-            onClearFilters={clearFilters}
-            hasActiveFilters={hasActiveFilters}
-          />
-        </div>
-
-        {/* Products Grid */}
-        <div className="pb-12">
-          <EnhancedProductGrid
-            products={filteredProducts}
-            loading={isLoading}
-            error={error?.message || null}
-            emptyStateMessage={
-              hasActiveFilters 
-                ? "Valitud filtritele vastavaid tooteid ei leitud"
-                : "Tooteid ei leitud"
-            }
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pb-12">
+          {categories.map((category) => (
+            <Link key={category.id} to={category.href}>
+              <Card className="h-full hover:shadow-lg transition-shadow duration-300">
+                <div className="aspect-square w-full relative overflow-hidden rounded-t-lg bg-gray-100">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
+                  <p className="text-gray-600 text-sm">{category.description}</p>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
         </div>
       </div>
     </>
