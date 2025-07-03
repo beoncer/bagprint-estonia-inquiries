@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -46,24 +47,36 @@ const Portfolio = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  // Fetch dynamic content
+  // Fetch dynamic content with proper dependency array and cleanup
   useEffect(() => {
+    let mounted = true;
+
     const fetchContent = async () => {
-      const { data } = await supabase
-        .from("website_content")
-        .select("key, value")
-        .eq("page", "portfolio");
-      if (data) {
-        setHeader(data.find((row: any) => row.key === "portfolio_header")?.value || "");
-        setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
-        setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
-        setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "");
-        setCtaSubtitle(data.find((row: any) => row.key === "portfolio_cta_subtitle")?.value || "");
-        setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "");
+      try {
+        const { data } = await supabase
+          .from("website_content")
+          .select("key, value")
+          .eq("page", "portfolio");
+        
+        if (data && mounted) {
+          setHeader(data.find((row: any) => row.key === "portfolio_header")?.value || "");
+          setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
+          setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
+          setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "");
+          setCtaSubtitle(data.find((row: any) => row.key === "portfolio_cta_subtitle")?.value || "");
+          setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "");
+        }
+      } catch (error) {
+        console.error('Error fetching content:', error);
       }
     };
+
     fetchContent();
-  }, []);
+
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty dependency array - only run once on mount
 
   useEffect(() => {
     if (categoryFilter === "all") {
@@ -78,7 +91,7 @@ const Portfolio = () => {
     setCategoryFilter(category);
   };
 
-  if (isLoading || !header) {
+  if (isLoading) {
     return (
       <div className="bg-gray-50 py-16 overflow-x-hidden">
         <div className="max-w-7xl mx-auto px-4">
@@ -126,10 +139,10 @@ const Portfolio = () => {
                   <span className="text-primary">{headerHighlight}</span>
                   {header.split(headerHighlight)[1]}
                 </>
-              ) : header}
+              ) : (header || "Portfoolio")}
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
-              {description}
+              {description || "Vaadake meie tehtud töid ja projekte"}
             </p>
           </div>
         </div>
