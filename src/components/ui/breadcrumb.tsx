@@ -11,166 +11,70 @@ interface BreadcrumbItem {
 interface BreadcrumbProps {
   items?: BreadcrumbItem[];
   className?: string;
-  productData?: {
-    name: string;
-    category: string;
-  };
-  blogPostTitle?: string;
 }
 
-const Breadcrumb: React.FC<BreadcrumbProps> = ({ 
-  items, 
-  className = "", 
-  productData,
-  blogPostTitle 
-}) => {
+const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
   const location = useLocation();
   
-  // Category mapping for Estonian labels
-  const categoryLabels: Record<string, string> = {
-    'cotton_bag': 'Riidest kotid',
-    'paper_bag': 'Paberkotid', 
-    'drawstring_bag': 'Nööriga kotid',
-    'shoebag': 'Sussikotid',
-    'packaging': 'E-poe pakendid'
-  };
-
-  const categoryRoutes: Record<string, string> = {
-    '/riidest-kotid': 'cotton_bag',
-    '/paberkotid': 'paper_bag',
-    '/nooriga-kotid': 'drawstring_bag',
-    '/sussikotid': 'shoebag'
-  };
-
-  // Generate hierarchical breadcrumbs based on site structure
-  const generateHierarchicalBreadcrumbs = (): BreadcrumbItem[] => {
-    const path = location.pathname;
+  // Generate breadcrumbs from URL if not provided
+  const generateBreadcrumbs = (): BreadcrumbItem[] => {
+    const pathSegments = location.pathname.split('/').filter(Boolean);
     const breadcrumbs: BreadcrumbItem[] = [];
     
-    // Homepage - no breadcrumbs
-    if (path === '/') {
-      return [];
-    }
-    
-    // Products main page
-    if (path === '/tooted') {
-      breadcrumbs.push({ label: 'Tooted' });
-      return breadcrumbs;
-    }
-    
-    // Product category pages
-    if (categoryRoutes[path]) {
-      breadcrumbs.push({ label: 'Tooted', href: '/tooted' });
-      const categoryKey = categoryRoutes[path];
-      breadcrumbs.push({ label: categoryLabels[categoryKey] || categoryKey });
-      return breadcrumbs;
-    }
-    
-    // Product detail pages (with product data)
-    if (path.startsWith('/tooted/') && productData) {
-      breadcrumbs.push({ label: 'Tooted', href: '/tooted' });
-      
-      // Add category if available
-      if (productData.category && categoryLabels[productData.category]) {
-        const categoryRoute = Object.keys(categoryRoutes).find(
-          route => categoryRoutes[route] === productData.category
-        );
-        if (categoryRoute) {
-          breadcrumbs.push({ 
-            label: categoryLabels[productData.category], 
-            href: categoryRoute 
-          });
-        }
-      }
-      
-      breadcrumbs.push({ label: productData.name });
-      return breadcrumbs;
-    }
-    
-    // Blog post pages
-    if (path.startsWith('/blogi/') && blogPostTitle) {
-      breadcrumbs.push({ label: 'Blogi', href: '/blogi' });
-      breadcrumbs.push({ label: blogPostTitle });
-      return breadcrumbs;
-    }
-    
-    // Blog main page
-    if (path === '/blogi') {
-      breadcrumbs.push({ label: 'Blogi' });
-      return breadcrumbs;
-    }
-    
-    // Static pages
-    const staticPages: Record<string, string> = {
-      '/meist': 'Meist',
-      '/kontakt': 'Kontakt',
-      '/portfoolio': 'Portfoolio'
+    // Map Estonian URLs to readable labels
+    const urlToLabel: Record<string, string> = {
+      'tooted': 'Tooted',
+      'riidest-kotid': 'Riidest kotid',
+      'paberkotid': 'Paberkotid',
+      'nooriga-kotid': 'Nööriga kotid',
+      'sussikotid': 'Sussikotid',
+      'kontakt': 'Kontakt',
+      'meist': 'Meist',
+      'portfoolio': 'Portfoolio',
+      'blogi': 'Blogi',
+      'products': 'Products',
+      'contact': 'Contact',
+      'portfolio': 'Portfolio',
+      'blog': 'Blog'
     };
     
-    if (staticPages[path]) {
-      breadcrumbs.push({ label: staticPages[path] });
-      return breadcrumbs;
-    }
+    let currentPath = '';
     
-    // 404 or unknown pages
-    if (path.includes('404') || !Object.keys(staticPages).includes(path)) {
-      breadcrumbs.push({ label: '404' });
-      return breadcrumbs;
-    }
-    
-    // Fallback for other pages
-    const segments = path.split('/').filter(Boolean);
-    if (segments.length > 0) {
-      const lastSegment = segments[segments.length - 1];
-      const label = lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
-      breadcrumbs.push({ label });
-    }
+    pathSegments.forEach((segment, index) => {
+      currentPath += `/${segment}`;
+      const label = urlToLabel[segment] || segment.charAt(0).toUpperCase() + segment.slice(1);
+      
+      breadcrumbs.push({
+        label,
+        href: index === pathSegments.length - 1 ? undefined : currentPath
+      });
+    });
     
     return breadcrumbs;
   };
   
-  const breadcrumbItems = items || generateHierarchicalBreadcrumbs();
+  const breadcrumbItems = items || generateBreadcrumbs();
   
   // Add structured data for breadcrumbs
   React.useEffect(() => {
-    // Remove existing breadcrumb structured data
-    const existingScript = document.querySelector('script[data-breadcrumb-structured-data]');
-    if (existingScript) {
-      existingScript.remove();
-    }
-
-    if (breadcrumbItems.length > 0) {
-      const structuredData = {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Avaleht",
-            "item": "https://leatex.ee/"
-          },
-          ...breadcrumbItems.map((item, index) => ({
-            "@type": "ListItem",
-            "position": index + 2,
-            "name": item.label,
-            "item": item.href ? `https://leatex.ee${item.href}` : undefined
-          }))
-        ]
-      };
-      
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.setAttribute('data-breadcrumb-structured-data', 'true');
-      script.textContent = JSON.stringify(structuredData);
-      document.head.appendChild(script);
-    }
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": breadcrumbItems.map((item, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": item.label,
+        "item": item.href ? `https://leatex.ee${item.href}` : undefined
+      }))
+    };
+    
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(structuredData);
+    document.head.appendChild(script);
     
     return () => {
-      const scriptToRemove = document.querySelector('script[data-breadcrumb-structured-data]');
-      if (scriptToRemove) {
-        scriptToRemove.remove();
-      }
+      document.head.removeChild(script);
     };
   }, [breadcrumbItems]);
   
@@ -187,7 +91,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
       </Link>
       
       {breadcrumbItems.map((item, index) => (
-        <div key={index} className="flex items-center">
+        <React.Fragment key={index}>
           <ChevronRight className="h-4 w-4 text-gray-400" />
           {item.href ? (
             <Link
@@ -201,7 +105,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
               {item.label}
             </span>
           )}
-        </div>
+        </React.Fragment>
       ))}
     </nav>
   );

@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getProductBySlug } from "@/lib/supabase";
-import type { Product } from "@/lib/supabase";
+import { getProductBySlug, Product } from "@/lib/supabase";
 import OrderingFAQSection from "@/components/seo/OrderingFAQSection";
 import OrderingFAQStructuredData from "@/components/seo/OrderingFAQStructuredData";
 import ColorPicker from "@/components/product/ColorPicker";
@@ -17,7 +16,6 @@ import { usePricing } from "@/hooks/usePricing";
 import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetails";
 import { PRODUCT_COLORS } from "@/lib/constants";
 import ProductStructuredData from "@/components/seo/ProductStructuredData";
-import Breadcrumb from "@/components/ui/breadcrumb";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -253,46 +251,8 @@ const ProductDetail = () => {
 
   return (
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
-      {/* Add breadcrumb navigation */}
-      <div className="mb-8">
-        <Breadcrumb 
-          productData={{
-            name: product.name,
-            category: product.category
-          }}
-        />
-      </div>
-
       {/* Inject structured data for SEO */}
-      {product && <ProductStructuredData product={{
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        image_url: product.image_url,
-        image: product.image,
-        base_price: product.base_price,
-        slug: product.slug,
-        created_at: product.created_at,
-        updated_at: product.updated_at,
-        category: product.category,
-        type: product.type,
-        colors: product.colors,
-        sizes: product.sizes,
-        is_eco: product.is_eco || false,
-        badges: (product.badges || []).filter((badge): badge is BadgeType => 
-          ['eco', 'organic', 'reusable', 'recycled'].includes(badge)
-        ),
-        material: product.material,
-        color_images: product.color_images,
-        size_images: product.size_images,
-        additional_images: product.additional_images,
-        main_color: product.main_color,
-        seo_title: product.seo_title,
-        seo_description: product.seo_description,
-        seo_keywords: product.seo_keywords,
-        is_popular: product.is_popular || false
-      }} price={lowestPossiblePrice} />}
-      
+      {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
