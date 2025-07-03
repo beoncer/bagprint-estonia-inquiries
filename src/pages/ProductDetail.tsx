@@ -16,6 +16,7 @@ import { usePricing } from "@/hooks/usePricing";
 import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetails";
 import { PRODUCT_COLORS } from "@/lib/constants";
 import ProductStructuredData from "@/components/seo/ProductStructuredData";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -253,6 +254,12 @@ const ProductDetail = () => {
     <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-10">
       {/* Inject structured data for SEO */}
       {product && <ProductStructuredData product={product} price={lowestPossiblePrice} />}
+      
+      {/* Enhanced Breadcrumb Navigation */}
+      <div className="mb-8">
+        <Breadcrumb />
+      </div>
+      
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
@@ -305,7 +312,6 @@ const ProductDetail = () => {
           {sizeThumbnails.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">
               {sizeThumbnails.map(({ size, url }) => {
-                // No border for selected size
                 return (
                   <div
                     key={size}

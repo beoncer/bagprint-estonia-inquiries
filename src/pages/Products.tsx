@@ -446,6 +446,11 @@ const Products = () => {
     return (
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
         <div className="max-w-7xl mx-auto px-4">
+          {/* Enhanced Breadcrumb Navigation */}
+          <div className="mb-8">
+            <Breadcrumb />
+          </div>
+          
           {/* Hero Section - Portfolio style */}
           <div className="text-center mb-16">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
@@ -576,7 +581,7 @@ const Products = () => {
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen py-16">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Breadcrumb Navigation */}
+          {/* Enhanced Breadcrumb Navigation */}
           <div className="mb-8">
             <Breadcrumb />
           </div>
