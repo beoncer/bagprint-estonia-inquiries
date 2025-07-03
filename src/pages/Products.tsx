@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -89,6 +90,27 @@ const fetchProducts = async (
   return data || [];
 };
 
+const fetchAvailableSizes = async (): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from("products")
+    .select("sizes")
+    .not("sizes", "eq", "{}");
+
+  if (error) {
+    console.error("Error fetching sizes:", error);
+    return [];
+  }
+
+  const allSizes = new Set<string>();
+  data?.forEach(product => {
+    if (product.sizes && Array.isArray(product.sizes)) {
+      product.sizes.forEach(size => allSizes.add(size));
+    }
+  });
+
+  return Array.from(allSizes).sort();
+};
+
 const Products = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -104,6 +126,12 @@ const Products = () => {
     queryKey: ["products", category, searchTerm, selectedColors, selectedSizes, sortBy],
     queryFn: () => fetchProducts(category, searchTerm, selectedColors, selectedSizes, sortBy),
     staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: availableSizes = [] } = useQuery({
+    queryKey: ["available-sizes"],
+    queryFn: fetchAvailableSizes,
+    staleTime: 1000 * 60 * 10,
   });
 
   useEffect(() => {
@@ -218,7 +246,7 @@ const Products = () => {
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold mb-2">Suurused</h3>
                   <div className="flex flex-wrap gap-2">
-                    {["S", "M", "L", "XL", "XXL"].map((size) => (
+                    {availableSizes.map((size) => (
                       <div key={size} className="flex items-center space-x-2">
                         <Checkbox
                           id={`size-${size}`}
@@ -277,7 +305,7 @@ const Products = () => {
               <div className="flex items-center space-x-2">
                 <h3 className="text-sm font-semibold">Suurused:</h3>
                 <div className="flex flex-wrap gap-1">
-                  {["S", "M", "L", "XL", "XXL"].map((size) => (
+                  {availableSizes.map((size) => (
                     <Badge
                       key={size}
                       variant={selectedSizes.includes(size) ? "default" : "outline"}
