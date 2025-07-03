@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { 
   Card,
@@ -20,6 +19,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import Breadcrumb from "@/components/ui/breadcrumb";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -101,6 +101,11 @@ const Contact = () => {
   
   return (
     <div className="bg-gray-50 min-h-screen overflow-x-hidden">
+      {/* Add breadcrumb navigation */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <Breadcrumb />
+      </div>
+
       {/* Hero Section - matching portfolio style */}
       <section className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
