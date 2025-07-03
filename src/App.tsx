@@ -1,3 +1,4 @@
+
 import React, { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -72,7 +73,7 @@ const App: React.FC = () => {
                   {/* Sitemap route - must be before other routes */}
                   <Route path="/sitemap.xml" element={<Sitemap />} />
                   
-                  {/* Public routes */}
+                  {/* Public routes - Estonian only */}
                   <Route path="/" element={<MainLayout />}>
                     <Route index element={<Index />} />
                     <Route path="tooted" element={<Products />} />
@@ -81,17 +82,11 @@ const App: React.FC = () => {
                     <Route path="paberkotid" element={<Products />} />
                     <Route path="nooriga-kotid" element={<Products />} />
                     <Route path="sussikotid" element={<Products />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="products/:slug" element={<ProductDetail />} />
                     <Route path="kontakt" element={<Contact />} />
                     <Route path="meist" element={<Meist />} />
                     <Route path="portfoolio" element={<Portfolio />} />
                     <Route path="blogi" element={<Blog />} />
                     <Route path="blogi/:slug" element={<BlogPost />} />
-                    <Route path="contact" element={<Contact />} />
-                    <Route path="portfolio" element={<Portfolio />} />
-                    <Route path="blog" element={<Blog />} />
-                    <Route path="blog/:slug" element={<BlogPost />} />
                   </Route>
 
                   {/* Admin routes */}

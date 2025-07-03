@@ -6,7 +6,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://leatex.ee/</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/"/>
@@ -15,99 +15,75 @@
   <!-- Main Product Categories -->
   <url>
     <loc>https://leatex.ee/tooted</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/riidest-kotid</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/riidest-kotid"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/paberkotid</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/paberkotid"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/nooriga-kotid</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/nooriga-kotid"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/sussikotid</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/sussikotid"/>
   </url>
   
   <!-- Information Pages -->
   <url>
     <loc>https://leatex.ee/meist</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/meist"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/kontakt</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/kontakt"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/portfoolio</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/portfoolio"/>
   </url>
   
   <url>
     <loc>https://leatex.ee/blogi</loc>
-    <lastmod>2024-01-15</lastmod>
+    <lastmod>2025-01-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
-  </url>
-  
-  <!-- English Versions (for backward compatibility) -->
-  <url>
-    <loc>https://leatex.ee/products</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://leatex.ee/products"/>
-  </url>
-  
-  <url>
-    <loc>https://leatex.ee/contact</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://leatex.ee/contact"/>
-  </url>
-  
-  <url>
-    <loc>https://leatex.ee/portfolio</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://leatex.ee/portfolio"/>
-  </url>
-  
-  <url>
-    <loc>https://leatex.ee/blog</loc>
-    <lastmod>2024-01-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="https://leatex.ee/blog"/>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/blogi"/>
   </url>
   
 </urlset>
