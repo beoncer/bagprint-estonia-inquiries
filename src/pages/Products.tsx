@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -17,18 +18,12 @@ interface ProductFilter {
   slug: string;
 }
 
-interface ProductWithCategory extends Product {
-  product_categories?: {
-    name: string;
-  };
-}
-
-const fetchProducts = async (category?: string): Promise<ProductWithCategory[]> => {
+const fetchProducts = async (category?: string): Promise<Product[]> => {
   let query = supabase
     .from('products')
-    .select('*, product_categories(name)')
+    .select('*')
     .eq('visible', true)
-    .order('order', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (category) {
     query = query.eq('type', category);
@@ -45,32 +40,29 @@ const fetchProducts = async (category?: string): Promise<ProductWithCategory[]> 
 };
 
 const fetchProductFilters = async (): Promise<ProductFilter[]> => {
-  const { data, error } = await supabase
-    .from('product_categories')
-    .select('id, name, slug')
-    .eq('visible', true)
-    .order('order', { ascending: true });
+  // Create static filters based on product types
+  const staticFilters: ProductFilter[] = [
+    { id: '1', name: 'Riidest kotid', slug: 'cotton_bag' },
+    { id: '2', name: 'Paberkotid', slug: 'paper_bag' },
+    { id: '3', name: 'Nööriga kotid', slug: 'string_bag' },
+    { id: '4', name: 'Sussikotid', slug: 'shoe_bag' },
+  ];
 
-  if (error) {
-    console.error("Supabase error fetching product filters:", error);
-    return [];
-  }
-
-  return data || [];
+  return staticFilters;
 };
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState<ProductWithCategory[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', activeFilter],
-    queryFn: () => fetchProducts(activeFilter!),
+    queryFn: () => fetchProducts(activeFilter || undefined),
     staleTime: 1000 * 60 * 5,
   });
 
-  const { data: productFilters, isLoading: filtersLoading, error: filtersError } = useQuery({
+  const { data: productFilters } = useQuery({
     queryKey: ['productFilters'],
     queryFn: fetchProductFilters,
     staleTime: 1000 * 60 * 5,
@@ -82,7 +74,7 @@ const Products = () => {
     } else {
       const filtered = (products || []).filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
       );
       setFilteredProducts(filtered);
     }
@@ -96,8 +88,14 @@ const Products = () => {
     setActiveFilter(filter);
   };
 
-  const getCategoryName = (product: ProductWithCategory): string => {
-    return product.product_categories?.name || product.type || 'Unknown Category';
+  const getCategoryName = (productType: string): string => {
+    const typeMapping: Record<string, string> = {
+      'cotton_bag': 'Riidest kotid',
+      'paper_bag': 'Paberkotid',
+      'string_bag': 'Nööriga kotid',
+      'shoe_bag': 'Sussikotid',
+    };
+    return typeMapping[productType] || productType;
   };
 
   const getProductsTitle = (): string => {
@@ -169,7 +167,7 @@ const Products = () => {
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                   <div className="h-64 overflow-hidden">
                     <img
-                      src={product.image_url || product.image}
+                      src={product.image_url || product.image || '/placeholder.svg'}
                       alt={product.name}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />
