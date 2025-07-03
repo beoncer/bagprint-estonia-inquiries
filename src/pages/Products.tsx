@@ -22,7 +22,6 @@ const fetchProducts = async (category?: string): Promise<Product[]> => {
   let query = supabase
     .from('products')
     .select('*')
-    .eq('visible', true)
     .order('created_at', { ascending: false });
 
   if (category) {
