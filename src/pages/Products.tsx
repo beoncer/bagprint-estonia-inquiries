@@ -13,7 +13,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EnhancedProductGrid from "@/components/product/EnhancedProductGrid";
-import { PRODUCT_COLORS } from "@/lib/constants";
+import { PRODUCT_COLORS, ProductColor } from "@/lib/constants";
+import { BadgeType } from "@/lib/badge-constants";
 import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface Product {
@@ -26,10 +27,10 @@ interface Product {
   base_price: number;
   category: string;
   type: string;
-  colors: string[];
+  colors: ProductColor[];
   sizes: string[];
   material: string;
-  badges: string[];
+  badges: BadgeType[];
   is_eco: boolean;
   is_popular: boolean;
   created_at: string;
