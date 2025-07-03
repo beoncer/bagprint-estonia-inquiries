@@ -446,8 +446,8 @@ const Products = () => {
     return (
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Enhanced Breadcrumb Navigation - moved higher up */}
-          <div className="pt-8 mb-8">
+          {/* Breadcrumb Navigation - positioned exactly like /meist page */}
+          <div className="pt-6">
             <Breadcrumb />
           </div>
           
@@ -583,8 +583,8 @@ const Products = () => {
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto px-4">
-          {/* Enhanced Breadcrumb Navigation - moved higher up */}
-          <div className="pt-8 mb-8">
+          {/* Breadcrumb Navigation - positioned exactly like /meist page */}
+          <div className="pt-6">
             <Breadcrumb />
           </div>
           
