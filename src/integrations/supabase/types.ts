@@ -17,9 +17,6 @@ export type Database = {
           id: string
           image_url: string | null
           read_time: string | null
-          seo_description: string | null
-          seo_keywords: string | null
-          seo_title: string | null
           slug: string | null
           title: string
           updated_at: string | null
@@ -31,9 +28,6 @@ export type Database = {
           id?: string
           image_url?: string | null
           read_time?: string | null
-          seo_description?: string | null
-          seo_keywords?: string | null
-          seo_title?: string | null
           slug?: string | null
           title: string
           updated_at?: string | null
@@ -45,9 +39,6 @@ export type Database = {
           id?: string
           image_url?: string | null
           read_time?: string | null
-          seo_description?: string | null
-          seo_keywords?: string | null
-          seo_title?: string | null
           slug?: string | null
           title?: string
           updated_at?: string | null
@@ -322,9 +313,6 @@ export type Database = {
           main_color: string | null
           material: string | null
           name: string
-          seo_description: string | null
-          seo_keywords: string | null
-          seo_title: string | null
           size_images: Json | null
           sizes: string[] | null
           slug: string | null
@@ -345,9 +333,6 @@ export type Database = {
           main_color?: string | null
           material?: string | null
           name: string
-          seo_description?: string | null
-          seo_keywords?: string | null
-          seo_title?: string | null
           size_images?: Json | null
           sizes?: string[] | null
           slug?: string | null
@@ -368,9 +353,6 @@ export type Database = {
           main_color?: string | null
           material?: string | null
           name?: string
-          seo_description?: string | null
-          seo_keywords?: string | null
-          seo_title?: string | null
           size_images?: Json | null
           sizes?: string[] | null
           slug?: string | null
@@ -581,9 +563,6 @@ export type Database = {
           main_color: string | null
           material: string | null
           name: string
-          seo_description: string | null
-          seo_keywords: string | null
-          seo_title: string | null
           size_images: Json | null
           sizes: string[] | null
           slug: string | null
@@ -623,9 +602,6 @@ export type Database = {
           main_color: string | null
           material: string | null
           name: string
-          seo_description: string | null
-          seo_keywords: string | null
-          seo_title: string | null
           size_images: Json | null
           sizes: string[] | null
           slug: string | null
@@ -649,9 +625,6 @@ export type Database = {
           main_color: string | null
           material: string | null
           name: string
-          seo_description: string | null
-          seo_keywords: string | null
-          seo_title: string | null
           size_images: Json | null
           sizes: string[] | null
           slug: string | null
@@ -675,9 +648,6 @@ export type Database = {
           main_color: string | null
           material: string | null
           name: string
-          seo_description: string | null
-          seo_keywords: string | null
-          seo_title: string | null
           size_images: Json | null
           sizes: string[] | null
           slug: string | null

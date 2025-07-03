@@ -22,12 +22,10 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { X } from "lucide-react";
 
 interface InquiryFormProps {
   productId?: string;
   productName?: string;
-  onClose?: () => void;
 }
 
 const formSchema = z.object({
@@ -52,7 +50,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const InquiryForm = ({ productId, productName, onClose }: InquiryFormProps) => {
+const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -94,25 +92,11 @@ const InquiryForm = ({ productId, productName, onClose }: InquiryFormProps) => {
         description: "Võtame teiega peagi ühendust.",
       });
       form.reset();
-      // Close the modal if onClose is provided
-      if (onClose) {
-        onClose();
-      }
     }, 1000);
   };
 
   return (
-    <div className="bg-white p-4 md:p-6 rounded-lg shadow max-w-4xl mx-auto relative">
-      {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      )}
-      
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow max-w-4xl mx-auto">
       <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Pakkumise küsimine</h2>
       
       <Form {...form}>
