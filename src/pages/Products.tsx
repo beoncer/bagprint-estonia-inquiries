@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -445,9 +446,9 @@ const Products = () => {
     const split = heading.split(/(tooted)/i);
     return (
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           {/* Breadcrumb Navigation - positioned exactly like /meist page */}
-          <div className="pt-6">
+          <div className="pt-4">
             <Breadcrumb />
           </div>
           
@@ -582,9 +583,9 @@ const Products = () => {
       <FAQStructuredData faqs={currentFAQs} category={activeCategory} />
       
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           {/* Breadcrumb Navigation - positioned exactly like /meist page */}
-          <div className="pt-6">
+          <div className="pt-4">
             <Breadcrumb />
           </div>
           
