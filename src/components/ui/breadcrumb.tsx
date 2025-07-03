@@ -187,7 +187,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
       </Link>
       
       {breadcrumbItems.map((item, index) => (
-        <React.Fragment key={index}>
+        <div key={index} className="flex items-center">
           <ChevronRight className="h-4 w-4 text-gray-400" />
           {item.href ? (
             <Link
@@ -201,7 +201,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
               {item.label}
             </span>
           )}
-        </React.Fragment>
+        </div>
       ))}
     </nav>
   );
