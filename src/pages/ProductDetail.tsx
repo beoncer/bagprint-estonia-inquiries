@@ -268,7 +268,12 @@ const ProductDetail = () => {
         id: product.id,
         name: product.name,
         description: product.description,
+        image_url: product.image_url,
         image: product.image,
+        base_price: product.base_price,
+        slug: product.slug,
+        created_at: product.created_at,
+        updated_at: product.updated_at,
         category: product.category,
         type: product.type,
         colors: product.colors,
@@ -278,7 +283,14 @@ const ProductDetail = () => {
           ['eco', 'organic', 'reusable', 'recycled'].includes(badge)
         ),
         material: product.material,
-        slug: product.slug
+        color_images: product.color_images,
+        size_images: product.size_images,
+        additional_images: product.additional_images,
+        main_color: product.main_color,
+        seo_title: product.seo_title,
+        seo_description: product.seo_description,
+        seo_keywords: product.seo_keywords,
+        is_popular: product.is_popular || false
       }} price={lowestPossiblePrice} />}
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
