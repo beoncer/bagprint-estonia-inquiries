@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useSearchParams, useLocation, Link } from "react-router-dom";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -448,7 +447,7 @@ const Products = () => {
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           {/* Breadcrumb Navigation - positioned exactly like /meist page */}
-          <div className="pt-4">
+          <div className="pt-6">
             <Breadcrumb />
           </div>
           
@@ -585,7 +584,7 @@ const Products = () => {
       <div className="bg-gradient-to-b from-white to-gray-50 min-h-screen">
         <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20">
           {/* Breadcrumb Navigation - positioned exactly like /meist page */}
-          <div className="pt-4">
+          <div className="pt-6">
             <Breadcrumb />
           </div>
           
