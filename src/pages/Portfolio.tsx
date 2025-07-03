@@ -14,16 +14,17 @@ interface PortfolioItem {
   title: string;
   category: string;
   image_url: string;
-  website_url?: string;
-  details_url?: string;
+  description?: string;
+  tags?: string;
   created_at: string;
 }
 
 const fetchPortfolioItems = async (): Promise<PortfolioItem[]> => {
   const { data, error } = await supabase
-    .from('portfolio_items')
+    .from('portfolio')
     .select('*')
-    .order('created_at', { ascending: false });
+    .eq('visible', true)
+    .order('order', { ascending: true });
 
   if (error) throw error;
   return data || [];
@@ -158,7 +159,7 @@ const Portfolio = () => {
             <Filter className="mr-2 h-4 w-4" />
             Kõik
           </Button>
-          {[...new Set(portfolioItems.map(item => item.category))].map((category) => (
+          {[...new Set(portfolioItems.map(item => item.category).filter(Boolean))].map((category) => (
             <Button
               key={category}
               variant={categoryFilter === category ? "default" : "outline"}
@@ -176,36 +177,30 @@ const Portfolio = () => {
               <Card key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
                 <div className="relative">
                   <OptimizedImage
-                    src={item.image_url}
+                    src={item.image_url || '/placeholder.svg'}
                     alt={item.title}
                     className="w-full h-48 object-cover"
                     width={600}
                     height={300}
                   />
                   <div className="absolute top-2 left-2">
-                    <Badge>{item.category}</Badge>
+                    <Badge>{item.category || 'Üldine'}</Badge>
                   </div>
                 </div>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-semibold mb-2 break-words">{item.title}</h2>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {item.website_url && (
-                      <Button asChild variant="outline" size="sm">
-                        <a href={item.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Veebileht
-                        </a>
-                      </Button>
-                    )}
-                    {item.details_url && (
-                      <Button asChild variant="outline" size="sm">
-                        <a href={item.details_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                          <Eye className="mr-2 h-4 w-4" />
-                          Vaata lähemalt
-                        </a>
-                      </Button>
-                    )}
-                  </div>
+                  {item.description && (
+                    <p className="text-gray-600 mb-4 text-sm">{item.description}</p>
+                  )}
+                  {item.tags && (
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {item.tags.split(',').map((tag, index) => (
+                        <span key={index} className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                          {tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
