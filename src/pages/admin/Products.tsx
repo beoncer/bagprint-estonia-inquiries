@@ -62,6 +62,9 @@ interface Product {
   color_images?: Record<string, string>;
   size_images?: Record<string, string>;
   main_color?: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_keywords?: string | null;
 }
 
 interface PopularProduct {
@@ -224,6 +227,9 @@ const ProductsPage: React.FC = () => {
         color_images: colorImages,
         size_images: sizeImages,
         main_color: mainColor,
+        seo_title: formData.seo_title || null,
+        seo_description: formData.seo_description || null,
+        seo_keywords: formData.seo_keywords || null,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -289,6 +295,9 @@ const ProductsPage: React.FC = () => {
         size_images: sizeImages,
         updated_at: new Date().toISOString(),
         main_color: mainColor,
+        seo_title: formData.seo_title || null,
+        seo_description: formData.seo_description || null,
+        seo_keywords: formData.seo_keywords || null,
       };
 
       const { data, error } = await supabase
@@ -353,6 +362,9 @@ const ProductsPage: React.FC = () => {
       base_price: product.base_price,
       slug: product.slug || "",
       material: product.material || "",
+      seo_title: product.seo_title || "",
+      seo_description: product.seo_description || "",
+      seo_keywords: product.seo_keywords || "",
     });
     setIsDialogOpen(true);
   };
@@ -431,6 +443,9 @@ const ProductsPage: React.FC = () => {
       base_price: 0,
       slug: "",
       material: "",
+      seo_title: "",
+      seo_description: "",
+      seo_keywords: "",
     });
     setImageFile(null);
     setMaterialSearchValue("");
@@ -781,6 +796,33 @@ const ProductsPage: React.FC = () => {
                 >
                   Öko toode
                 </label>
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  name="seo_title"
+                  placeholder="SEO Title"
+                  value={formData.seo_title || ""}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Textarea
+                  name="seo_description"
+                  placeholder="SEO Description"
+                  value={formData.seo_description || ""}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  name="seo_keywords"
+                  placeholder="SEO Keywords"
+                  value={formData.seo_keywords || ""}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
             <DialogFooter>

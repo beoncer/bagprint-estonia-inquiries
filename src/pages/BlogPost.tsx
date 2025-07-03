@@ -1,10 +1,10 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Clock, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 interface BlogPost {
   id: string;
@@ -15,6 +15,9 @@ interface BlogPost {
   read_time: string;
   image_url: string;
   created_at: string;
+  seo_title?: string;
+  seo_description?: string;
+  seo_keywords?: string;
 }
 
 const fetchBlogPost = async (slug: string): Promise<BlogPost | null> => {
@@ -86,6 +89,43 @@ const BlogPost = () => {
         return match.replace(/<\/?p[^>]*>/g, '');
       });
   };
+
+  useEffect(() => {
+    if (blogPost) {
+      document.title = blogPost.seo_title || blogPost.title;
+      // Description
+      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = "description";
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = blogPost.seo_description || blogPost.excerpt || "";
+      // Keywords
+      let metaKeywords = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
+      if (!metaKeywords) {
+        metaKeywords = document.createElement('meta');
+        metaKeywords.name = "keywords";
+        document.head.appendChild(metaKeywords);
+      }
+      metaKeywords.content = blogPost.seo_keywords || "";
+      // Open Graph tags
+      let ogTitle = document.querySelector('meta[property="og:title"]') as HTMLMetaElement | null;
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.content = blogPost.seo_title || blogPost.title;
+      let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement | null;
+      if (!ogDesc) {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDesc);
+      }
+      ogDesc.content = blogPost.seo_description || blogPost.excerpt || "";
+    }
+  }, [blogPost]);
 
   if (isLoading) {
     return (

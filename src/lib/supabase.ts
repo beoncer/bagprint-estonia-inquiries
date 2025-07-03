@@ -59,6 +59,9 @@ export interface Product {
   size_images?: Record<string, string>;
   additional_images?: string[];
   main_color?: string;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_keywords?: string | null;
 }
 
 export async function getProducts() {
@@ -96,6 +99,9 @@ export async function getProducts() {
       size_images: item.size_images || {},
       additional_images: item.additional_images || [],
       main_color: item.main_color || null,
+      seo_title: item.seo_title || null,
+      seo_description: item.seo_description || null,
+      seo_keywords: item.seo_keywords || null,
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -126,6 +132,9 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     size_images: data.size_images || {},
     additional_images: data.additional_images || [],
     main_color: data.main_color || null,
+    seo_title: data.seo_title || null,
+    seo_description: data.seo_description || null,
+    seo_keywords: data.seo_keywords || null,
   };
 };
 
@@ -153,6 +162,9 @@ export async function getPopularProducts(): Promise<Product[]> {
     material: data.material,
     color_images: data.color_images || {},
     size_images: data.size_images || {},
+    seo_title: data.seo_title || null,
+    seo_description: data.seo_description || null,
+    seo_keywords: data.seo_keywords || null,
   })) as Product[];
 }
 

@@ -174,6 +174,44 @@ const ProductDetail = () => {
     }
   }
 
+  // Set SEO meta tags from product SEO fields
+  useEffect(() => {
+    if (product) {
+      document.title = product.seo_title || product.name;
+      // Description
+      let metaDesc = document.querySelector('meta[name="description"]') as HTMLMetaElement | null;
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = "description";
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = product.seo_description || product.description || "";
+      // Keywords
+      let metaKeywords = document.querySelector('meta[name="keywords"]') as HTMLMetaElement | null;
+      if (!metaKeywords) {
+        metaKeywords = document.createElement('meta');
+        metaKeywords.name = "keywords";
+        document.head.appendChild(metaKeywords);
+      }
+      metaKeywords.content = product.seo_keywords || "";
+      // Open Graph tags
+      let ogTitle = document.querySelector('meta[property="og:title"]') as HTMLMetaElement | null;
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.content = product.seo_title || product.name;
+      let ogDesc = document.querySelector('meta[property="og:description"]') as HTMLMetaElement | null;
+      if (!ogDesc) {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDesc);
+      }
+      ogDesc.content = product.seo_description || product.description || "";
+    }
+  }, [product]);
+
   if (loading) {
     return (
       <div className="max-w-screen-2xl mx-auto w-full px-4 md:px-8 xl:px-20 py-16">

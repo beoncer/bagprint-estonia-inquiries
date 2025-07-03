@@ -23,6 +23,9 @@ interface BlogPost {
   image_url: string;
   created_at: string;
   updated_at: string;
+  seo_title: string;
+  seo_description: string;
+  seo_keywords: string;
 }
 
 interface FeaturedBlogPost {
@@ -42,7 +45,10 @@ const BlogAdmin = () => {
     content: "",
     excerpt: "",
     read_time: "5 min",
-    image_url: ""
+    image_url: "",
+    seo_title: "",
+    seo_description: "",
+    seo_keywords: ""
   });
   
   // Dynamic content state for blog page
@@ -253,7 +259,10 @@ const BlogAdmin = () => {
       content: "",
       excerpt: "",
       read_time: "5 min",
-      image_url: ""
+      image_url: "",
+      seo_title: "",
+      seo_description: "",
+      seo_keywords: ""
     });
     setEditingPost(null);
   };
@@ -266,7 +275,10 @@ const BlogAdmin = () => {
       content: post.content,
       excerpt: post.excerpt,
       read_time: post.read_time,
-      image_url: post.image_url
+      image_url: post.image_url,
+      seo_title: post.seo_title,
+      seo_description: post.seo_description,
+      seo_keywords: post.seo_keywords
     });
     setIsDialogOpen(true);
   };
@@ -375,6 +387,40 @@ const BlogAdmin = () => {
                     value={formData.read_time}
                     onChange={(e) => setFormData(prev => ({ ...prev, read_time: e.target.value }))}
                     placeholder="5 min"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="seo_title">SEO Title</Label>
+                  <Input
+                    id="seo_title"
+                    value={formData.seo_title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, seo_title: e.target.value }))}
+                    placeholder="SEO Title"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="seo_description">SEO Description</Label>
+                  <textarea
+                    id="seo_description"
+                    value={formData.seo_description}
+                    onChange={(e) => setFormData(prev => ({ ...prev, seo_description: e.target.value }))}
+                    placeholder="SEO Description"
+                    rows={2}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="seo_keywords">SEO Keywords</Label>
+                  <Input
+                    id="seo_keywords"
+                    value={formData.seo_keywords}
+                    onChange={(e) => setFormData(prev => ({ ...prev, seo_keywords: e.target.value }))}
+                    placeholder="SEO Keywords"
                   />
                 </div>
               </div>

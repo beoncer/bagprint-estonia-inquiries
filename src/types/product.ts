@@ -23,4 +23,7 @@ export interface Product {
   size_images?: Record<string, string>;
   additional_images?: string[];
   main_color?: string;
+  seo_title?: string | null;
+  seo_description?: string | null;
+  seo_keywords?: string | null;
 } 

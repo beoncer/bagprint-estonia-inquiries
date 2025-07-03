@@ -14,12 +14,15 @@ const CSV_COLUMNS = [
   "colors",
   "sizes",
   "badges",
-  "type"
+  "type",
+  "seo_title",
+  "seo_description",
+  "seo_keywords"
 ];
 
 const CSV_TEMPLATE =
-  "name,description,slug,base_price,material,colors,sizes,badges,type\n" +
-  "Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag\n";
+  "name,description,slug,base_price,material,colors,sizes,badges,type,seo_title,seo_description,seo_keywords\n" +
+  "Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag,Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag\n";
 
 function downloadCSVTemplate() {
   const blob = new Blob([CSV_TEMPLATE], { type: "text/csv" });
@@ -70,6 +73,9 @@ const BulkProductUpload: React.FC<{ open: boolean; onOpenChange: (open: boolean)
             sizes: parseCSVValue(row.sizes),
             badges: parseCSVValue(row.badges),
             type: row.type?.trim() || "",
+            seo_title: row.seo_title?.trim() || "",
+            seo_description: row.seo_description?.trim() || "",
+            seo_keywords: row.seo_keywords?.trim() || "",
           };
         });
         setParsedRows(rows);
@@ -107,6 +113,9 @@ const BulkProductUpload: React.FC<{ open: boolean; onOpenChange: (open: boolean)
             sizes: row.sizes,
             badges: row.badges,
             type: row.type,
+            seo_title: row.seo_title,
+            seo_description: row.seo_description,
+            seo_keywords: row.seo_keywords,
             // Do not include is_eco
           }],
           { onConflict: "slug" }
@@ -203,7 +212,10 @@ export function exportProductsToCSV(products: any[]) {
     "colors",
     "sizes",
     "badges",
-    "type"
+    "type",
+    "seo_title",
+    "seo_description",
+    "seo_keywords"
   ];
   const data = products.map((p) => ({
     name: p.name || "",
@@ -214,7 +226,10 @@ export function exportProductsToCSV(products: any[]) {
     colors: Array.isArray(p.colors) ? p.colors.join("|") : (p.colors || ""),
     sizes: Array.isArray(p.sizes) ? p.sizes.join("|") : (p.sizes || ""),
     badges: Array.isArray(p.badges) ? p.badges.join("|") : (p.badges || ""),
-    type: p.type || ""
+    type: p.type || "",
+    seo_title: p.seo_title || "",
+    seo_description: p.seo_description || "",
+    seo_keywords: p.seo_keywords || ""
   }));
   const csv = Papa.unparse({ fields: CSV_COLUMNS, data });
   const blob = new Blob([csv], { type: "text/csv" });
