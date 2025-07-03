@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,7 +60,7 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
   
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200">
-      <div className="aspect-square w-full relative overflow-hidden bg-gray-100">
+      <Link to={`/tooted/${slug}`} className="aspect-square w-full relative overflow-hidden bg-gray-100 block">
         <OptimizedImage
           src={imageUrl}
           alt={altText}
@@ -70,7 +71,7 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
           priority={false}
           fallbackSrc="/placeholder.svg"
         />
-      </div>
+      </Link>
       <CardContent className="p-4 flex-grow">
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
         <p className="text-gray-600 text-sm line-clamp-3 mb-3">{description}</p>
