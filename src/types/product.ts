@@ -1,3 +1,4 @@
+
 import { BadgeType } from "@/lib/badge-constants";
 import { ProductColor } from "@/lib/constants";
 
@@ -26,4 +27,4 @@ export interface Product {
   seo_title?: string | null;
   seo_description?: string | null;
   seo_keywords?: string | null;
-} 
+}
