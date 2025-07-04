@@ -17,6 +17,7 @@ import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetail
 import { PRODUCT_COLORS } from "@/lib/constants";
 import ProductStructuredData from "@/components/seo/ProductStructuredData";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import ImageZoom from "@/components/ui/ImageZoom";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -265,21 +266,11 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
-          <div 
-            className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
-            onMouseEnter={() => setIsImageZoomed(true)}
-            onMouseLeave={() => setIsImageZoomed(false)}
-          >
-            {selectedImage && (
-              <img
-                src={selectedImage}
-                alt={selectedColor ? `${product.name} ${selectedColor}` : selectedSize ? `${product.name} ${selectedSize}` : product.name}
-                className={`object-cover w-full h-full transition-transform duration-300 ${
-                  isImageZoomed ? 'scale-110' : 'scale-100'
-                }`}
-              />
-            )}
-          </div>
+          <ImageZoom
+            src={selectedImage || ''}
+            alt={selectedColor ? `${product?.name} ${selectedColor}` : selectedSize ? `${product?.name} ${selectedSize}` : product?.name || ''}
+            className="aspect-square w-full"
+          />
 
           {/* Color thumbnails */}
           {colorThumbnails.length > 0 && (
@@ -289,20 +280,20 @@ const ProductDetail = () => {
                 return (
                   <div
                     key={color}
-                    className={`relative cursor-pointer transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
+                    className={`relative cursor-pointer transition-all duration-200 hover:scale-105 ${
+                      isSelected ? 'ring-2 ring-red-500 ring-offset-2 scale-105' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
                     }`}
                     onClick={() => handleColorThumbnailClick(color)}
                   >
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
                       <img
                         src={url}
-                        alt={`${product.name} ${color}`}
+                        alt={`${product?.name} ${color}`}
                         className="w-full h-full object-cover"
                       />
                     </div>
                     {isSelected && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse" />
                     )}
                   </div>
                 );
@@ -317,13 +308,13 @@ const ProductDetail = () => {
                 return (
                   <div
                     key={size}
-                    className="relative cursor-pointer transition-all duration-200"
+                    className="relative cursor-pointer transition-all duration-200 hover:scale-105"
                     onClick={() => setSelectedSize(size)}
                   >
                     <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
                       <img
                         src={url}
-                        alt={`${product.name} ${size}`}
+                        alt={`${product?.name} ${size}`}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -486,40 +477,46 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Inquiry form */}
+          {/* Inquiry form - Replace with enhanced FormField components */}
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Input
-                  placeholder="Nimi*"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="bg-white"
-                />
-              </div>
-              <div className="space-y-2">
-                <Input
-                  placeholder="E-mail*"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="bg-white"
-                />
-              </div>
+              <FormField
+                label="Nimi"
+                placeholder="Teie nimi"
+                required
+                value={name}
+                onChange={setName}
+                description="Täisnimi kontakti jaoks"
+              />
+              <FormField
+                label="E-mail"
+                type="email"
+                placeholder="teie@email.ee"
+                required
+                value={email}
+                onChange={setEmail}
+                description="Saadame pakkumise siia"
+              />
             </div>
             
-            <Input
-              placeholder="Telefoninumber*"
+            <FormField
+              label="Telefoninumber"
+              type="tel"
+              placeholder="+372 12345678"
+              required
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="bg-white"
+              onChange={setPhone}
+              description="Kiiremaks suhtluseks"
             />
             
-            <Textarea
-              placeholder="Lisainformatsioon*"
+            <FormField
+              label="Lisainformatsioon"
+              type="textarea"
+              placeholder="Kirjeldage oma vajadusi..."
+              required
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="bg-white min-h-[100px]"
+              onChange={setMessage}
+              description="Mida rohkem infot, seda täpsema pakkumise saate"
             />
 
             <Button className="w-full" size="lg">
