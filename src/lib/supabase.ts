@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js'
 import { ProductColor } from './constants'
 
@@ -62,6 +63,7 @@ export interface Product {
   seo_title?: string | null;
   seo_description?: string | null;
   seo_keywords?: string | null;
+  model?: string | null;
 }
 
 export async function getProducts() {
@@ -102,6 +104,7 @@ export async function getProducts() {
       seo_title: item.seo_title || null,
       seo_description: item.seo_description || null,
       seo_keywords: item.seo_keywords || null,
+      model: item.model || null,
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -135,6 +138,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     seo_title: data.seo_title || null,
     seo_description: data.seo_description || null,
     seo_keywords: data.seo_keywords || null,
+    model: data.model || null,
   };
 };
 
