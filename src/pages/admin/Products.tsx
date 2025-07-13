@@ -65,6 +65,7 @@ interface Product {
   seo_title?: string | null;
   seo_description?: string | null;
   seo_keywords?: string | null;
+  model?: string | null;
 }
 
 interface PopularProduct {
@@ -88,6 +89,7 @@ const ProductsPage: React.FC = () => {
     base_price: 0,
     slug: "",
     material: "",
+    model: "",
   });
   const [selectedColors, setSelectedColors] = useState<ProductColor[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -220,6 +222,7 @@ const ProductsPage: React.FC = () => {
         base_price: formData.base_price,
         slug: formData.slug || null,
         material: formData.material || null,
+        model: formData.model || null,
         colors: selectedColors,
         sizes: selectedSizes,
         is_eco: isEco,
@@ -287,6 +290,7 @@ const ProductsPage: React.FC = () => {
         base_price: formData.base_price,
         slug: formData.slug || null,
         material: formData.material || null,
+        model: formData.model || null,
         colors: selectedColors,
         sizes: selectedSizes,
         is_eco: isEco,
@@ -362,6 +366,7 @@ const ProductsPage: React.FC = () => {
       base_price: product.base_price,
       slug: product.slug || "",
       material: product.material || "",
+      model: product.model || "",
       seo_title: product.seo_title || "",
       seo_description: product.seo_description || "",
       seo_keywords: product.seo_keywords || "",
@@ -443,6 +448,7 @@ const ProductsPage: React.FC = () => {
       base_price: 0,
       slug: "",
       material: "",
+      model: "",
       seo_title: "",
       seo_description: "",
       seo_keywords: "",
@@ -576,6 +582,15 @@ const ProductsPage: React.FC = () => {
                   name="name"
                   placeholder="Product Name"
                   value={formData.name}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  name="model"
+                  placeholder="Product Model (e.g., CB001, PB002)"
+                  value={formData.model || ""}
                   onChange={handleInputChange}
                 />
               </div>

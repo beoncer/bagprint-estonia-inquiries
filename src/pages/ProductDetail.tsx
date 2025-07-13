@@ -336,9 +336,14 @@ const ProductDetail = () => {
 
         {/* Product details section */}
         <div className="space-y-6">
-          {/* Title and badges */}
+          {/* Title, model and badges */}
           <div>
             <h1 className="text-3xl font-bold">{product.name}</h1>
+            
+            {/* Display model under the title */}
+            {product.model && (
+              <p className="text-lg text-gray-600 mt-1">Mudel: {product.model}</p>
+            )}
             
             {product.badges && product.badges.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
