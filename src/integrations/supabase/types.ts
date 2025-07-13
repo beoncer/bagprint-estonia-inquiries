@@ -326,6 +326,7 @@ export type Database = {
           is_eco: boolean | null
           main_color: string | null
           material: string | null
+          model: string | null
           name: string
           seo_description: string | null
           seo_keywords: string | null
@@ -349,6 +350,7 @@ export type Database = {
           is_eco?: boolean | null
           main_color?: string | null
           material?: string | null
+          model?: string | null
           name: string
           seo_description?: string | null
           seo_keywords?: string | null
@@ -372,6 +374,7 @@ export type Database = {
           is_eco?: boolean | null
           main_color?: string | null
           material?: string | null
+          model?: string | null
           name?: string
           seo_description?: string | null
           seo_keywords?: string | null
@@ -585,6 +588,7 @@ export type Database = {
           is_eco: boolean | null
           main_color: string | null
           material: string | null
+          model: string | null
           name: string
           seo_description: string | null
           seo_keywords: string | null
@@ -627,6 +631,7 @@ export type Database = {
           is_eco: boolean | null
           main_color: string | null
           material: string | null
+          model: string | null
           name: string
           seo_description: string | null
           seo_keywords: string | null
@@ -653,6 +658,7 @@ export type Database = {
           is_eco: boolean | null
           main_color: string | null
           material: string | null
+          model: string | null
           name: string
           seo_description: string | null
           seo_keywords: string | null
@@ -679,6 +685,7 @@ export type Database = {
           is_eco: boolean | null
           main_color: string | null
           material: string | null
+          model: string | null
           name: string
           seo_description: string | null
           seo_keywords: string | null
