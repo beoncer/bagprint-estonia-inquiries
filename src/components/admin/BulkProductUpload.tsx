@@ -15,14 +15,15 @@ const CSV_COLUMNS = [
   "sizes",
   "badges",
   "type",
+  "model", // <-- Add model here
   "seo_title",
   "seo_description",
   "seo_keywords"
 ];
 
 const CSV_TEMPLATE =
-  "name,description,slug,base_price,material,colors,sizes,badges,type,seo_title,seo_description,seo_keywords\n" +
-  "Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag,Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag\n";
+  "name,description,slug,base_price,material,colors,sizes,badges,type,model,seo_title,seo_description,seo_keywords\n" +
+  "Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag,CB001,Cotton Bag,An eco-friendly cotton bag,cotton-bag,1.5,140g cotton,Royal sinine,Punane,eco|organic,cotton_bag,CB001\n";
 
 function downloadCSVTemplate() {
   const blob = new Blob([CSV_TEMPLATE], { type: "text/csv" });
@@ -73,6 +74,7 @@ const BulkProductUpload: React.FC<{ open: boolean; onOpenChange: (open: boolean)
             sizes: parseCSVValue(row.sizes),
             badges: parseCSVValue(row.badges),
             type: row.type?.trim() || "",
+            model: row.model?.trim() || "", // <-- Add model here
             seo_title: row.seo_title?.trim() || "",
             seo_description: row.seo_description?.trim() || "",
             seo_keywords: row.seo_keywords?.trim() || "",
@@ -113,6 +115,7 @@ const BulkProductUpload: React.FC<{ open: boolean; onOpenChange: (open: boolean)
             sizes: row.sizes,
             badges: row.badges,
             type: row.type,
+            model: row.model, // <-- Add model here
             seo_title: row.seo_title,
             seo_description: row.seo_description,
             seo_keywords: row.seo_keywords,
@@ -213,6 +216,7 @@ export function exportProductsToCSV(products: any[]) {
     "sizes",
     "badges",
     "type",
+    "model", // <-- Add model here
     "seo_title",
     "seo_description",
     "seo_keywords"
@@ -227,6 +231,7 @@ export function exportProductsToCSV(products: any[]) {
     sizes: Array.isArray(p.sizes) ? p.sizes.join("|") : (p.sizes || ""),
     badges: Array.isArray(p.badges) ? p.badges.join("|") : (p.badges || ""),
     type: p.type || "",
+    model: p.model || "", // <-- Add model here
     seo_title: p.seo_title || "",
     seo_description: p.seo_description || "",
     seo_keywords: p.seo_keywords || ""
