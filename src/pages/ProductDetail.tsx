@@ -154,28 +154,38 @@ const ProductDetail = () => {
     setSelectedColor(color);
   };
   
-  // Build unique thumbnail list for color and size images
-  const colorThumbnails: { color: string; url: string }[] = [];
-  const colorUrlSet = new Set<string>();
-  if (product && product.colors && product.color_images) {
-    for (const color of product.colors) {
-      const url = product.color_images[color] || (product.main_color && product.color_images[product.main_color]) || product.image;
-      if (url && !colorUrlSet.has(url)) {
-        colorThumbnails.push({ color, url });
-        colorUrlSet.add(url);
+  // Build unified thumbnail list: color images, size images, then additional images (no duplicates)
+  const unifiedThumbnails: { url: string; type: string; key: string; label?: string }[] = [];
+  const urlSet = new Set<string>();
+  if (product) {
+    // Color images
+    if (product.colors && product.color_images) {
+      for (const color of product.colors) {
+        const url = product.color_images[color];
+        if (url && !urlSet.has(url)) {
+          unifiedThumbnails.push({ url, type: 'color', key: `color-${color}`, label: getColorLabel(color) });
+          urlSet.add(url);
+        }
       }
     }
-  }
-
-  // Only show size thumbnails if a size-specific image exists
-  const sizeThumbnails: { size: string; url: string }[] = [];
-  const sizeUrlSet = new Set<string>();
-  if (product && product.sizes && product.size_images) {
-    for (const size of product.sizes) {
-      const url = product.size_images[size];
-      if (url && !sizeUrlSet.has(url)) {
-        sizeThumbnails.push({ size, url });
-        sizeUrlSet.add(url);
+    // Size images
+    if (product.sizes && product.size_images) {
+      for (const size of product.sizes) {
+        const url = product.size_images[size];
+        if (url && !urlSet.has(url)) {
+          unifiedThumbnails.push({ url, type: 'size', key: `size-${size}`, label: size });
+          urlSet.add(url);
+        }
+      }
+    }
+    // Additional images
+    if (product.additional_images && product.additional_images.length > 0) {
+      for (let i = 0; i < product.additional_images.length; i++) {
+        const url = product.additional_images[i];
+        if (url && !urlSet.has(url)) {
+          unifiedThumbnails.push({ url, type: 'additional', key: `additional-${i}` });
+          urlSet.add(url);
+        }
       }
     }
   }
@@ -273,80 +283,36 @@ const ProductDetail = () => {
             {selectedImage && (
               <img
                 src={selectedImage}
-                alt={selectedColor ? `${product.name} ${selectedColor}` : selectedSize ? `${product.name} ${selectedSize}` : product.name}
+                alt={product.name}
                 className={`object-cover w-full h-full transition-transform duration-300 ${
                   isImageZoomed ? 'scale-110' : 'scale-100'
                 }`}
               />
             )}
           </div>
-
-          {product?.additional_images && product.additional_images.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-2">Lisapildid</h3>
-              <div className="flex flex-wrap gap-4">
-                {product.additional_images.map((url, idx) => (
-                  <img
-                    key={url}
-                    src={url}
-                    alt={`Lisapilt ${idx + 1}`}
-                    className="w-32 h-32 object-cover rounded border"
-                    loading="lazy"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Color thumbnails */}
-          {colorThumbnails.length > 0 && (
-            <div className="flex flex-wrap gap-3 justify-center">
-              {colorThumbnails.map(({ color, url }) => {
-                const isSelected = selectedColor === color;
-                return (
-                  <div
-                    key={color}
-                    className={`relative cursor-pointer transition-all duration-200 ${
-                      isSelected ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
-                    }`}
-                    onClick={() => handleColorThumbnailClick(color)}
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                      <img
-                        src={url}
-                        alt={`${product.name} ${color}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    {isSelected && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
-                    )}
+          {/* Unified thumbnail gallery */}
+          {unifiedThumbnails.length > 0 && (
+            <div className="flex flex-wrap gap-3 mt-4">
+              {unifiedThumbnails.map(({ url, key, label }) => (
+                <div
+                  key={key}
+                  className={`relative cursor-pointer transition-all duration-200 ${
+                    selectedImage === url ? 'ring-2 ring-red-500 ring-offset-2' : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-1'
+                  }`}
+                  onClick={() => setSelectedImage(url)}
+                >
+                  <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
+                    <img
+                      src={url}
+                      alt={label ? `${product.name} ${label}` : product.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Size thumbnails */}
-          {sizeThumbnails.length > 0 && (
-            <div className="flex flex-wrap gap-3 justify-center">
-              {sizeThumbnails.map(({ size, url }) => {
-                return (
-                  <div
-                    key={size}
-                    className="relative cursor-pointer transition-all duration-200"
-                    onClick={() => setSelectedSize(size)}
-                  >
-                    <div className="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 border">
-                      <img
-                        src={url}
-                        alt={`${product.name} ${size}`}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                );
-              })}
+                  {selectedImage === url && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white" />
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
