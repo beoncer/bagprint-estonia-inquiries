@@ -174,4 +174,81 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   );
 };
 
+export const MultiImageUpload: React.FC<{
+  label?: string;
+  imageUrls: string[];
+  onChange: (urls: string[]) => void;
+}> = ({ label = "Upload Images", imageUrls, onChange }) => {
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+
+  const uploadImage = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Error", description: "Please select an image file", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Error", description: "Image size must be less than 5MB", variant: "destructive" });
+      return;
+    }
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
+      const filePath = `products/additional-images/${fileName}`;
+      const { data, error } = await supabase.storage.from('site-assets').upload(filePath, file);
+      if (error) throw error;
+      const { data: { publicUrl } } = supabase.storage.from('site-assets').getPublicUrl(filePath);
+      onChange([...imageUrls, publicUrl]);
+      toast({ title: "Success", description: "Image uploaded successfully" });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({ title: "Error", description: "Failed to upload image", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      Array.from(files).forEach(uploadImage);
+    }
+  };
+
+  const removeImage = (url: string) => {
+    onChange(imageUrls.filter(u => u !== url));
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="flex flex-wrap gap-4 mb-2">
+        {imageUrls.map((url, idx) => (
+          <div key={url} className="relative group">
+            <img src={url} alt={`Additional ${idx + 1}`} className="w-24 h-24 object-cover rounded border" />
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="absolute top-1 right-1 opacity-80 group-hover:opacity-100"
+              onClick={() => removeImage(url)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <Input
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={handleFileSelect}
+        disabled={uploading}
+      />
+      {uploading && <div className="text-sm text-gray-500">Uploading...</div>}
+    </div>
+  );
+};
+
 export default ImageUpload;

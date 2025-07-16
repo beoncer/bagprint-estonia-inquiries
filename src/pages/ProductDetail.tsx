@@ -281,6 +281,23 @@ const ProductDetail = () => {
             )}
           </div>
 
+          {product?.additional_images && product.additional_images.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold mb-2">Lisapildid</h3>
+              <div className="flex flex-wrap gap-4">
+                {product.additional_images.map((url, idx) => (
+                  <img
+                    key={url}
+                    src={url}
+                    alt={`Lisapilt ${idx + 1}`}
+                    className="w-32 h-32 object-cover rounded border"
+                    loading="lazy"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Color thumbnails */}
           {colorThumbnails.length > 0 && (
             <div className="flex flex-wrap gap-3 justify-center">

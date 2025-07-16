@@ -43,6 +43,7 @@ import { usePricing } from "@/hooks/usePricing";
 import ColorImageUpload from "@/components/admin/ColorImageUpload";
 import SizeImageUpload from "@/components/admin/SizeImageUpload";
 import BulkProductUpload, { exportProductsToCSV } from "@/components/admin/BulkProductUpload";
+import ImageUpload, { MultiImageUpload } from "@/components/admin/ImageUpload";
 
 interface Product {
   id: string;
@@ -66,6 +67,7 @@ interface Product {
   seo_description?: string | null;
   seo_keywords?: string | null;
   model?: string | null;
+  additional_images?: string[];
 }
 
 interface PopularProduct {
@@ -101,6 +103,7 @@ const ProductsPage: React.FC = () => {
   const [sizeImages, setSizeImages] = useState<Record<string, string>>({});
   const [mainColor, setMainColor] = useState<string>("");
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
+  const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   
   const { calculatePrice } = usePricing();
 
@@ -119,6 +122,7 @@ const ProductsPage: React.FC = () => {
       setColorImages(selectedProduct.color_images || {});
       setSizeImages(selectedProduct.size_images || {});
       setMainColor(selectedProduct.main_color || "");
+      setAdditionalImages(selectedProduct.additional_images || []);
     } else {
       setSelectedColors([]);
       setSelectedSizes([]);
@@ -127,6 +131,7 @@ const ProductsPage: React.FC = () => {
       setColorImages({});
       setSizeImages({});
       setMainColor("");
+      setAdditionalImages([]);
     }
   }, [selectedProduct]);
 
@@ -233,6 +238,7 @@ const ProductsPage: React.FC = () => {
         seo_title: formData.seo_title || null,
         seo_description: formData.seo_description || null,
         seo_keywords: formData.seo_keywords || null,
+        additional_images: additionalImages,
       };
 
       const { data, error } = await supabase.from("products").insert(newProductData).select();
@@ -302,6 +308,7 @@ const ProductsPage: React.FC = () => {
         seo_title: formData.seo_title || null,
         seo_description: formData.seo_description || null,
         seo_keywords: formData.seo_keywords || null,
+        additional_images: additionalImages,
       };
 
       const { data, error } = await supabase
@@ -841,6 +848,12 @@ const ProductsPage: React.FC = () => {
                   onChange={handleInputChange}
                 />
               </div>
+
+              <MultiImageUpload
+                label="Additional Product Images"
+                imageUrls={additionalImages}
+                onChange={setAdditionalImages}
+              />
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={handleDialogClose}>
