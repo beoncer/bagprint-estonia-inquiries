@@ -281,7 +281,7 @@ const ProductDetail = () => {
               <MagnifyingGlass
                 src={selectedImage}
                 alt={product.name}
-                zoomLevel={4}
+                zoomLevel={2.5}
                 lensSize={160}
                 className="w-full h-full"
               />
