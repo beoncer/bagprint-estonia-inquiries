@@ -17,6 +17,7 @@ import ProductTechnicalDetails from "@/components/product/ProductTechnicalDetail
 import { PRODUCT_COLORS } from "@/lib/constants";
 import ProductStructuredData from "@/components/seo/ProductStructuredData";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import MagnifyingGlass from "@/components/ui/MagnifyingGlass";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -275,18 +276,14 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {/* Image section */}
         <div className="space-y-6">
-          <div 
-            className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-zoom-in"
-            onMouseEnter={() => setIsImageZoomed(true)}
-            onMouseLeave={() => setIsImageZoomed(false)}
-          >
+          <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
             {selectedImage && (
-              <img
+              <MagnifyingGlass
                 src={selectedImage}
                 alt={product.name}
-                className={`object-cover w-full h-full transition-transform duration-300 ${
-                  isImageZoomed ? 'scale-110' : 'scale-100'
-                }`}
+                zoomLevel={4}
+                lensSize={160}
+                className="w-full h-full"
               />
             )}
           </div>
