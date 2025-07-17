@@ -43,30 +43,35 @@ const MagnifyingGlass: React.FC<MagnifyingGlassProps> = ({
     if (!imageRef.current || !containerRef.current) return '0% 0%';
 
     const rect = containerRef.current.getBoundingClientRect();
-    const img = imageRef.current;
     
-    // Calculate the percentage position within the image
+    // Calculate the percentage position within the image for magnification
     const xPercent = (mousePosition.x / rect.width) * 100;
     const yPercent = (mousePosition.y / rect.height) * 100;
 
     return `${xPercent}% ${yPercent}%`;
   }, [mousePosition]);
 
-  const lensStyle = {
-    width: `${lensSize}px`,
-    height: `${lensSize}px`,
-    left: `${mousePosition.x - lensSize / 2}px`,
-    top: `${mousePosition.y - lensSize / 2}px`,
-    backgroundImage: `url(${src})`,
-    backgroundSize: `${zoomLevel * 100}%`,
-    backgroundPosition: getBackgroundPosition(),
-    backgroundRepeat: 'no-repeat',
-  };
+  const getContainerDimensions = useCallback(() => {
+    if (!containerRef.current) return { width: 0, height: 0 };
+    const rect = containerRef.current.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  }, []);
 
   // Load high-resolution version for zooming
   const highResSrc = src.includes('?') 
     ? src.replace(/quality=\d+/, 'quality=100').replace(/width=\d+/, 'width=1200')
     : src;
+
+  const lensStyle = {
+    width: `${lensSize}px`,
+    height: `${lensSize}px`,
+    left: `${mousePosition.x - lensSize / 2}px`,
+    top: `${mousePosition.y - lensSize / 2}px`,
+    backgroundImage: `url(${highResSrc})`,
+    backgroundSize: `${getContainerDimensions().width * zoomLevel}px ${getContainerDimensions().height * zoomLevel}px`,
+    backgroundPosition: getBackgroundPosition(),
+    backgroundRepeat: 'no-repeat',
+  };
 
   useEffect(() => {
     const img = new Image();
@@ -94,11 +99,7 @@ const MagnifyingGlass: React.FC<MagnifyingGlassProps> = ({
       {isActive && imageLoaded && (
         <div
           className="absolute pointer-events-none border-4 border-white rounded-full shadow-lg z-10"
-          style={{
-            ...lensStyle,
-            backgroundImage: `url(${highResSrc})`,
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), inset 0 0 0 2px rgba(255, 255, 255, 0.8)',
-          }}
+          style={lensStyle}
         >
           {/* Inner border for better definition */}
           <div className="absolute inset-1 rounded-full border border-gray-300 opacity-50" />
