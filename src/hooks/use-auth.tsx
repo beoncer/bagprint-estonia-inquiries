@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Session, User } from "@supabase/supabase-js";
@@ -22,9 +23,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log('Setting up auth state listener...');
+    
     // First set up the auth listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.email);
+        
         setSession(session);
         setUser(session?.user ?? null);
 
@@ -48,6 +53,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setTimeout(() => {
             navigate("/admin/login");
           }, 0);
+        } else if (event === "TOKEN_REFRESHED") {
+          console.log("Token refreshed successfully");
         }
       }
     );
@@ -55,11 +62,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Then check for existing session
     const initAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        setSession(session);
-        setUser(session?.user ?? null);
+        console.log('Checking for existing session...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error("Error retrieving session:", error);
+          // Clear any corrupted session data
+          cleanupAuthState();
+        } else {
+          console.log('Initial session check:', session?.user?.email || 'No session');
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
       } catch (error) {
-        console.error("Error retrieving session:", error);
+        console.error("Error initializing auth:", error);
+        cleanupAuthState();
       } finally {
         setLoading(false);
       }
@@ -73,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [navigate]);
 
   const cleanupAuthState = () => {
+    console.log('Cleaning up auth state...');
     localStorage.removeItem("supabase.auth.token");
     
     Object.keys(localStorage).forEach((key) => {
@@ -91,6 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
+      console.log('Attempting sign in for:', email);
+      
       // Clean up existing auth state
       cleanupAuthState();
       
@@ -98,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         await supabase.auth.signOut({ scope: "global" });
       } catch (err) {
-        // Continue even if this fails
+        console.log('Global signout failed (expected):', err);
       }
       
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -106,14 +126,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
       });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
       
-      if (data.user) {
-        // Session is handled by onAuthStateChange listener
+      if (data.user && data.session) {
+        console.log('Sign in successful:', data.user.email);
         setUser(data.user);
         setSession(data.session);
       }
     } catch (error: any) {
+      console.error('Sign in failed:', error);
       toast({
         title: "Viga sisselogimisel",
         description: error.message || "Kontrollige oma e-posti ja parooli",
@@ -156,6 +180,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     try {
       setLoading(true);
+      console.log('Signing out...');
+      
       // Clean up auth state
       cleanupAuthState();
       
@@ -165,6 +191,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(null);
       setSession(null);
     } catch (error: any) {
+      console.error('Sign out error:', error);
       toast({
         title: "Viga väljalogimisel",
         description: error.message,
