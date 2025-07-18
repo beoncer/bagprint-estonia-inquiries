@@ -67,11 +67,6 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
 
   const uploadColorImage = async (file: File, color: string) => {
     console.log('🔄 Starting upload for color:', color, 'file:', file.name);
-    console.log('📁 File details:', { 
-      name: file.name, 
-      size: file.size, 
-      type: file.type 
-    });
     
     if (!file.type.startsWith('image/')) {
       toast({
@@ -91,12 +86,6 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
       return;
     }
 
-    // Check authentication before proceeding
-    const isAuthenticated = await checkAuthentication();
-    if (!isAuthenticated) {
-      return;
-    }
-
     setUploading(color);
     
     try {
@@ -105,23 +94,8 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
       const fileName = `${slugify(productTitle)}-${color}-${timestamp}.${fileExt}`;
       const filePath = `products/color-images/${fileName}`;
 
-      console.log('Uploading to path:', filePath);
+      console.log('📁 Uploading to path:', filePath);
 
-      // First, check if bucket exists and is accessible
-      const { data: buckets, error: bucketError } = await supabase.storage.listBuckets();
-      console.log('Available buckets:', buckets);
-      
-      if (bucketError) {
-        console.error('Bucket list error:', bucketError);
-        throw new Error(`Storage access error: ${bucketError.message}`);
-      }
-
-      const siteAssetsBucket = buckets?.find(bucket => bucket.name === 'site-assets');
-      if (!siteAssetsBucket) {
-        throw new Error('site-assets bucket not found');
-      }
-
-      // Try to upload the file
       const { data, error } = await supabase.storage
         .from('site-assets')
         .upload(filePath, file, {
@@ -129,30 +103,11 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
           upsert: true
         });
 
-      console.log('Upload response:', { data, error });
-
-      if (error) {
-        console.error('Upload error details:', error);
-        
-        // Handle specific error types
-        if (error.message.includes('Unauthorized')) {
-          throw new Error('Authentication failed. Please log in again.');
-        } else if (error.message.includes('not found')) {
-          throw new Error('Storage bucket not accessible. Please contact support.');
-        } else {
-          throw new Error(`Upload failed: ${error.message}`);
-        }
-      }
-
-      if (!data) {
-        throw new Error('Upload succeeded but no data returned');
-      }
+      if (error) throw error;
 
       const { data: { publicUrl } } = supabase.storage
         .from('site-assets')
         .getPublicUrl(filePath);
-
-      console.log('Public URL generated:', publicUrl);
 
       // Update color images
       const updatedColorImages = {
