@@ -66,7 +66,12 @@ const ColorImageUpload: React.FC<ColorImageUploadProps> = ({
   };
 
   const uploadColorImage = async (file: File, color: string) => {
-    console.log('Starting upload for color:', color, 'file:', file.name);
+    console.log('🔄 Starting upload for color:', color, 'file:', file.name);
+    console.log('📁 File details:', { 
+      name: file.name, 
+      size: file.size, 
+      type: file.type 
+    });
     
     if (!file.type.startsWith('image/')) {
       toast({
