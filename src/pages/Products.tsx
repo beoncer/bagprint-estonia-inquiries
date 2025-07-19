@@ -11,6 +11,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import FAQStructuredData from "@/components/seo/FAQStructuredData";
 import Breadcrumb from "@/components/ui/breadcrumb";
+import OptimizedImage from "@/components/ui/OptimizedImage";
+
+// Import local category images as fallbacks
+import categoryFallbackCotton from "@/assets/category-cotton-bags.jpg";
+import categoryFallbackPaper from "@/assets/category-paper-bags.jpg";
+import categoryFallbackDrawstring from "@/assets/category-drawstring-bags.jpg";
+import categoryFallbackShoe from "@/assets/category-shoe-bags.jpg";
+
+// Helper function to get category fallback images
+const getCategoryFallback = (categoryId: string): string => {
+  const fallbackMap: Record<string, string> = {
+    "cotton_bag": categoryFallbackCotton,
+    "paper_bag": categoryFallbackPaper,
+    "drawstring_bag": categoryFallbackDrawstring,
+    "shoebag": categoryFallbackShoe
+  };
+  return fallbackMap[categoryId] || "/placeholder.svg";
+};
 
 const categories = [
   { id: "all", name: "Kõik tooted" },
@@ -509,19 +527,14 @@ const Products = () => {
               {productCategories.map((category) => (
                 <Link key={category.id} to={category.link} className="text-center group">
                   <div className="h-80 md:h-60 mb-4 overflow-hidden rounded-lg">
-                    <img 
+                    <OptimizedImage 
                       src={category.image}
                       alt={category.name}
                       className="w-full h-full object-cover transition-all group-hover:scale-105"
-                      onError={(e) => {
-                        console.log(`Image error for category ${category.id}`);
-                        console.log(`Failed image URL: ${category.image}`);
-                        console.log('Falling back to default image');
-                        (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1607166452147-3a432d381111?w=800&auto=format&fit=crop";
-                      }}
-                      onLoad={() => {
-                        console.log(`Image loaded successfully for category ${category.id}: ${category.image}`);
-                      }}
+                      fallbackSrc={getCategoryFallback(category.id)}
+                      width={400}
+                      height={300}
+                      priority={false}
                     />
                   </div>
                   <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
