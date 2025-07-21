@@ -114,13 +114,29 @@ const FooterAdmin: React.FC = () => {
       if (error) toast({ title: "Error updating footer content", description: error.message, variant: "destructive" });
       else toast({ title: "Footer content updated" });
     } else {
-      // Insert
+      // Insert - for link_label, check if we need a unique key to avoid conflicts
+      let keyToUse = formData.key;
+      if (keyToUse === "link_label") {
+        // Check if this exact key already exists, if so, don't create a duplicate
+        const existingItem = items.find(i => 
+          i.section === formData.section && 
+          i.key === keyToUse && 
+          i.value === formData.value
+        );
+        
+        if (existingItem) {
+          toast({ title: "Duplicate entry", description: "This exact link already exists.", variant: "destructive" });
+          setSaving(false);
+          return;
+        }
+      }
+      
       const maxOrder = items.filter(i => i.section === formData.section).length > 0 ? Math.max(...items.filter(i => i.section === formData.section).map(i => i.order || 0)) : 0;
       const { error } = await supabase
         .from("footer_content")
         .insert({
           section: formData.section,
-          key: formData.key,
+          key: keyToUse,
           value: formData.value,
           order: maxOrder + 1,
           visible: formData.visible ?? true,
@@ -129,7 +145,7 @@ const FooterAdmin: React.FC = () => {
       else toast({ title: "Footer content added" });
     }
     setSaving(false);
-    setIsDialogOpen(false);
+    handleDialogClose();
     fetchItems();
   };
 
