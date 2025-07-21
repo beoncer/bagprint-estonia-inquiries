@@ -100,11 +100,10 @@ const FooterAdmin: React.FC = () => {
       return;
     }
     if (editingId) {
-      // Update
+      // Update - don't allow section changes to prevent accidental moves
       const { error } = await supabase
         .from("footer_content")
         .update({
-          section: formData.section,
           key: formData.key,
           value: formData.value,
           order: formData.order,
@@ -193,7 +192,14 @@ const FooterAdmin: React.FC = () => {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="section">Sektsioon</Label>
-                <Input id="section" value={formData.section || ""} onChange={e => setFormData({ ...formData, section: e.target.value })} placeholder="logo, kiirlingid, tootekategooriad, kontakt" />
+                <Input 
+                  id="section" 
+                  value={formData.section || ""} 
+                  onChange={e => setFormData({ ...formData, section: e.target.value })} 
+                  placeholder="logo, kiirlingid, tootekategooriad, kontakt" 
+                  disabled={!!editingId}
+                  className={editingId ? "opacity-50" : ""}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="key">Võti (key)</Label>
