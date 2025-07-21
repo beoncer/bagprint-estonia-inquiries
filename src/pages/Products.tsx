@@ -603,10 +603,10 @@ const Products = () => {
           </div>
         </div>
         
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-7xl mx-auto">
           {/* Hero Section - matching portfolio style */}
-          <div className="text-center mb-16 py-8 md:py-16 px-4 sm:px-6">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+          <div className="text-center mb-16 py-8 md:py-16 px-6 sm:px-8 md:px-12">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight break-words">
               {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
                 <>
                   {categoryContent.title.split(categoryContent.highlight)[0]}
@@ -615,13 +615,13 @@ const Products = () => {
                 </>
               ) : categoryContent.title}
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-none sm:max-w-2xl md:max-w-3xl mx-auto leading-relaxed px-2">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-none sm:max-w-2xl md:max-w-3xl mx-auto leading-relaxed">
               {categoryContent.description}
             </p>
           </div>
           
           {/* Search */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10">
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-10 mx-6 sm:mx-8 md:mx-12">
             <div className="w-full md:w-auto">
               <form onSubmit={handleSearch} className="relative">
                 <Input
@@ -637,23 +637,25 @@ const Products = () => {
           </div>
           
           {/* Results */}
-          {filteredProducts.length > 0 ? (
-            <>
-              <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
-              <ProductGrid products={filteredProducts} />
-            </>
-          ) : (
-            <div className="text-center py-20">
-              <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
-              <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
-              <Button onClick={() => {
-                setSearchTerm("");
-                window.location.href = "/tooted";
-              }}>
-                Näita kõiki tooteid
-              </Button>
-            </div>
-          )}
+          <div className="px-6 sm:px-8 md:px-12">
+            {filteredProducts.length > 0 ? (
+              <>
+                <p className="mb-6">Leitud {filteredProducts.length} toodet</p>
+                <ProductGrid products={filteredProducts} />
+              </>
+            ) : (
+              <div className="text-center py-20">
+                <h3 className="text-xl font-semibold mb-2">Tooteid ei leitud</h3>
+                <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
+                <Button onClick={() => {
+                  setSearchTerm("");
+                  window.location.href = "/tooted";
+                }}>
+                  Näita kõiki tooteid
+                </Button>
+              </div>
+            )}
+          </div>
 
           {/* FAQ Section - only show if there are FAQs for this category */}
           {activeCategory !== "all" && (
