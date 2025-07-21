@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { useSearchParams, useLocation, Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,33 +24,20 @@ const getCategoryFallback = (categoryId: string): string => {
     "cotton_bag": categoryFallbackCotton,
     "paper_bag": categoryFallbackPaper,
     "drawstring_bag": categoryFallbackDrawstring,
-    "shoebag": categoryFallbackShoe
+    "shoebag": categoryFallbackShoe,
+    "packaging": categoryFallbackShoe // fallback for packaging
   };
   return fallbackMap[categoryId] || "/placeholder.svg";
 };
 
-const categories = [
-  { id: "all", name: "Kõik tooted" },
-  { id: "cotton_bag", name: "Puuvillakotid" },
-  { id: "paper_bag", name: "Paberkotid" },
-  { id: "drawstring_bag", name: "Paelaga kotid" },
-  { id: "packaging", name: "E-poe pakendid" },
-];
-
+// Updated category path mapping - only dedicated routes
 const categoryPathMap: Record<string, string> = {
   "/riidest-kotid": "cotton_bag",
-  "/paberkotid": "paper_bag",
+  "/paberkotid": "paper_bag", 
   "/nooriga-kotid": "drawstring_bag",
   "/sussikotid": "shoebag",
+  "/e-poe-pakendid": "packaging",
   "/tooted": "all",
-};
-
-const categoryPrettyUrlMap: Record<string, string> = {
-  all: "/tooted",
-  cotton_bag: "/riidest-kotid",
-  paper_bag: "/paberkotid",
-  drawstring_bag: "/nooriga-kotid",
-  shoebag: "/sussikotid",
 };
 
 const blogArticles = [
@@ -91,7 +77,6 @@ interface FeaturedBlogPost {
 }
 
 const Products = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
@@ -145,7 +130,8 @@ const Products = () => {
             'cotton': 'cotton_bag',
             'paper': 'paper_bag',
             'drawstring': 'drawstring_bag',
-            'shoebag': 'shoebag'
+            'shoebag': 'shoebag',
+            'packaging': 'packaging'
           };
 
           data.forEach((row) => {
@@ -311,17 +297,12 @@ const Products = () => {
     fetchProducts();
   }, []);
   
-  // Handle category filtering from URL params
+  // Handle category filtering from URL path only (no query parameters)
   useEffect(() => {
     const path = location.pathname;
-    let categoryFromPath = categoryPathMap[path];
-    if (!categoryFromPath) {
-      // fallback to query param logic
-      const categoryFromUrl = searchParams.get("category");
-      categoryFromPath = categoryFromUrl || "all";
-    }
+    const categoryFromPath = categoryPathMap[path] || "all";
     setActiveCategory(categoryFromPath);
-  }, [location.pathname, searchParams]);
+  }, [location.pathname]);
   
   // Apply filters when category or search term changes
   useEffect(() => {
@@ -348,17 +329,6 @@ const Products = () => {
     console.log("Filtered products:", result);
     setFilteredProducts(result);
   }, [activeCategory, searchTerm, products]);
-  
-  const handleCategoryChange = (categoryId: string) => {
-    console.log("Category changed to:", categoryId);
-    if (categoryId === "all") {
-      searchParams.delete("category");
-      setSearchParams(searchParams);
-    } else {
-      setSearchParams({ category: categoryId });
-    }
-    setActiveCategory(categoryId);
-  };
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -678,7 +648,7 @@ const Products = () => {
               <p className="text-gray-600 mb-6">Proovige muuta otsingufiltrit või sirvige kõiki tooteid</p>
               <Button onClick={() => {
                 setSearchTerm("");
-                handleCategoryChange("all");
+                window.location.href = "/tooted";
               }}>
                 Näita kõiki tooteid
               </Button>
@@ -723,7 +693,6 @@ const Products = () => {
             </section>
           )}
 
-          {/* Guarantees Section */}
           <section className="mt-20 mb-16">
             <div className="bg-white rounded-lg shadow-sm p-8">
               <div className="text-center mb-10">
