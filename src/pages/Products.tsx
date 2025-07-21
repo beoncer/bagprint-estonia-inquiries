@@ -606,7 +606,7 @@ const Products = () => {
         <div className="max-w-7xl mx-auto">
           {/* Hero Section - matching portfolio style */}
           <div className="text-center mb-16 py-8 md:py-16 px-6 sm:px-8 md:px-12">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight break-words">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 leading-tight break-words">
               {categoryContent.highlight && categoryContent.title.includes(categoryContent.highlight) ? (
                 <>
                   {categoryContent.title.split(categoryContent.highlight)[0]}
@@ -615,7 +615,7 @@ const Products = () => {
                 </>
               ) : categoryContent.title}
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-none sm:max-w-2xl md:max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-none sm:max-w-2xl md:max-w-3xl mx-auto leading-relaxed">
               {categoryContent.description}
             </p>
           </div>
