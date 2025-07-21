@@ -463,7 +463,7 @@ const Products = () => {
         <div className="max-w-7xl mx-auto px-4">
           {/* Hero Section - Portfolio style */}
           <div className="text-center mb-16 py-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6">
               {splitHeading.length === 3 ? (
                 <>
                   {splitHeading[0]}
@@ -485,7 +485,7 @@ const Products = () => {
                 heading
               )}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
               {tootedPageContent.description}
             </p>
           </div>

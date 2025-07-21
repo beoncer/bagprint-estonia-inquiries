@@ -112,7 +112,7 @@ const Contact = () => {
       <section className="py-12 md:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 md:mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-4 md:mb-6 break-words">
               {headerHighlight && header.includes(headerHighlight) ? (
                 <>
                   {header.split(headerHighlight)[0]}
@@ -121,7 +121,7 @@ const Contact = () => {
                 </>
               ) : header}
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed px-4 break-words">
               {description}
             </p>
           </div>
