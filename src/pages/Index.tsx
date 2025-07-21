@@ -342,8 +342,8 @@ const Index = () => {
             {categories.map((cat, idx) => {
               const imageWithCacheBuster = cat.image ? `${cat.image}?t=${Date.now()}` : '/placeholder.svg';
               return (
-                <div className="text-center group hover:transform hover:scale-105 transition-all duration-200" key={idx}>
-                  <div className="h-64 md:h-80 mb-3 md:mb-4 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
+                <Link to={cat.link || '#'} key={idx} className="text-center group hover:transform hover:scale-105 transition-all duration-200 block">
+                  <div className="h-64 md:h-80 mb-3 md:mb-4 overflow-hidden rounded-lg shadow-sm group-hover:shadow-md transition-shadow cursor-pointer">
                     <img
                       src={imageWithCacheBuster}
                       alt={cat.name}
@@ -353,10 +353,10 @@ const Index = () => {
                     />
                   </div>
                   <h3 className="text-lg md:text-xl font-semibold mb-2 text-gray-900">{cat.name}</h3>
-                  <Button variant="link" asChild className="text-sm md:text-base">
-                    <Link to={cat.link || '#'}>{cat.button}</Link>
+                  <Button variant="link" className="text-sm md:text-base pointer-events-none">
+                    {cat.button}
                   </Button>
-                </div>
+                </Link>
               );
             })}
           </div>
