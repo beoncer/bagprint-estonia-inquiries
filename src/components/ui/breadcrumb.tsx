@@ -141,7 +141,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
   // Don't render if no breadcrumbs or if loading critical data
   if (breadcrumbItems.length === 0 || (loading && (context.pageType === 'product-detail' || context.pageType === 'blog-post'))) {
     return loading ? (
-      <nav className={`flex items-center space-x-1 text-sm text-gray-600 ${className}`} aria-label="Breadcrumb">
+      <nav className={`flex items-center space-x-1 text-sm text-gray-600 px-4 ${className}`} aria-label="Breadcrumb">
         <div className="flex items-center space-x-1">
           <Home className="h-4 w-4" />
           <ChevronRight className="h-4 w-4 text-gray-400" />
@@ -152,7 +152,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className = "" }) => {
   }
   
   return (
-    <nav className={`flex items-center space-x-1 text-sm text-gray-600 ${className}`} aria-label="Navigatsioon">
+    <nav className={`flex items-center space-x-1 text-sm text-gray-600 px-4 ${className}`} aria-label="Navigatsioon">
       <Link 
         to="/" 
         className="flex items-center hover:text-primary transition-colors"
