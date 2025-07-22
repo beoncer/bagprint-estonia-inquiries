@@ -11,6 +11,7 @@ import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
+import ScrollToTop from "./components/ui/ScrollToTop";
 import Sitemap from "./pages/Sitemap";
 
 // Import lazy components
@@ -65,6 +66,7 @@ const App: React.FC = () => {
         <TooltipProvider>
           <Toaster />
           <BrowserRouter>
+            <ScrollToTop />
             <AuthProvider>
               <DynamicSEO />
               <WebSiteStructuredData />
