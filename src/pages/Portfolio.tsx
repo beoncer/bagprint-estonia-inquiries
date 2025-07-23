@@ -64,7 +64,7 @@ const Portfolio = () => {
           setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
           setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
           setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "");
-          setCtaSubtitle(data.find((row: any) => row.key === "portfolio_cta_subtitle")?.value || "");
+          setCtaSubtitle(data.find((row: any) => row.key === "portfolio_cta_text")?.value || "");
           setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "");
         }
       } catch (error) {
