@@ -38,6 +38,9 @@ const Portfolio = () => {
   const [header, setHeader] = useState("");
   const [headerHighlight, setHeaderHighlight] = useState("");
   const [description, setDescription] = useState("");
+  const [achievementsTitle, setAchievementsTitle] = useState("");
+  const [achievementsDescription, setAchievementsDescription] = useState("");
+  const [achievements, setAchievements] = useState<Array<{value: string, label: string}>>([]);
   const [ctaTitle, setCtaTitle] = useState("");
   const [ctaSubtitle, setCtaSubtitle] = useState("");
   const [ctaButton, setCtaButton] = useState("");
@@ -63,6 +66,18 @@ const Portfolio = () => {
           setHeader(data.find((row: any) => row.key === "portfolio_header")?.value || "");
           setHeaderHighlight(data.find((row: any) => row.key === "portfolio_header_highlight")?.value || "");
           setDescription(data.find((row: any) => row.key === "portfolio_description")?.value || "");
+          setAchievementsTitle(data.find((row: any) => row.key === "portfolio_achievements_title")?.value || "");
+          setAchievementsDescription(data.find((row: any) => row.key === "portfolio_achievements_description")?.value || "");
+          
+          // Fetch achievements
+          const achArr = [];
+          for (let i = 1; i <= 6; i++) {
+            const value = data.find((row: any) => row.key === `portfolio_achievement_${i}_value`)?.value || "";
+            const label = data.find((row: any) => row.key === `portfolio_achievement_${i}_label`)?.value || "";
+            if (value || label) achArr.push({ value, label });
+          }
+          setAchievements(achArr);
+          
           setCtaTitle(data.find((row: any) => row.key === "portfolio_cta_title")?.value || "");
           setCtaSubtitle(data.find((row: any) => row.key === "portfolio_cta_text")?.value || "");
           setCtaButton(data.find((row: any) => row.key === "portfolio_cta_button")?.value || "");
@@ -213,6 +228,28 @@ const Portfolio = () => {
               Näita kõiki
             </Button>
           </div>
+        )}
+
+        {/* Achievements Section */}
+        {achievementsTitle && achievements.length > 0 && (
+          <section className="bg-white py-12 md:py-16 px-6 md:px-8 rounded-lg mt-16">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4 break-words">{achievementsTitle}</h2>
+              {achievementsDescription && (
+                <p className="text-gray-600 max-w-3xl mx-auto text-lg leading-relaxed break-words">
+                  {achievementsDescription}
+                </p>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {achievements.map((achievement, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">{achievement.value}</div>
+                  <div className="text-gray-600 font-medium">{achievement.label}</div>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* CTA Section */}
