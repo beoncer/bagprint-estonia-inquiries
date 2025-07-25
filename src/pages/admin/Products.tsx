@@ -205,7 +205,9 @@ const ProductsPage: React.FC = () => {
 
       let imageUrl = "";
       if (imageFile) {
-        const fileName = `${Date.now()}-${imageFile.name.replace(/\s+/g, "-")}`;
+        const fileExt = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const timestamp = Date.now();
+        const fileName = `${formData.name?.toLowerCase().replace(/\s+/g, '-')}-main-${timestamp}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("site-assets")
           .upload(`products/${fileName}`, imageFile);
@@ -274,7 +276,9 @@ const ProductsPage: React.FC = () => {
 
       let imageUrl = selectedProduct.image_url;
       if (imageFile) {
-        const fileName = `${Date.now()}-${imageFile.name.replace(/\s+/g, "-")}`;
+        const fileExt = imageFile.name.split('.').pop()?.toLowerCase() || 'jpg';
+        const timestamp = Date.now();
+        const fileName = `${formData.name?.toLowerCase().replace(/\s+/g, '-')}-main-${timestamp}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("site-assets")
           .upload(`products/${fileName}`, imageFile);
@@ -853,6 +857,7 @@ const ProductsPage: React.FC = () => {
                 label="Additional Product Images"
                 imageUrls={additionalImages}
                 onChange={setAdditionalImages}
+                productTitle={formData.name}
               />
             </div>
             <DialogFooter>

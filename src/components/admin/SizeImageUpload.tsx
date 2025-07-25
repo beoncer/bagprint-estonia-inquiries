@@ -55,8 +55,9 @@ const SizeImageUpload: React.FC<SizeImageUploadProps> = ({
     setUploading(size);
     
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${slugify(productTitle)}-${size}.${fileExt}`;
+      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const timestamp = Date.now();
+      const fileName = `${slugify(productTitle)}-${size}-${timestamp}.${fileExt}`;
       const filePath = `products/size-images/${fileName}`;
 
       const { data, error } = await supabase.storage
