@@ -1,21 +1,11 @@
 
 import React, { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, X, Image } from "lucide-react";
-
-function slugify(text: string) {
-  return text
-    .toString()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9\-]/g, '')
-    .replace(/\-+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
 
 interface ImageUploadProps {
   onImageUploaded: (url: string) => void;
@@ -188,8 +178,7 @@ export const MultiImageUpload: React.FC<{
   label?: string;
   imageUrls: string[];
   onChange: (urls: string[]) => void;
-  productTitle?: string;
-}> = ({ label = "Upload Images", imageUrls, onChange, productTitle = "product" }) => {
+}> = ({ label = "Upload Images", imageUrls, onChange }) => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
@@ -204,10 +193,8 @@ export const MultiImageUpload: React.FC<{
     }
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const timestamp = Date.now();
-      const randomId = Math.random().toString(36).slice(2);
-      const fileName = `${slugify(productTitle)}-additional-${timestamp}-${randomId}.${fileExt}`;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${fileExt}`;
       const filePath = `products/additional-images/${fileName}`;
       const { data, error } = await supabase.storage.from('site-assets').upload(filePath, file);
       if (error) throw error;

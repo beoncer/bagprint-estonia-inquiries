@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,9 +55,8 @@ const SizeImageUpload: React.FC<SizeImageUploadProps> = ({
     setUploading(size);
     
     try {
-      const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-      const timestamp = Date.now();
-      const fileName = `${slugify(productTitle)}-${size}-${timestamp}.${fileExt}`;
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${slugify(productTitle)}-${size}.${fileExt}`;
       const filePath = `products/size-images/${fileName}`;
 
       const { data, error } = await supabase.storage
