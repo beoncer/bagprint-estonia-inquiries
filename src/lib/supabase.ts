@@ -64,6 +64,7 @@ export interface Product {
   seo_description?: string | null;
   seo_keywords?: string | null;
   model?: string | null;
+  priority?: number;
 }
 
 export async function getProducts() {
@@ -71,7 +72,8 @@ export async function getProducts() {
     console.log('Attempting to fetch products from Supabase...');
     const { data, error } = await supabase
       .from('products')
-      .select('*');
+      .select('*')
+      .order('priority', { ascending: true });
 
     if (error) {
       console.error('Supabase error details:', error);
@@ -105,6 +107,7 @@ export async function getProducts() {
       seo_description: item.seo_description || null,
       seo_keywords: item.seo_keywords || null,
       model: item.model || null,
+      priority: item.priority || 50,
     })) as Product[];
   } catch (err) {
     console.error('Unexpected error in getProducts:', err);
@@ -165,6 +168,7 @@ export async function getPopularProducts(): Promise<Product[]> {
     base_price: data.base_price || 0,
     material: data.material,
     color_images: data.color_images || {},
+    priority: data.priority || 50,
     size_images: data.size_images || {},
     seo_title: data.seo_title || null,
     seo_description: data.seo_description || null,

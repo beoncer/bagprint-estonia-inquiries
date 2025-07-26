@@ -68,6 +68,7 @@ interface Product {
   seo_keywords?: string | null;
   model?: string | null;
   additional_images?: string[];
+  priority?: number;
 }
 
 interface PopularProduct {
@@ -92,6 +93,7 @@ const ProductsPage: React.FC = () => {
     slug: "",
     material: "",
     model: "",
+    priority: 50,
   });
   const [selectedColors, setSelectedColors] = useState<ProductColor[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
@@ -138,7 +140,7 @@ const ProductsPage: React.FC = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from("products").select("*");
+      const { data, error } = await supabase.from("products").select("*").order("priority", { ascending: true });
       if (error) throw error;
       
       if (data) {
@@ -228,6 +230,7 @@ const ProductsPage: React.FC = () => {
         slug: formData.slug || null,
         material: formData.material || null,
         model: formData.model || null,
+        priority: formData.priority || 50,
         colors: selectedColors,
         sizes: selectedSizes,
         is_eco: isEco,
@@ -297,6 +300,7 @@ const ProductsPage: React.FC = () => {
         slug: formData.slug || null,
         material: formData.material || null,
         model: formData.model || null,
+        priority: formData.priority || 50,
         colors: selectedColors,
         sizes: selectedSizes,
         is_eco: isEco,
@@ -374,6 +378,7 @@ const ProductsPage: React.FC = () => {
       slug: product.slug || "",
       material: product.material || "",
       model: product.model || "",
+      priority: product.priority || 50,
       seo_title: product.seo_title || "",
       seo_description: product.seo_description || "",
       seo_keywords: product.seo_keywords || "",
@@ -445,6 +450,39 @@ const ProductsPage: React.FC = () => {
     }
   };
 
+  const handlePriorityChange = async (productId: string, newPriority: number) => {
+    try {
+      if (newPriority < 1 || newPriority > 100) {
+        toast({
+          title: "Invalid priority",
+          description: "Priority must be between 1 and 100",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("products")
+        .update({ priority: newPriority })
+        .eq("id", productId);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Priority updated",
+        description: "Product priority has been updated successfully",
+      });
+      
+      await fetchProducts();
+    } catch (error: any) {
+      toast({
+        title: "Error updating priority",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleDialogClose = () => {
     setIsDialogOpen(false);
     setSelectedProduct(null);
@@ -456,6 +494,7 @@ const ProductsPage: React.FC = () => {
       slug: "",
       material: "",
       model: "",
+      priority: 50,
       seo_title: "",
       seo_description: "",
       seo_keywords: "",
@@ -631,6 +670,21 @@ const ProductsPage: React.FC = () => {
                 />
                 <p className="text-sm text-gray-500">
                   This is the base price that will be used with quantity multipliers and print costs
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Input
+                  name="priority"
+                  type="number"
+                  min="1"
+                  max="100"
+                  placeholder="Priority (1-100)"
+                  value={formData.priority || ""}
+                  onChange={handleInputChange}
+                />
+                <p className="text-sm text-gray-500">
+                  Priority determines the order products appear. Lower numbers (1-10) appear first, higher numbers (90-100) appear last.
                 </p>
               </div>
 
@@ -900,6 +954,7 @@ const ProductsPage: React.FC = () => {
                 <TableHead>Type</TableHead>
                 <TableHead>Material</TableHead>
                 <TableHead>Pricing</TableHead>
+                <TableHead>Priority</TableHead>
                 <TableHead>Popular</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -932,6 +987,21 @@ const ProductsPage: React.FC = () => {
                       <div className="text-sm">
                         {getPriceDisplay(product)}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={product.priority || 50}
+                        onChange={(e) => {
+                          const newPriority = parseInt(e.target.value);
+                          if (!isNaN(newPriority)) {
+                            handlePriorityChange(product.id, newPriority);
+                          }
+                        }}
+                        className="w-16 h-8 text-sm"
+                      />
                     </TableCell>
                     <TableCell>
                       <Button
