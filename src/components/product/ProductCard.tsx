@@ -58,6 +58,11 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
   
   const altText = main_color ? `${name} ${main_color}` : name;
   
+  // Truncate description to max 8 words
+  const truncatedDescription = description 
+    ? description.split(' ').slice(0, 8).join(' ') + (description.split(' ').length > 8 ? '...' : '')
+    : '';
+  
   return (
     <Card className="h-full flex flex-col overflow-hidden hover:shadow-md transition-shadow duration-200">
       <Link to={`/tooted/${slug}`} className="aspect-square w-full relative overflow-hidden bg-gray-100 block">
@@ -74,7 +79,7 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
       </Link>
       <CardContent className="p-4 flex-grow flex flex-col">
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
-        <p className="text-gray-600 text-sm line-clamp-3 mb-3 flex-grow">{description}</p>
+        <p className="text-gray-600 text-sm mb-3 flex-grow">{truncatedDescription}</p>
         <div className="mt-auto">
           {startingPriceResult ? (
             <p className="text-primary font-medium">
