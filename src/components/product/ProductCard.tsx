@@ -56,6 +56,28 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
     }
   }, [mainImage]);
   
+  // Get available colors from color_images
+  const availableColors = color_images ? Object.keys(color_images) : [];
+  
+  // Color mapping for display
+  const getColorStyle = (colorName: string) => {
+    const colorMap: Record<string, string> = {
+      'naturaalne': '#F5F5DC',
+      'must': '#000000',
+      'tume sinine': '#1e3a8a',
+      'royal sinine': '#2563eb',
+      'valge': '#ffffff',
+      'hall': '#6b7280',
+      'roheline': '#16a34a',
+      'punane': '#dc2626',
+      'kollane': '#eab308',
+      'roosa': '#ec4899',
+      'oranž': '#ea580c',
+      'pruun': '#92400e'
+    };
+    return colorMap[colorName.toLowerCase()] || '#6b7280';
+  };
+  
   const altText = main_color ? `${name} ${main_color}` : name;
   
   // Truncate description to max 8 words
@@ -81,6 +103,23 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
         <p className="text-gray-600 text-sm mb-3 flex-grow">{truncatedDescription}</p>
         <div className="mt-auto">
+          {availableColors.length > 0 && (
+            <div className="flex gap-1 mb-2 flex-wrap">
+              {availableColors.slice(0, 5).map((color) => (
+                <div
+                  key={color}
+                  className="w-4 h-4 rounded-full border border-gray-300 shadow-sm"
+                  style={{ backgroundColor: getColorStyle(color) }}
+                  title={color}
+                />
+              ))}
+              {availableColors.length > 5 && (
+                <div className="w-4 h-4 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center text-xs text-gray-600">
+                  +{availableColors.length - 5}
+                </div>
+              )}
+            </div>
+          )}
           {startingPriceResult ? (
             <p className="text-primary font-medium">
               Alates €{startingPriceResult.pricePerItem.toFixed(2)}
