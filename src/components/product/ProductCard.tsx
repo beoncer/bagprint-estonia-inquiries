@@ -72,18 +72,20 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
           fallbackSrc="/placeholder.svg"
         />
       </Link>
-      <CardContent className="p-4 flex-grow">
+      <CardContent className="p-4 flex-grow flex flex-col">
         <h3 className="text-lg font-semibold mb-2 line-clamp-2">{name}</h3>
-        <p className="text-gray-600 text-sm line-clamp-3 mb-3">{description}</p>
-        {startingPriceResult ? (
-          <p className="text-primary font-medium">
-            Alates €{startingPriceResult.pricePerItem.toFixed(2)}
-          </p>
-        ) : (
-          <p className="text-gray-400 font-medium">
-            Hind puudub
-          </p>
-        )}
+        <p className="text-gray-600 text-sm line-clamp-3 mb-3 flex-grow">{description}</p>
+        <div className="mt-auto">
+          {startingPriceResult ? (
+            <p className="text-primary font-medium">
+              Alates €{startingPriceResult.pricePerItem.toFixed(2)}
+            </p>
+          ) : (
+            <p className="text-gray-400 font-medium">
+              Hind puudub
+            </p>
+          )}
+        </div>
       </CardContent>
       <CardFooter className="p-4 pt-0 flex gap-2">
         <Button variant="outline" size="sm" className="flex-1 text-sm" asChild>
