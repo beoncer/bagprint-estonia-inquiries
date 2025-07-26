@@ -59,23 +59,26 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
   // Get available colors from color_images
   const availableColors = color_images ? Object.keys(color_images) : [];
   
-  // Color mapping for display
+  // Color mapping for display - same as used in ColorPicker component
   const getColorStyle = (colorName: string) => {
-    const colorMap: Record<string, string> = {
-      'naturaalne': '#F5F5DC',
-      'must': '#000000',
-      'tume sinine': '#1e3a8a',
-      'royal sinine': '#2563eb',
-      'valge': '#ffffff',
-      'hall': '#6b7280',
-      'roheline': '#16a34a',
-      'punane': '#dc2626',
-      'kollane': '#eab308',
-      'roosa': '#ec4899',
-      'oranž': '#ea580c',
-      'pruun': '#92400e'
-    };
-    return colorMap[colorName.toLowerCase()] || '#6b7280';
+    const colorValue = colorName.toLowerCase();
+    
+    return colorValue === 'naturalne' ? '#F5F5DC' :
+      colorValue === 'punane' ? '#FF0000' :
+      colorValue === 'must' ? '#000000' :
+      colorValue === 'valge' ? '#FFFFFF' :
+      colorValue === 'hall' ? '#808080' :
+      colorValue === 'roosa' ? '#FFC0CB' :
+      colorValue === 'lilla' ? '#800080' :
+      colorValue === 'royal_sinine' ? '#4169E1' :
+      colorValue === 'taevasinine' ? '#87CEEB' :
+      colorValue === 'tume_sinine' ? '#000080' :
+      colorValue === 'hele_roheline' ? '#90EE90' :
+      colorValue === 'tume_roheline' ? '#006400' :
+      colorValue === 'kollane' ? '#FFFF00' :
+      colorValue === 'pehme_kollane' ? '#F0E68C' :
+      colorValue === 'oranz' ? '#FFA500' :
+      colorValue === 'granate' ? '#800000' : '#6b7280';
   };
   
   const altText = main_color ? `${name} ${main_color}` : name;
