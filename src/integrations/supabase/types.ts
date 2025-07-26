@@ -328,6 +328,7 @@ export type Database = {
           material: string | null
           model: string | null
           name: string
+          priority: number | null
           seo_description: string | null
           seo_keywords: string | null
           seo_title: string | null
@@ -352,6 +353,7 @@ export type Database = {
           material?: string | null
           model?: string | null
           name: string
+          priority?: number | null
           seo_description?: string | null
           seo_keywords?: string | null
           seo_title?: string | null
@@ -376,6 +378,7 @@ export type Database = {
           material?: string | null
           model?: string | null
           name?: string
+          priority?: number | null
           seo_description?: string | null
           seo_keywords?: string | null
           seo_title?: string | null
@@ -590,6 +593,7 @@ export type Database = {
           material: string | null
           model: string | null
           name: string
+          priority: number | null
           seo_description: string | null
           seo_keywords: string | null
           seo_title: string | null
@@ -633,6 +637,7 @@ export type Database = {
           material: string | null
           model: string | null
           name: string
+          priority: number | null
           seo_description: string | null
           seo_keywords: string | null
           seo_title: string | null
@@ -660,6 +665,7 @@ export type Database = {
           material: string | null
           model: string | null
           name: string
+          priority: number | null
           seo_description: string | null
           seo_keywords: string | null
           seo_title: string | null
@@ -687,6 +693,7 @@ export type Database = {
           material: string | null
           model: string | null
           name: string
+          priority: number | null
           seo_description: string | null
           seo_keywords: string | null
           seo_title: string | null
