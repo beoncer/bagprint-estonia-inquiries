@@ -508,6 +508,7 @@ const ProductsPage: React.FC = () => {
       case "cotton_bag": return "Cotton Bag";
       case "paper_bag": return "Paper Bag";
       case "drawstring_bag": return "Drawstring Bag";
+      case "shoebag": return "Shoe Bag";
       case "packaging_box": return "Packaging Box";
       default: return type;
     }
@@ -617,8 +618,8 @@ const ProductsPage: React.FC = () => {
                   <SelectContent>
                     <SelectItem value="cotton_bag">Cotton Bag</SelectItem>
                     <SelectItem value="paper_bag">Paper Bag</SelectItem>
-                    <SelectItem value="string_bag">String Bag</SelectItem>
-                    <SelectItem value="shoe_bag">Shoe Bag</SelectItem>
+                    <SelectItem value="drawstring_bag">Drawstring Bag</SelectItem>
+                    <SelectItem value="shoebag">Shoe Bag</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
