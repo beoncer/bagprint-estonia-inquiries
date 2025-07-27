@@ -3,7 +3,8 @@ import { useLocation, Link } from "react-router-dom";
 import ProductGrid from "@/components/product/ProductGrid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Phone, Mail, ChevronDown, Camera, Shield, Smile, Briefcase, Gift, Truck } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, Phone, Mail, ChevronDown, Camera, Shield, Smile, Briefcase, Gift, Truck, ChevronDown as ChevronDownIcon } from "lucide-react";
 import { getProducts, Product, getSiteContent } from "@/lib/supabase";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useQuery } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ import Breadcrumb from "@/components/ui/breadcrumb";
 import OptimizedImage from "@/components/ui/OptimizedImage";
 import { filterProducts, getSearchSuggestions } from "@/utils/productUtils";
 import SearchWithSuggestions from "@/components/ui/SearchWithSuggestions";
+import { PRODUCT_COLORS } from "@/lib/constants";
 
 // Import local category images as fallbacks
 import categoryFallbackCotton from "@/assets/category-cotton-bags.jpg";
@@ -86,6 +88,12 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchSuggestions, setSearchSuggestions] = useState<Array<{id: string, text: string, category?: string}>>([]);
+  
+  // Filter states
+  const [selectedMaterial, setSelectedMaterial] = useState<string>("all");
+  const [selectedColor, setSelectedColor] = useState<string>("all");
+  const [selectedSize, setSelectedSize] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("popular");
   const location = useLocation();
   const [guarantees, setGuarantees] = useState<any[]>([]);
   const [guaranteesLoading, setGuaranteesLoading] = useState(true);
@@ -311,15 +319,102 @@ const Products = () => {
     setActiveCategory(categoryFromPath);
   }, [location.pathname]);
   
-  // Apply filters when category or search term changes
+  // Helper function to get color label
+  const getColorLabel = (colorValue: string) => {
+    const color = PRODUCT_COLORS.find(c => c.value === colorValue);
+    return color ? color.label : colorValue;
+  };
+
+  // Get available filter options for current category
+  const getAvailableFilters = () => {
+    const categoryProducts = activeCategory !== "all" 
+      ? products.filter(product => product.category === activeCategory)
+      : products;
+    
+    const materials = [...new Set(categoryProducts.map(p => p.material).filter(Boolean))];
+    const colors = [...new Set(categoryProducts.flatMap(p => p.colors || []))];
+    const sizes = [...new Set(categoryProducts.flatMap(p => p.sizes || []))];
+    
+    return { materials, colors, sizes };
+  };
+
+  // Enhanced filtering with dropdown filters
+  const applyFilters = () => {
+    let result = [...products];
+    
+    // Apply category filter
+    if (activeCategory !== "all") {
+      result = result.filter(product => product.category === activeCategory);
+    }
+    
+    // Apply material filter
+    if (selectedMaterial && selectedMaterial !== "all") {
+      result = result.filter(product => product.material === selectedMaterial);
+    }
+    
+    // Apply color filter
+    if (selectedColor && selectedColor !== "all") {
+      result = result.filter(product => product.colors?.some(color => color === selectedColor));
+    }
+    
+    // Apply size filter
+    if (selectedSize && selectedSize !== "all") {
+      result = result.filter(product => product.sizes?.includes(selectedSize));
+    }
+    
+    // Apply search filter
+    if (searchTerm.trim() !== "") {
+      const searchLower = searchTerm.toLowerCase();
+      result = result.filter(product => {
+        const nameMatch = product.name.toLowerCase().includes(searchLower);
+        const descriptionMatch = product.description.toLowerCase().includes(searchLower);
+        const materialMatch = product.material?.toLowerCase().includes(searchLower) || false;
+        const colorsMatch = product.colors?.some(color => color.toLowerCase().includes(searchLower)) || false;
+        const sizesMatch = product.sizes?.some(size => size.toLowerCase().includes(searchLower)) || false;
+        const badgesMatch = product.badges?.some(badge => badge.toLowerCase().includes(searchLower)) || false;
+        const modelMatch = product.model?.toLowerCase().includes(searchLower) || false;
+        const seoKeywordsMatch = product.seo_keywords?.toLowerCase().includes(searchLower) || false;
+        
+        return nameMatch || descriptionMatch || materialMatch || colorsMatch || sizesMatch || badgesMatch || modelMatch || seoKeywordsMatch;
+      });
+    }
+    
+    // Apply sorting
+    switch (sortBy) {
+      case "price-low":
+        result.sort((a, b) => a.base_price - b.base_price);
+        break;
+      case "price-high":
+        result.sort((a, b) => b.base_price - a.base_price);
+        break;
+      case "name":
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "popular":
+      default:
+        result.sort((a, b) => (a.priority || 50) - (b.priority || 50));
+        break;
+    }
+    
+    setFilteredProducts(result);
+  };
+
+  // Apply filters when any filter changes
   useEffect(() => {
-    const filtered = filterProducts(products, searchTerm, activeCategory);
-    setFilteredProducts(filtered);
-  }, [activeCategory, searchTerm, products]);
+    applyFilters();
+  }, [activeCategory, searchTerm, selectedMaterial, selectedColor, selectedSize, sortBy, products]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Search submitted with term:", searchTerm);
+  };
+
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setSelectedMaterial("all");
+    setSelectedColor("all");
+    setSelectedSize("all");
+    setSortBy("popular");
   };
   
   const handleRetry = () => {
@@ -608,7 +703,7 @@ const Products = () => {
           </div>
           
           {/* Search */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10 mx-6 sm:mx-8 md:mx-12">
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-6 mx-6 sm:mx-8 md:mx-12">
             <div className="w-full md:w-auto">
               <SearchWithSuggestions
                 value={searchTerm}
@@ -618,6 +713,100 @@ const Products = () => {
                 placeholder="Otsi tooteid..."
                 className="w-full"
               />
+            </div>
+          </div>
+
+          {/* Filters */}
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-10 mx-6 sm:mx-8 md:mx-12">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Filtrid</h3>
+              {(selectedMaterial !== "all" || selectedColor !== "all" || selectedSize !== "all" || searchTerm) && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={clearAllFilters}
+                  className="text-sm"
+                >
+                  Tühjenda filtrid
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Material Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Materjal</label>
+                <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Kõik materjalid">
+                      {selectedMaterial === "all" ? "Kõik materjalid" : selectedMaterial}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Kõik materjalid</SelectItem>
+                    {getAvailableFilters().materials.map((material) => (
+                      <SelectItem key={material} value={material}>
+                        {material}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Color Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Värv</label>
+                <Select value={selectedColor} onValueChange={setSelectedColor}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Kõik värvid">
+                      {selectedColor === "all" ? "Kõik värvid" : getColorLabel(selectedColor)}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Kõik värvid</SelectItem>
+                    {getAvailableFilters().colors.map((color) => (
+                      <SelectItem key={color} value={color}>
+                        {getColorLabel(color)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Size Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Suurus</label>
+                <Select value={selectedSize} onValueChange={setSelectedSize}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Kõik suurused">
+                      {selectedSize === "all" ? "Kõik suurused" : selectedSize}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Kõik suurused</SelectItem>
+                    {getAvailableFilters().sizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Sort Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Sorteeri</label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="popular">Populaarsed</SelectItem>
+                    <SelectItem value="price-low">Hind: madalast kõrgeni</SelectItem>
+                    <SelectItem value="price-high">Hind: kõrgest madalani</SelectItem>
+                    <SelectItem value="name">Nimi: A-Ž</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
           
