@@ -717,34 +717,36 @@ const Products = () => {
           </div>
 
           {/* Filters */}
-          <div className="bg-white p-6 rounded-lg shadow-sm mb-10 mx-6 sm:mx-8 md:mx-12">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Filtrid</h3>
-              {(selectedMaterial !== "all" || selectedColor !== "all" || selectedSize !== "all" || searchTerm) && (
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-100 mb-10 mx-6 sm:mx-8 md:mx-12">
+            {(selectedMaterial !== "all" || selectedColor !== "all" || selectedSize !== "all" || searchTerm) && (
+              <div className="mb-4 flex justify-end">
                 <Button 
-                  variant="outline" 
+                  variant="ghost" 
                   size="sm" 
                   onClick={clearAllFilters}
-                  className="text-sm"
+                  className="text-primary hover:text-primary/80 hover:bg-primary/5 font-medium"
                 >
-                  Tühjenda filtrid
+                  ✕ Tühjenda filtrid
                 </Button>
-              )}
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              </div>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* Material Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Materjal</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-800 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-primary rounded-full"></div>
+                  Materjal
+                </label>
                 <Select value={selectedMaterial} onValueChange={setSelectedMaterial}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full border-gray-200 hover:border-gray-300 focus:border-primary transition-colors bg-gray-50/50 hover:bg-white">
                     <SelectValue placeholder="Kõik materjalid">
                       {selectedMaterial === "all" ? "Kõik materjalid" : selectedMaterial}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Kõik materjalid</SelectItem>
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                    <SelectItem value="all" className="hover:bg-gray-50">Kõik materjalid</SelectItem>
                     {getAvailableFilters().materials.map((material) => (
-                      <SelectItem key={material} value={material}>
+                      <SelectItem key={material} value={material} className="hover:bg-gray-50">
                         {material}
                       </SelectItem>
                     ))}
@@ -753,18 +755,21 @@ const Products = () => {
               </div>
 
               {/* Color Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Värv</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-800 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-primary rounded-full"></div>
+                  Värv
+                </label>
                 <Select value={selectedColor} onValueChange={setSelectedColor}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full border-gray-200 hover:border-gray-300 focus:border-primary transition-colors bg-gray-50/50 hover:bg-white">
                     <SelectValue placeholder="Kõik värvid">
                       {selectedColor === "all" ? "Kõik värvid" : getColorLabel(selectedColor)}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Kõik värvid</SelectItem>
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                    <SelectItem value="all" className="hover:bg-gray-50">Kõik värvid</SelectItem>
                     {getAvailableFilters().colors.map((color) => (
-                      <SelectItem key={color} value={color}>
+                      <SelectItem key={color} value={color} className="hover:bg-gray-50">
                         {getColorLabel(color)}
                       </SelectItem>
                     ))}
@@ -773,18 +778,21 @@ const Products = () => {
               </div>
 
               {/* Size Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Suurus</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-800 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-primary rounded-full"></div>
+                  Suurus
+                </label>
                 <Select value={selectedSize} onValueChange={setSelectedSize}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full border-gray-200 hover:border-gray-300 focus:border-primary transition-colors bg-gray-50/50 hover:bg-white">
                     <SelectValue placeholder="Kõik suurused">
                       {selectedSize === "all" ? "Kõik suurused" : selectedSize}
                     </SelectValue>
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Kõik suurused</SelectItem>
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                    <SelectItem value="all" className="hover:bg-gray-50">Kõik suurused</SelectItem>
                     {getAvailableFilters().sizes.map((size) => (
-                      <SelectItem key={size} value={size}>
+                      <SelectItem key={size} value={size} className="hover:bg-gray-50">
                         {size}
                       </SelectItem>
                     ))}
@@ -793,17 +801,20 @@ const Products = () => {
               </div>
 
               {/* Sort Filter */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Sorteeri</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-800 flex items-center gap-2">
+                  <div className="w-1 h-4 bg-primary rounded-full"></div>
+                  Sorteeri
+                </label>
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger className="w-full border-gray-200 hover:border-gray-300 focus:border-primary transition-colors bg-gray-50/50 hover:bg-white">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="popular">Populaarsed</SelectItem>
-                    <SelectItem value="price-low">Hind: madalast kõrgeni</SelectItem>
-                    <SelectItem value="price-high">Hind: kõrgest madalani</SelectItem>
-                    <SelectItem value="name">Nimi: A-Ž</SelectItem>
+                  <SelectContent className="bg-white border-gray-200 shadow-lg">
+                    <SelectItem value="popular" className="hover:bg-gray-50">Populaarsed</SelectItem>
+                    <SelectItem value="price-low" className="hover:bg-gray-50">Hind: madalast kõrgeni</SelectItem>
+                    <SelectItem value="price-high" className="hover:bg-gray-50">Hind: kõrgest madalani</SelectItem>
+                    <SelectItem value="name" className="hover:bg-gray-50">Nimi: A-Ž</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
