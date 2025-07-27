@@ -27,14 +27,18 @@
       });
     </script>
 
-    <!-- Preconnect to external domains for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://ixotpxliaerkzjznyipi.supabase.co">
-    
-    <!-- DNS prefetch for performance -->
+    <!-- Critical resource hints for faster loading -->
+    <link rel="preconnect" href="https://ixotpxliaerkzjznyipi.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="//www.googletagmanager.com">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Preload critical CSS and main script -->
+    <link rel="preload" href="/src/index.css" as="style">
+    <link rel="modulepreload" href="/src/main.tsx">
+    
+    <!-- Early hints for key resources -->
+    <link rel="prefetch" href="/src/components/performance/LazyComponents.tsx">
 
     <meta property="og:title" content="Leatex - Kvaliteetsed kotid ja pakendid" />
     <meta property="og:description" content="Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga. Küsi pakkumist juba täna!" />

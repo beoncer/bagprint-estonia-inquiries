@@ -38,15 +38,19 @@ export const usePerformance = () => {
   });
 
   useEffect(() => {
-    // First Contentful Paint (FCP)
-    const fcpObserver = new PerformanceObserver((list) => {
-      const entries = list.getEntries();
-      const fcpEntry = entries.find(entry => entry.name === 'first-contentful-paint');
-      if (fcpEntry) {
-        setMetrics(prev => ({ ...prev, fcp: fcpEntry.startTime }));
-      }
-    });
-    fcpObserver.observe({ entryTypes: ['paint'] });
+    // First Contentful Paint (FCP) - optimized observer
+    let fcpObserver: PerformanceObserver | null = null;
+    if ('PerformanceObserver' in window) {
+      fcpObserver = new PerformanceObserver((list) => {
+        const entries = list.getEntries();
+        const fcpEntry = entries.find(entry => entry.name === 'first-contentful-paint');
+        if (fcpEntry) {
+          setMetrics(prev => ({ ...prev, fcp: fcpEntry.startTime }));
+          fcpObserver?.disconnect();
+        }
+      });
+      fcpObserver.observe({ entryTypes: ['paint'], buffered: true });
+    }
 
     // Largest Contentful Paint (LCP)
     const lcpObserver = new PerformanceObserver((list) => {
