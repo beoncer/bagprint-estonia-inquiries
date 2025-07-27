@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, Building2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 interface FooterContentItem {
@@ -139,6 +139,7 @@ const Footer: React.FC = () => {
                   {info.label.toLowerCase().includes("tel") || info.label.includes("+") ? <Phone size={16} className="text-primary" /> : null}
                   {info.label.toLowerCase().includes("mail") || info.value.includes("@") ? <Mail size={16} className="text-primary" /> : null}
                   {info.label.toLowerCase().includes("aadress") || info.label.toLowerCase().includes("tallinn") ? <MapPin size={16} className="text-primary" /> : null}
+                  {info.label.toLowerCase().includes("firma") ? <Building2 size={16} className="text-primary" /> : null}
                   <span className="text-gray-400">{info.value}</span>
                 </div>
               ))}
