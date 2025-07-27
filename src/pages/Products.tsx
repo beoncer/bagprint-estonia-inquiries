@@ -11,6 +11,8 @@ import { supabase } from "@/lib/supabase";
 import FAQStructuredData from "@/components/seo/FAQStructuredData";
 import Breadcrumb from "@/components/ui/breadcrumb";
 import OptimizedImage from "@/components/ui/OptimizedImage";
+import { filterProducts, getSearchSuggestions } from "@/utils/productUtils";
+import SearchWithSuggestions from "@/components/ui/SearchWithSuggestions";
 
 // Import local category images as fallbacks
 import categoryFallbackCotton from "@/assets/category-cotton-bags.jpg";
@@ -83,6 +85,7 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchSuggestions, setSearchSuggestions] = useState<Array<{id: string, text: string, category?: string}>>([]);
   const location = useLocation();
   const [guarantees, setGuarantees] = useState<any[]>([]);
   const [guaranteesLoading, setGuaranteesLoading] = useState(true);
@@ -286,6 +289,10 @@ const Products = () => {
         const data = await getProducts();
         setProducts(data);
         setFilteredProducts(data);
+        
+        // Generate search suggestions from product data
+        const suggestions = getSearchSuggestions(data);
+        setSearchSuggestions(suggestions);
       } catch (err) {
         setError('Failed to fetch products. Please try again later.');
         console.error('Error fetching products:', err);
@@ -306,28 +313,8 @@ const Products = () => {
   
   // Apply filters when category or search term changes
   useEffect(() => {
-    let result = [...products];
-    
-    // Apply category filter
-    if (activeCategory !== "all") {
-      console.log(`Filtering by category: ${activeCategory}`);
-      result = result.filter(product => product.category === activeCategory);
-      console.log(`After category filter: ${result.length} products`);
-    }
-    
-    // Apply search filter
-    if (searchTerm.trim() !== "") {
-      const searchLower = searchTerm.toLowerCase();
-      console.log(`Filtering by search term: ${searchLower}`);
-      result = result.filter(product => 
-        product.name.toLowerCase().includes(searchLower) || 
-        product.description.toLowerCase().includes(searchLower)
-      );
-      console.log(`After search filter: ${result.length} products`);
-    }
-    
-    console.log("Filtered products:", result);
-    setFilteredProducts(result);
+    const filtered = filterProducts(products, searchTerm, activeCategory);
+    setFilteredProducts(filtered);
   }, [activeCategory, searchTerm, products]);
   
   const handleSearch = (e: React.FormEvent) => {
@@ -623,16 +610,14 @@ const Products = () => {
           {/* Search */}
           <div className="bg-white p-6 rounded-lg shadow-sm mb-10 mx-6 sm:mx-8 md:mx-12">
             <div className="w-full md:w-auto">
-              <form onSubmit={handleSearch} className="relative">
-                <Input
-                  type="text"
-                  placeholder="Otsi tooteid..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-              </form>
+              <SearchWithSuggestions
+                value={searchTerm}
+                onChange={setSearchTerm}
+                onSubmit={(value) => setSearchTerm(value)}
+                suggestions={searchSuggestions}
+                placeholder="Otsi tooteid..."
+                className="w-full"
+              />
             </div>
           </div>
           
