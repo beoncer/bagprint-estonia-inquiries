@@ -1,18 +1,11 @@
 export default async function handler(req, res) {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).setHeader('Access-Control-Allow-Origin', '*').end()
-  }
-
   try {
     // Get the base URL from request headers
     const protocol = req.headers['x-forwarded-proto'] || 'https'
     const host = req.headers.host
     const baseUrl = `${protocol}://${host}`
     
-    console.log('Using base URL:', baseUrl)
-
-    // Use fetch to call the Supabase edge function
+    // Call the Supabase edge function
     const response = await fetch(`https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/generate-sitemap`, {
       method: 'POST',
       headers: {
@@ -29,15 +22,25 @@ export default async function handler(req, res) {
     }
 
     // Set headers for XML response
-    res.setHeader('Content-Type', 'application/xml')
-    res.setHeader('Cache-Control', 'public, max-age=3600') // Cache for 1 hour
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+    res.setHeader('Cache-Control', 'public, max-age=3600')
     res.status(200).send(data.xml)
 
   } catch (error) {
     console.error('Error in sitemap generation:', error)
-    res.status(500).json({ 
-      error: error.message,
-      success: false 
-    })
+    
+    // Fallback to static sitemap if dynamic fails
+    const fallbackSitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${req.headers.host ? `https://${req.headers.host}/` : 'https://bagprint-estonia-inquiries.lovable.app/'}</loc>
+    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`
+    
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+    res.status(200).send(fallbackSitemap)
   }
 }
