@@ -27,19 +27,25 @@ Deno.serve(async (req) => {
       throw syncError;
     }
 
-    // Generate sitemap XML
+    // Generate sitemap XML with XSL reference
     const { data: sitemapXml, error: xmlError } = await supabaseClient.rpc('generate_sitemap_xml');
     if (xmlError) {
       console.error('Error generating sitemap XML:', xmlError);
       throw xmlError;
     }
 
+    // Add XSL stylesheet reference to the XML
+    const styledSitemapXml = sitemapXml.replace(
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<?xml version="1.0" encoding="UTF-8"?>\n<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>'
+    );
+
     console.log('Generated sitemap XML, length:', sitemapXml?.length);
 
     // Write to static file using Supabase Storage
     const { error: uploadError } = await supabaseClient.storage
       .from('site-assets')
-      .upload('sitemap.xml', sitemapXml, {
+      .upload('sitemap.xml', styledSitemapXml, {
         contentType: 'application/xml',
         upsert: true
       });
@@ -55,7 +61,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: 'Sitemap generated and saved successfully',
-        xml: sitemapXml 
+        xml: styledSitemapXml 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
