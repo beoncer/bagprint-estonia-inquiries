@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
 const Sitemap = () => {
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const generateAndServeSitemap = async () => {
       try {
-        setLoading(true);
-        
         // Call the edge function to generate sitemap
         const { data, error } = await supabase.functions.invoke('generate-sitemap');
         
@@ -17,10 +13,10 @@ const Sitemap = () => {
           throw error;
         }
 
-        // Get the generated XML
+        // Get the generated XML with XSL stylesheet
         const sitemapXml = data?.xml || '';
         
-        // Set the document content type to XML and replace content
+        // Replace current document content with XML
         document.open('application/xml');
         document.write(sitemapXml);
         document.close();
@@ -28,8 +24,9 @@ const Sitemap = () => {
       } catch (error) {
         console.error('Failed to generate sitemap:', error);
         
-        // Fallback - serve basic XML structure
+        // Fallback - serve basic XML structure with XSL
         const fallbackXml = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://leatex.ee/</loc>
@@ -42,8 +39,6 @@ const Sitemap = () => {
         document.open('application/xml');
         document.write(fallbackXml);
         document.close();
-      } finally {
-        setLoading(false);
       }
     };
 
