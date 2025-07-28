@@ -18,20 +18,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get baseUrl from request body
-    const requestBody = await req.json().catch(() => ({}));
-    const baseUrl = requestBody.baseUrl || 'https://bagprint.ee';
-
-    console.log('Starting sitemap generation with baseUrl:', baseUrl);
-
-    // Set the base URL in the database session for the function to use
-    const { error: settingError } = await supabaseClient.rpc('exec', {
-      sql: `SELECT set_config('app.base_url', '${baseUrl}', false)`
-    });
-
-    if (settingError) {
-      console.log('Could not set base URL config, continuing with edge function handling...');
-    }
+    console.log('Starting sitemap generation...');
 
     // First sync dynamic content
     const { error: syncError } = await supabaseClient.rpc('sync_dynamic_sitemap_entries');
@@ -49,18 +36,10 @@ Deno.serve(async (req) => {
 
     console.log('Generated sitemap XML, length:', sitemapXml?.length);
 
-    // Replace relative URLs with full URLs
-    let finalSitemapXml = sitemapXml;
-    if (finalSitemapXml && baseUrl) {
-      finalSitemapXml = finalSitemapXml.replace(/<loc>\/([^<]*)<\/loc>/g, `<loc>${baseUrl}/$1</loc>`);
-      finalSitemapXml = finalSitemapXml.replace(/href="\/([^"]*)"/g, `href="${baseUrl}/$1"`);
-      finalSitemapXml = finalSitemapXml.replace(`<loc>${baseUrl}/</loc>`, `<loc>${baseUrl}/</loc>`);
-    }
-
     // Write to static file using Supabase Storage for backup
     const { error: uploadError } = await supabaseClient.storage
       .from('site-assets')
-      .upload('sitemap.xml', finalSitemapXml, {
+      .upload('sitemap.xml', sitemapXml, {
         contentType: 'application/xml',
         upsert: true
       });
@@ -80,7 +59,7 @@ Deno.serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: 'Sitemap generated and saved successfully',
-        xml: finalSitemapXml 
+        xml: sitemapXml 
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
