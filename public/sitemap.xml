@@ -5,7 +5,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://leatex.ee/</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/"/>
@@ -14,7 +14,7 @@
   <!-- Main Product Categories -->
   <url>
     <loc>https://leatex.ee/tooted</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted"/>
@@ -22,7 +22,7 @@
   
   <url>
     <loc>https://leatex.ee/riidest-kotid</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/riidest-kotid"/>
@@ -30,7 +30,7 @@
   
   <url>
     <loc>https://leatex.ee/paberkotid</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/paberkotid"/>
@@ -38,7 +38,7 @@
   
   <url>
     <loc>https://leatex.ee/nooriga-kotid</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/nooriga-kotid"/>
@@ -46,7 +46,7 @@
   
   <url>
     <loc>https://leatex.ee/sussikotid</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/sussikotid"/>
@@ -55,7 +55,7 @@
   <!-- Information Pages -->
   <url>
     <loc>https://leatex.ee/meist</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/meist"/>
@@ -63,7 +63,7 @@
   
   <url>
     <loc>https://leatex.ee/kontakt</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/kontakt"/>
@@ -71,7 +71,7 @@
   
   <url>
     <loc>https://leatex.ee/portfoolio</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/portfoolio"/>
@@ -79,10 +79,140 @@
   
   <url>
     <loc>https://leatex.ee/blogi</loc>
-    <lastmod>2025-01-03</lastmod>
+    <lastmod>2025-07-28</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
     <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/blogi"/>
+  </url>
+  
+  <!-- Product Pages -->
+  <url>
+    <loc>https://leatex.ee/tooted/laiad-kandekotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/laiad-kandekotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/luhikeste-sangadega-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/luhikeste-sangadega-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/naturaalsed-puuvillased-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/naturaalsed-puuvillased-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/puuvillased-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/puuvillased-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/riidest-kotid-220g</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/riidest-kotid-220g"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/riidest-kotide-muuk</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/riidest-kotide-muuk"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/suured-kangast-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/suured-kangast-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/suured-puuvillased-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/suured-puuvillased-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/suured-riidest-kandekotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/suured-riidest-kandekotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/taaskasutatud-riidest-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/taaskasutatud-riidest-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/umbertoodeldud-plastikust-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/umbertoodeldud-plastikust-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/umbertoodeldud-riidest-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/umbertoodeldud-riidest-kotid"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/vaiksed-kotid-nooriga</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/vaiksed-kotid-nooriga"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/tooted/varviliste-sangadega-puuvillased-kotid</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/tooted/varviliste-sangadega-puuvillased-kotid"/>
+  </url>
+  
+  <!-- Blog Posts -->
+  <url>
+    <loc>https://leatex.ee/blogi/paha-ne-v-shoke</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/blogi/paha-ne-v-shoke"/>
+  </url>
+  
+  <url>
+    <loc>https://leatex.ee/blogi/pizdec-kakojto</loc>
+    <lastmod>2025-07-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="et" href="https://leatex.ee/blogi/pizdec-kakojto"/>
   </url>
   
 </urlset>
