@@ -20,6 +20,19 @@ Deno.serve(async (req) => {
 
     console.log('Starting sitemap generation...');
 
+    // Get the base URL from request headers dynamically
+    const url = new URL(req.url);
+    const baseUrl = `${url.protocol}//${url.host}`;
+    
+    console.log('Using base URL:', baseUrl);
+
+    // Set the base URL as a session variable for the database function
+    await supabaseClient.rpc('set_config', {
+      setting_name: 'app.base_url',
+      new_value: baseUrl,
+      is_local: true
+    });
+
     // First sync dynamic content
     const { error: syncError } = await supabaseClient.rpc('sync_dynamic_sitemap_entries');
     if (syncError) {
