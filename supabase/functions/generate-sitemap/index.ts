@@ -20,9 +20,17 @@ Deno.serve(async (req) => {
 
     console.log('Starting sitemap generation...');
 
-    // Get the base URL from request headers dynamically
-    const url = new URL(req.url);
-    const baseUrl = `${url.protocol}//${url.host}`;
+    // Get the base URL from request body or fallback to request URL
+    let baseUrl = '';
+    if (req.method === 'POST') {
+      const body = await req.json();
+      baseUrl = body.baseUrl || '';
+    }
+    
+    if (!baseUrl) {
+      const url = new URL(req.url);
+      baseUrl = `${url.protocol}//${url.host}`;
+    }
     
     console.log('Using base URL:', baseUrl);
 
