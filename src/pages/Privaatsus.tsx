@@ -1,7 +1,112 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
 
 const Privaatsus: React.FC = () => {
+  const [title, setTitle] = useState("Privaatsuspoliitika");
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const fetchContent = async () => {
+    try {
+      // Fetch page title
+      const { data: titleData } = await supabase
+        .from("website_content")
+        .select("value")
+        .eq("page", "privaatsus")
+        .eq("key", "page_title")
+        .single();
+
+      if (titleData) {
+        setTitle(titleData.value);
+      }
+
+      // Fetch page content
+      const { data: contentData } = await supabase
+        .from("website_content")
+        .select("value")
+        .eq("page", "privaatsus")
+        .eq("key", "page_content")
+        .single();
+
+      if (contentData) {
+        setContent(contentData.value);
+      } else {
+        // Fallback content if not set in database
+        setContent(`
+# Privaatsuspoliitika
+
+Oleme võtnud endale kohustuse kaitsta klientide ja kasutajate privaatsust. Sellest lähtuvalt oleme koostanud käesolevad privaatsuspoliitika põhimõtted, mis käsitlevad kliendi andmete kogumist, kasutamist, avaldamist, edastamist ja talletamist. Meie tegevus internetis on kooskõlas kõigi asjakohaste tegevuste ja vastavate Euroopa Liidu õigusaktide ja Eesti Vabariigi seadustega.
+
+## ISIKUANDMETE KOGUMINE JA KASUTAMINE
+
+Isikuandmed on andmed, mida Leatex OÜ kogub üksikisiku tuvastamiseks või temaga ühenduse võtmiseks. Isikuandmete kogumine võib toimuda kliendi nõusolekul järgnevatel viisidel:
+
+- Kontaktandmete (sh teie nimi, postiaadress, telefoninumber, e-posti aadress) esitamisel meie veebilehel
+- Veebilehe kasutamisel kliendi kontoinfost või küpsiste (cookies) kaudu ostu või tellimuse pärimise sooritamisel meie e-poes
+- Pakkumise taotluse esitamisel
+
+Kogutud isikuandmete abil saame teavitada kliente Leatex OÜ uudistest, kampaaniatest ja tulevastest sündmustest.
+
+## ISIKUANDMETE KAITSE
+
+Leatex OÜ rakendab kõiki ettevaatusabinõusid (sh administratiivsed, tehnilised ja füüsilised meetmed) kliendi isikuandmete kaitsmiseks.
+
+## KONTAKTANDMED
+
+**Ettevõte:** Leatex OÜ  
+**E-post:** pavel@leatex.ee
+
+Kõigi privaatsuspoliitika või andmetöötluse kohta tekkivate küsimuste või muredega palume võtta meiega ühendust.
+        `);
+      }
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      // Use fallback content on error
+      setContent("Privaatsuspoliitika sisu laadimise viga. Palun proovige hiljem uuesti.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContent();
+  }, []);
+
+  const renderMarkdown = (text: string) => {
+    return text
+      .split('\n')
+      .map((line, index) => {
+        if (line.startsWith('# ')) {
+          return <h1 key={index} className="text-3xl font-bold text-primary mb-6">{line.substring(2)}</h1>;
+        }
+        if (line.startsWith('## ')) {
+          return <h2 key={index} className="text-2xl font-semibold text-primary mb-4 mt-8">{line.substring(3)}</h2>;
+        }
+        if (line.startsWith('### ')) {
+          return <h3 key={index} className="text-xl font-semibold text-primary mb-3 mt-6">{line.substring(4)}</h3>;
+        }
+        if (line.startsWith('- ')) {
+          return <li key={index} className="mb-2">{line.substring(2)}</li>;
+        }
+        if (line.startsWith('**') && line.endsWith('**')) {
+          return <p key={index} className="font-semibold mb-2">{line.substring(2, line.length - 2)}</p>;
+        }
+        if (line.trim() === '') {
+          return <br key={index} />;
+        }
+        return <p key={index} className="mb-4 leading-relaxed">{line}</p>;
+      });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center">
+        <div className="text-lg">Laaditakse...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
       <div className="container mx-auto px-4 py-8">
@@ -9,140 +114,12 @@ const Privaatsus: React.FC = () => {
           <Card className="shadow-xl border-0">
             <CardContent className="p-8">
               <h1 className="text-4xl font-bold text-primary mb-8 text-center">
-                Privaatsuspoliitika
+                {title}
               </h1>
               
               <div className="prose max-w-none space-y-6 text-muted-foreground">
-                <p className="text-lg leading-relaxed">
-                  Oleme võtnud endale kohustuse kaitsta klientide ja kasutajate privaatsust. 
-                  Sellest lähtuvalt oleme koostanud käesolevad privaatsuspoliitika põhimõtted, 
-                  mis käsitlevad kliendi andmete kogumist, kasutamist, avaldamist, edastamist ja talletamist. 
-                  Meie tegevus internetis on kooskõlas kõigi asjakohaste tegevuste ja vastavate 
-                  Euroopa Liidu õigusaktide ja Eesti Vabariigi seadustega.
-                </p>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    ISIKUANDMETE KOGUMINE JA KASUTAMINE
-                  </h2>
-                  <p className="mb-4">
-                    Isikuandmed on andmed, mida Leatex OÜ kogub üksikisiku tuvastamiseks või 
-                    temaga ühenduse võtmiseks. Isikuandmete kogumine võib toimuda kliendi nõusolekul 
-                    järgnevatel viisidel:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>
-                      Kontaktandmete (sh teie nimi, postiaadress, telefoninumber, e-posti aadress) 
-                      esitamisel meie veebilehel
-                    </li>
-                    <li>
-                      Veebilehe kasutamisel kliendi kontoinfost või küpsiste (cookies) kaudu ostu 
-                      või tellimuse pärimise sooritamisel meie e-poes
-                    </li>
-                    <li>
-                      Pakkumise taotluse esitamisel
-                    </li>
-                  </ul>
-                  <p className="mt-4">
-                    Kogutud isikuandmete abil saame teavitada kliente Leatex OÜ uudistest, 
-                    kampaaniatest ja tulevastest sündmustest. Klient, kes ei soovi olla meie 
-                    uudiskirjaloendis, saab ennast sellest igal ajal eemaldada. Kogutud isikuandmeid 
-                    kasutame ka kauba kohaletoimetamiseks ning kliendi ees võetud kohustuste täitmiseks.
-                  </p>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    ISIKUANDMETE KAITSE
-                  </h2>
-                  <p>
-                    Leatex OÜ rakendab kõiki ettevaatusabinõusid (sh administratiivsed, tehnilised ja 
-                    füüsilised meetmed) kliendi isikuandmete kaitsmiseks. Juurdepääs andmete muutmiseks 
-                    ja töötlemiseks on ainult selleks volitatud isikutel.
-                  </p>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    TURVALISUS
-                  </h2>
-                  <p>
-                    Kõik Leatex OÜ veebilehe külastamise ja pakkumiste pärimise käigus teatavaks 
-                    saanud kliendi isikuandmeid käsitletakse kui konfidentsiaalset infot. 
-                    Krüpteeritud andmesidekanal tagab kommunikatsiooni turvalisuse.
-                  </p>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    ANDMETE JAGAMINE KOLMANDATE OSAPOOLTEGA
-                  </h2>
-                  <p>
-                    Kliendi paremaks teenindamiseks võib Leatex OÜ avaldada teavet üksikute 
-                    kasutajate kohta kolmandale osapoolele, kes osutab Leatex OÜ teenuseid ning 
-                    on lepinguga kohustunud hoidma jagatud teavet konfidentsiaalsena. Kolmandaks 
-                    osapooleks on näiteks meie partner, kelle ülesanneteks on müüdavate kaupade transport.
-                  </p>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    ANDMETE SÄILITAMINE
-                  </h2>
-                  <p>
-                    Säilitame teie isikuandmeid nii kaua, kui see on vajalik käesoleva 
-                    privaatsuspoliitikaga või seadusega ette nähtud eesmärkide täitmiseks. 
-                    Kui teil ei ole enam meie teenustega seotud suhteid, kustutame või 
-                    anonümiseerime teie isikuandmed.
-                  </p>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    TEIE ÕIGUSED
-                  </h2>
-                  <p className="mb-4">
-                    Vastavalt Euroopa Liidu Üldisele Andmekaitse Määrusele (GDPR) on teil õigus:
-                  </p>
-                  <ul className="list-disc pl-6 space-y-1">
-                    <li>Juurdepääsuks oma isikuandmetele</li>
-                    <li>Oma andmete parandamisele</li>
-                    <li>Oma andmete kustutamisele</li>
-                    <li>Andmetöötluse piiramisele</li>
-                    <li>Andmete ülekandmisele</li>
-                    <li>Vastuväitele andmetöötlusele</li>
-                  </ul>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    PRIVAATSUSPOLIITIKA TINGIMUSED JA MUUDATUSED
-                  </h2>
-                  <p>
-                    Jätame endale õiguse vajadusel privaatsustingimusi muuta. Meie veebilehte 
-                    kasutama asudes, eeldame, et olete nende põhimõtetega tutvunud ning nõustute 
-                    nendega. Muudatustest teavitame teid meie veebilehe kaudu.
-                  </p>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
-                    KONTAKTANDMED
-                  </h2>
-                  <div className="bg-muted p-6 rounded-lg">
-                    <p className="mb-2">
-                      <strong>Ettevõte:</strong> Leatex OÜ
-                    </p>
-                    <p className="mb-2">
-                      <strong>E-post:</strong> pavel@leatex.ee
-                    </p>
-                    <p>
-                      Kõigi privaatsuspoliitika või andmetöötluse kohta tekkivate küsimuste või 
-                      muredega palume võtta meiega ühendust.
-                    </p>
-                  </div>
-                </section>
-
+                {renderMarkdown(content)}
+                
                 <div className="text-center text-sm text-muted-foreground mt-8 pt-6 border-t">
                   Viimati uuendatud: {new Date().toLocaleDateString('et-EE')}
                 </div>

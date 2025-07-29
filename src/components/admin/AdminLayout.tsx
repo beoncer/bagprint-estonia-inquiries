@@ -150,6 +150,12 @@ const AdminLayout: React.FC = () => {
                   <span>Product FAQ</span>
                 </Link>
               </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/pages-content" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/pages-content") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <FileText className="h-5 w-5" />
+                  <span>Static Pages</span>
+                </Link>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
           <SidebarFooter>

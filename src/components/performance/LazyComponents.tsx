@@ -33,3 +33,4 @@ export const AdminContact = lazy(() => import("@/pages/admin/Contact"));
 export const AdminFooter = lazy(() => import("@/pages/admin/Footer"));
 export const AdminGuarantees = lazy(() => import("@/pages/admin/Guarantees"));
 export const AdminProductFAQ = lazy(() => import("@/pages/admin/ProductFAQ"));
+export const AdminPagesContent = lazy(() => import("@/pages/admin/PagesContent"));
