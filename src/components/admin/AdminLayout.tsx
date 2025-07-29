@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, ShoppingBag, FileText, ImageIcon, Search, LogOut, HelpCircle, Briefcase, BookOpen, ShieldCheck, Phone, Package, Euro, Globe, Settings } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, FileText, ImageIcon, Search, LogOut, HelpCircle, Briefcase, BookOpen, ShieldCheck, Phone, Package, Euro, Globe } from "lucide-react";
 
 const AdminLayout: React.FC = () => {
   const { user, loading, signOut } = useAuth();
@@ -61,14 +61,8 @@ const AdminLayout: React.FC = () => {
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <Link to="/admin/pricing" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/pricing") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
-                  <Settings className="h-4 w-4" />
+                  <Euro className="h-5 w-5" />
                   <span>Pricing</span>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link to="/admin/sitemap" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/sitemap") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
-                  <Globe className="h-5 w-5" />
-                  <span>Sitemap</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -111,6 +105,12 @@ const AdminLayout: React.FC = () => {
                 <Link to="/admin/seo" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/seo") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
                   <Search className="h-5 w-5" />
                   <span>SEO</span>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to="/admin/sitemap" className={`flex items-center gap-2 w-full rounded-md p-2 text-sm ${location.pathname.startsWith("/admin/sitemap") ? "bg-accent text-accent-foreground font-medium" : "hover:bg-accent hover:text-accent-foreground"}`}>
+                  <Globe className="h-5 w-5" />
+                  <span>Sitemap</span>
                 </Link>
               </SidebarMenuItem>
               <SidebarMenuItem>

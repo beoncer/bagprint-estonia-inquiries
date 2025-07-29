@@ -1,14 +1,6 @@
 {
   "rewrites": [
     {
-      "source": "/sitemap.xml",
-      "destination": "/sitemap"
-    },
-    {
-      "source": "/admin",
-      "destination": "/index.html"
-    },
-    {
       "source": "/admin/(.*)",
       "destination": "/index.html"
     },
@@ -18,32 +10,6 @@
     }
   ],
   "headers": [
-    {
-      "source": "/sitemap",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
     {
       "source": "/admin/(.*)",
       "headers": [
