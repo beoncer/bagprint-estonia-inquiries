@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "/index.html"
+      "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
     },
     {
       "source": "/admin/(.*)",
