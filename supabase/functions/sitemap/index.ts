@@ -6,6 +6,8 @@ const corsHeaders = {
 }
 
 Deno.serve(async (req) => {
+  console.log('Sitemap function called:', req.method, req.url);
+  
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -17,40 +19,40 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
+    console.log('Supabase client created');
+
     // Set the base URL for sitemap generation
     const url = new URL(req.url);
     const baseUrl = `${url.protocol}//${url.host}`;
+    console.log('Base URL:', baseUrl);
     
-    // Set the base URL in a way the database function can access it
-    await supabaseClient.rpc('set_config', {
-      setting_name: 'app.base_url',
-      new_value: baseUrl,
-      is_local: false
-    }).catch(() => {
-      // Ignore errors if set_config doesn't exist, we'll handle it in the XML generation
-    });
-
     // First sync dynamic content
+    console.log('Syncing dynamic content...');
     const { error: syncError } = await supabaseClient.rpc('sync_dynamic_sitemap_entries');
     if (syncError) {
       console.error('Error syncing dynamic content:', syncError);
       throw syncError;
     }
+    console.log('Dynamic content synced successfully');
 
     // Generate sitemap XML
+    console.log('Generating sitemap XML...');
     const { data: sitemapXml, error: xmlError } = await supabaseClient.rpc('generate_sitemap_xml');
     if (xmlError) {
       console.error('Error generating sitemap XML:', xmlError);
       throw xmlError;
     }
+    console.log('Sitemap XML generated, length:', sitemapXml?.length);
 
     // Add base URL to the XML if it wasn't added by the database function
     let finalXml = sitemapXml;
     if (finalXml && !finalXml.includes('http')) {
       finalXml = finalXml.replace(/<loc>/g, `<loc>${baseUrl}`);
       finalXml = finalXml.replace(/href="/g, `href="${baseUrl}`);
+      console.log('Added base URL to XML');
     }
 
+    console.log('Returning successful response');
     return new Response(finalXml, {
       headers: {
         ...corsHeaders,
@@ -76,6 +78,7 @@ Deno.serve(async (req) => {
   </url>
 </urlset>`;
     
+    console.log('Returning fallback XML');
     return new Response(fallbackXml, {
       headers: {
         ...corsHeaders,
