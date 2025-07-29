@@ -75,22 +75,6 @@ const Privaatsus: React.FC = () => {
 
                 <section className="mt-8">
                   <h2 className="text-2xl font-semibold text-primary mb-4">
-                    KÜPSISED (COOKIES)
-                  </h2>
-                  <p>
-                    Meie veebileht kasutab küpsiseid (cookies) kasutajakogemuse parandamiseks. 
-                    Küpsised on väikesed tekstifailid, mis salvestatakse teie seadmesse veebilehe 
-                    külastamisel. Need aitavad meil:
-                  </p>
-                  <ul className="list-disc pl-6 mt-2 space-y-1">
-                    <li>Meeles pidada teie eelistusi</li>
-                    <li>Analüüsida veebilehe kasutamist</li>
-                    <li>Pakkuda personaliseeritud sisu</li>
-                  </ul>
-                </section>
-
-                <section className="mt-8">
-                  <h2 className="text-2xl font-semibold text-primary mb-4">
                     ANDMETE JAGAMINE KOLMANDATE OSAPOOLTEGA
                   </h2>
                   <p>
