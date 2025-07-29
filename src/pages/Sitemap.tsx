@@ -1,31 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+interface SitemapEntry {
+  url: string;
+  lastmod: string;
+  changefreq: string;
+  priority: number;
+}
+
 const Sitemap: React.FC = () => {
-  const [sitemap, setSitemap] = useState<string>('');
+  const [entries, setEntries] = useState<SitemapEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const generateSitemap = async () => {
+    const fetchSitemapData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Call the database function to generate sitemap XML
-        const { data, error: functionError } = await supabase.rpc('generate_sitemap_xml');
+        const { data, error: queryError } = await supabase
+          .from('sitemap_entries')
+          .select('*')
+          .order('priority', { ascending: false });
         
-        if (functionError) {
-          console.error('Error generating sitemap:', functionError);
-          setError('Failed to generate sitemap');
+        if (queryError) {
+          console.error('Error fetching sitemap:', queryError);
+          setError('Failed to load sitemap');
           return;
         }
 
-        // Set the base URL in the XML
         const baseUrl = 'https://leatex.ee';
-        const sitemapWithBaseUrl = data.replace(/(<loc>)/g, `$1${baseUrl}`);
+        const formattedEntries = data.map(entry => ({
+          url: `${baseUrl}${entry.url}`,
+          lastmod: entry.lastmod,
+          changefreq: entry.changefreq,
+          priority: entry.priority
+        }));
         
-        setSitemap(sitemapWithBaseUrl);
+        setEntries(formattedEntries);
       } catch (err) {
         console.error('Error:', err);
         setError('Failed to load sitemap');
@@ -34,28 +47,78 @@ const Sitemap: React.FC = () => {
       }
     };
 
-    generateSitemap();
+    fetchSitemapData();
   }, []);
 
-  useEffect(() => {
-    // Replace the entire document with XML when sitemap is ready
-    if (sitemap && !loading && !error) {
-      document.open();
-      document.write(sitemap);
-      document.close();
-    }
-  }, [sitemap, loading, error]);
-
   if (loading) {
-    return <div>Loading sitemap...</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Loading sitemap...</div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center text-destructive">Error: {error}</div>
+      </div>
+    );
   }
 
-  // This component renders but gets replaced by the XML
-  return <div>Generating sitemap...</div>;
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="bg-card rounded-lg shadow-sm p-6">
+        <h1 className="text-3xl font-bold text-primary mb-2">Leatex.ee Sitemap</h1>
+        <hr className="border-primary mb-6" />
+        
+        <div className="mb-6 space-y-2">
+          <p><strong>Total URLs:</strong> {entries.length}</p>
+          <p><strong>Last Generated:</strong> {new Date().toISOString().split('T')[0]}</p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-primary text-primary-foreground">
+                <th className="text-left p-3 font-semibold">URL</th>
+                <th className="text-left p-3 font-semibold">Last Modified</th>
+                <th className="text-left p-3 font-semibold">Change Frequency</th>
+                <th className="text-left p-3 font-semibold">Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((entry, index) => (
+                <tr key={index} className={index % 2 === 0 ? 'bg-muted/50' : ''}>
+                  <td className="p-3">
+                    <a 
+                      href={entry.url} 
+                      className="text-primary hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {entry.url}
+                    </a>
+                  </td>
+                  <td className="p-3">{entry.lastmod}</td>
+                  <td className="p-3">{entry.changefreq}</td>
+                  <td className="p-3">
+                    <span className={`font-semibold ${
+                      entry.priority >= 0.8 ? 'text-green-600' :
+                      entry.priority >= 0.6 ? 'text-blue-600' :
+                      'text-orange-600'
+                    }`}>
+                      {entry.priority}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Sitemap;
