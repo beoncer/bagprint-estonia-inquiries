@@ -12,6 +12,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import ScrollToTop from "./components/ui/ScrollToTop";
+import PageTransition from "./components/ui/PageTransition";
 
 
 // Import lazy components
@@ -72,7 +73,7 @@ const App: React.FC = () => {
             <AuthProvider>
               <DynamicSEO />
               <WebSiteStructuredData />
-              <Suspense fallback={<LoadingSpinner />}>
+              <Suspense fallback={<div className="min-h-4" />}>
                 <Routes>
                   {/* Public routes - Estonian only */}
                   <Route path="/" element={<MainLayout />}>

@@ -14,17 +14,17 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
     setIsTransitioning(true);
     const timer = setTimeout(() => {
       setIsTransitioning(false);
-    }, 150);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
   return (
     <div 
-      className={`transition-all duration-300 ease-out ${
+      className={`transition-all duration-200 ease-out ${
         isTransitioning 
-          ? 'opacity-0 translate-y-2' 
-          : 'opacity-100 translate-y-0'
+          ? 'opacity-0' 
+          : 'opacity-100'
       }`}
     >
       {children}

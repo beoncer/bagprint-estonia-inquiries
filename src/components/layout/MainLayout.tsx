@@ -4,6 +4,7 @@ import TopBar from "./TopBar";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { Outlet } from "react-router-dom";
+import PageTransition from "../ui/PageTransition";
 
 const MainLayout: React.FC = () => {
   return (
@@ -11,7 +12,9 @@ const MainLayout: React.FC = () => {
       <TopBar />
       <Navbar />
       <main className="flex-1">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
     </div>
