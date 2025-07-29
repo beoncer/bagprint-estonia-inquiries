@@ -37,7 +37,6 @@ const Ostutingimused: React.FC = () => {
                   <ul className="list-disc pl-6 space-y-2">
                     <li>Kõik hinnapakkumised on individuaalsed ja sõltuvad tellitavast kogusest</li>
                     <li>Esitatud hinnad on käibemaksuta, välja arvatud juhul, kui on märgitud teisiti</li>
-                    <li>Hinnas ei sisaldu trükikulu, mis arvutatakse vastavalt projekti keerukusele</li>
                     <li>Lõplik hind kinnitatakse pärast tehnilise joonise ja materjalivaliku heakskiitmist</li>
                   </ul>
                 </section>
@@ -64,9 +63,9 @@ const Ostutingimused: React.FC = () => {
                   <div className="bg-muted p-6 rounded-lg mb-4">
                     <p className="mb-2"><strong>Standard tingimused:</strong></p>
                     <ul className="list-disc pl-6 space-y-1">
-                      <li>Ettemakse: 50% tellimuse kinnitamisel</li>
+                      <li>Ettemakse: 100% tellimuse kinnitamisel. Vana kliendidele 0% ettemakse</li>
                       <li>Lõppmakse: enne kauba väljastamist või tarnet</li>
-                      <li>Makseperiood: 14 kalendripäeva arve koostamisest</li>
+                      <li>Makseperiood: 7 kalendripäeva arve koostamisest</li>
                     </ul>
                   </div>
                   <p>
