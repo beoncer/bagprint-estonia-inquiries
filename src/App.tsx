@@ -48,6 +48,8 @@ import {
   Ostutingimused
 } from "./components/performance/LazyComponents";
 
+const Sitemap = React.lazy(() => import('./pages/Sitemap'));
+
 // Optimized QueryClient configuration
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -92,6 +94,7 @@ const App: React.FC = () => {
                     <Route path="blogi/:slug" element={<BlogPost />} />
                     <Route path="privaatsus" element={<Privaatsus />} />
                     <Route path="ostutingimused" element={<Ostutingimused />} />
+                    <Route path="sitemap.xml" element={<Sitemap />} />
                   </Route>
 
                   {/* Admin routes */}
