@@ -44,7 +44,7 @@ const PagesContentAdmin: React.FC = () => {
         .from("website_content")
         .select("*")
         .eq("page", "privaatsus")
-        .eq("key", "page_content")
+        .eq("key", "privaatsus_page_content")
         .single();
 
       if (!privacyError && privacyData) {
@@ -60,7 +60,7 @@ const PagesContentAdmin: React.FC = () => {
         .from("website_content")
         .select("*")
         .eq("page", "ostutingimused")
-        .eq("key", "page_content")
+        .eq("key", "ostutingimused_page_content")
         .single();
 
       if (!termsError && termsData) {
@@ -76,7 +76,7 @@ const PagesContentAdmin: React.FC = () => {
         .from("website_content")
         .select("*")
         .eq("page", "privaatsus")
-        .eq("key", "page_title")
+        .eq("key", "privaatsus_page_title")
         .single();
 
       if (privacyTitle) {
@@ -90,7 +90,7 @@ const PagesContentAdmin: React.FC = () => {
         .from("website_content")
         .select("*")
         .eq("page", "ostutingimused")
-        .eq("key", "page_title")
+        .eq("key", "ostutingimused_page_title")
         .single();
 
       if (termsTitle) {
@@ -118,7 +118,7 @@ const PagesContentAdmin: React.FC = () => {
       // Save page content
       const contentData = {
         page: pageData.page,
-        key: "page_content",
+        key: pageData.page === 'privaatsus' ? 'privaatsus_page_content' : 'ostutingimused_page_content',
         value: pageData.content,
       };
 
@@ -146,7 +146,7 @@ const PagesContentAdmin: React.FC = () => {
       // Save page title
       const titleData = {
         page: pageData.page,
-        key: "page_title",
+        key: pageData.page === 'privaatsus' ? 'privaatsus_page_title' : 'ostutingimused_page_title',
         value: pageData.title,
       };
 

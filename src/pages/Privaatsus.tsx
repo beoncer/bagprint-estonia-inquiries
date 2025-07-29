@@ -14,8 +14,8 @@ const Privaatsus: React.FC = () => {
         .from("website_content")
         .select("value")
         .eq("page", "privaatsus")
-        .eq("key", "page_title")
-        .single();
+        .eq("key", "privaatsus_page_title")
+        .maybeSingle();
 
       if (titleData) {
         setTitle(titleData.value);
@@ -26,8 +26,8 @@ const Privaatsus: React.FC = () => {
         .from("website_content")
         .select("value")
         .eq("page", "privaatsus")
-        .eq("key", "page_content")
-        .single();
+        .eq("key", "privaatsus_page_content")
+        .maybeSingle();
 
       if (contentData) {
         setContent(contentData.value);

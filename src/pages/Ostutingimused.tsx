@@ -14,8 +14,8 @@ const Ostutingimused: React.FC = () => {
         .from("website_content")
         .select("value")
         .eq("page", "ostutingimused")
-        .eq("key", "page_title")
-        .single();
+        .eq("key", "ostutingimused_page_title")
+        .maybeSingle();
 
       if (titleData) {
         setTitle(titleData.value);
@@ -26,8 +26,8 @@ const Ostutingimused: React.FC = () => {
         .from("website_content")
         .select("value")
         .eq("page", "ostutingimused")
-        .eq("key", "page_content")
-        .single();
+        .eq("key", "ostutingimused_page_content")
+        .maybeSingle();
 
       if (contentData) {
         setContent(contentData.value);
