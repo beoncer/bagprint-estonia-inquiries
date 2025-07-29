@@ -43,7 +43,8 @@ import {
   AdminGuarantees,
   AdminProductFAQ,
   AdminPricing,
-  Privaatsus
+  Privaatsus,
+  Ostutingimused
 } from "./components/performance/LazyComponents";
 
 // Optimized QueryClient configuration
@@ -89,6 +90,7 @@ const App: React.FC = () => {
                     <Route path="blogi" element={<Blog />} />
                     <Route path="blogi/:slug" element={<BlogPost />} />
                     <Route path="privaatsus" element={<Privaatsus />} />
+                    <Route path="ostutingimused" element={<Ostutingimused />} />
                   </Route>
 
                   {/* Admin routes */}
