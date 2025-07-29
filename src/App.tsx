@@ -43,7 +43,6 @@ import {
   AdminGuarantees,
   AdminProductFAQ,
   AdminPricing,
-  AdminPagesContent,
   Privaatsus,
   Ostutingimused
 } from "./components/performance/LazyComponents";
@@ -114,7 +113,6 @@ const App: React.FC = () => {
                     <Route path="footer" element={<AdminFooter />} />
                     <Route path="guarantees" element={<AdminGuarantees />} />
                     <Route path="product-faq" element={<AdminProductFAQ />} />
-                    <Route path="pages-content" element={<AdminPagesContent />} />
                   </Route>
 
                   <Route path="*" element={<NotFound />} />
