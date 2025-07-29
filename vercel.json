@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/sitemap.xml",
+      "destination": "/sitemap"
+    },
+    {
       "source": "/admin",
       "destination": "/index.html"
     },
@@ -14,6 +18,19 @@
     }
   ],
   "headers": [
+    {
+      "source": "/sitemap",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    },
     {
       "source": "/sitemap.xml",
       "headers": [

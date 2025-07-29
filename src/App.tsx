@@ -26,6 +26,7 @@ import {
   Blog,
   BlogPost,
   NotFound,
+  Sitemap,
   AdminLogin,
   AdminDashboard,
   AdminProducts,
@@ -92,6 +93,7 @@ const App: React.FC = () => {
                     <Route path="blogi/:slug" element={<BlogPost />} />
                     <Route path="privaatsus" element={<Privaatsus />} />
                     <Route path="ostutingimused" element={<Ostutingimused />} />
+                    <Route path="sitemap" element={<Sitemap />} />
                   </Route>
 
                   {/* Admin routes */}

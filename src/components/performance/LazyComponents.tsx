@@ -11,6 +11,7 @@ export const Portfolio = lazy(() => import("@/pages/Portfolio"));
 export const Blog = lazy(() => import("@/pages/Blog"));
 export const BlogPost = lazy(() => import("@/pages/BlogPost"));
 export const NotFound = lazy(() => import("@/pages/NotFound"));
+export const Sitemap = lazy(() => import("@/pages/Sitemap"));
 export const Privaatsus = lazy(() => import("@/pages/Privaatsus"));
 export const Ostutingimused = lazy(() => import("@/pages/Ostutingimused"));
 

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { getSitemapStatus, updateStaticSitemap, rebuildSitemap, SitemapStatus } from '@/utils/sitemapUtils';
+import { getSitemapStatus, updateStaticSitemap, rebuildSitemap, updateStaticSitemapFile, SitemapStatus } from '@/utils/sitemapUtils';
 import { RefreshCw, Download, Settings, FileText, ShoppingBag, Calendar } from 'lucide-react';
 
 const Sitemap: React.FC = () => {
@@ -39,11 +39,11 @@ const Sitemap: React.FC = () => {
   const handleUpdateSitemap = async () => {
     setIsLoading(true);
     try {
-      await updateStaticSitemap();
+      await updateStaticSitemapFile();
       await fetchStatus();
       toast({
         title: "Success",
-        description: "Sitemap updated successfully"
+        description: "Sitemap updated successfully. The dynamic sitemap will now show current content."
       });
     } catch (error: any) {
       toast({

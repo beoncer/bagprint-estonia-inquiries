@@ -123,3 +123,58 @@ export async function rebuildSitemap(): Promise<void> {
     throw error;
   }
 } 
+
+/**
+ * Update the static sitemap.xml file directly
+ */
+export async function updateStaticSitemapFile(): Promise<void> {
+  try {
+    const xml = await generateSitemapXML();
+    
+    // Store in database for backup
+    await supabase
+      .from('site_settings')
+      .upsert({
+        key: 'sitemap_xml',
+        value: xml,
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'key'
+      });
+    
+    // Update timestamp
+    await supabase
+      .from('site_settings')
+      .upsert({
+        key: 'sitemap_last_generated',
+        value: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'key'
+      });
+
+    // Try to update the static file via API call
+    try {
+      const response = await fetch('/api/update-sitemap', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ xml })
+      });
+      
+      if (response.ok) {
+        console.log('Static sitemap file updated successfully');
+      } else {
+        console.log('Static file update failed, but database was updated');
+      }
+    } catch (error) {
+      console.log('Static file update not available, but database was updated');
+    }
+    
+    console.log('Sitemap updated successfully');
+  } catch (error) {
+    console.error('Error updating static sitemap:', error);
+    throw error;
+  }
+} 
