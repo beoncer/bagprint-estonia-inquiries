@@ -42,7 +42,8 @@ import {
   AdminFooter,
   AdminGuarantees,
   AdminProductFAQ,
-  AdminPricing
+  AdminPricing,
+  Privaatsus
 } from "./components/performance/LazyComponents";
 
 // Optimized QueryClient configuration
@@ -87,6 +88,7 @@ const App: React.FC = () => {
                     <Route path="portfoolio" element={<Portfolio />} />
                     <Route path="blogi" element={<Blog />} />
                     <Route path="blogi/:slug" element={<BlogPost />} />
+                    <Route path="privaatsus" element={<Privaatsus />} />
                   </Route>
 
                   {/* Admin routes */}

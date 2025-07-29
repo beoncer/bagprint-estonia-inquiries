@@ -11,6 +11,7 @@ export const Portfolio = lazy(() => import("@/pages/Portfolio"));
 export const Blog = lazy(() => import("@/pages/Blog"));
 export const BlogPost = lazy(() => import("@/pages/BlogPost"));
 export const NotFound = lazy(() => import("@/pages/NotFound"));
+export const Privaatsus = lazy(() => import("@/pages/Privaatsus"));
 
 // Admin components - only load when needed
 export const AdminLogin = lazy(() => import("@/pages/admin/Login"));
