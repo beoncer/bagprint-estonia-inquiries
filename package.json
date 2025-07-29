@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/update-sitemap.mjs && vite build",
     "build:dev": "vite build --mode development",
+    "update-sitemap": "node scripts/update-sitemap.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
