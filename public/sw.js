@@ -1,7 +1,7 @@
 
-const CACHE_NAME = 'leatex-ee-v2.0.0';
-const STATIC_CACHE = 'static-v2.0.0';
-const DYNAMIC_CACHE = 'dynamic-v2.0.0';
+const CACHE_NAME = 'leatex-ee-v3.0.0';
+const STATIC_CACHE = 'static-v3.0.0';
+const DYNAMIC_CACHE = 'dynamic-v3.0.0';
 
 const STATIC_ASSETS = [
   '/',
@@ -80,15 +80,25 @@ self.addEventListener('fetch', (event) => {
   // HTML pages - network first with cache fallback
   event.respondWith(
     fetch(request).then((response) => {
-      if (response.ok) {
+      if (response.ok && response.status === 200) {
         const responseClone = response.clone();
         caches.open(DYNAMIC_CACHE).then((cache) => {
           cache.put(request, responseClone);
         });
       }
       return response;
-    }).catch(() => {
-      return caches.match(request);
+    }).catch((error) => {
+      console.log('SW: Network failed, trying cache', error);
+      return caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // If no cached version, return a basic offline page
+        return new Response('Page not available offline', {
+          status: 200,
+          headers: { 'Content-Type': 'text/html' }
+        });
+      });
     })
   );
 });
