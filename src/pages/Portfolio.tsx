@@ -5,8 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import OptimizedImage from "@/components/ui/OptimizedImage";
-import { Eye, ExternalLink, Filter } from "lucide-react";
+import { Eye, ExternalLink, Filter, X } from "lucide-react";
 import Breadcrumb from "@/components/ui/breadcrumb";
 
 interface PortfolioItem {
@@ -33,6 +34,7 @@ const fetchPortfolioItems = async (): Promise<PortfolioItem[]> => {
 const Portfolio = () => {
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<PortfolioItem | null>(null);
   
   // Dynamic content state
   const [header, setHeader] = useState("");
@@ -190,16 +192,19 @@ const Portfolio = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredItems.map((item) => (
               <Card key={item.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                <div className="relative">
+                <div className="relative cursor-pointer" onClick={() => setSelectedImage(item)}>
                   <OptimizedImage
                     src={item.image_url || '/placeholder.svg'}
                     alt={item.title}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
                     width={600}
                     height={300}
                   />
                   <div className="absolute top-2 left-2">
                     <Badge>{item.category || 'Üldine'}</Badge>
+                  </div>
+                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-opacity duration-300 flex items-center justify-center">
+                    <Eye className="text-white opacity-0 hover:opacity-100 transition-opacity duration-300 w-8 h-8" />
                   </div>
                 </div>
                 <CardContent className="p-6">
@@ -216,6 +221,15 @@ const Portfolio = () => {
                       ))}
                     </div>
                   )}
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setSelectedImage(item)}
+                    className="w-full"
+                  >
+                    <Eye className="mr-2 h-4 w-4" />
+                    Vaata pilti
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -269,6 +283,47 @@ const Portfolio = () => {
           </section>
         )}
       </div>
+
+      {/* Image Modal */}
+      {selectedImage && (
+        <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+            <div className="relative">
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white rounded-full p-2 hover:bg-opacity-70 transition-opacity"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <OptimizedImage
+                src={selectedImage.image_url || '/placeholder.svg'}
+                alt={selectedImage.title}
+                className="w-full max-h-[80vh] object-contain"
+                width={1200}
+                height={800}
+              />
+              <div className="p-6 bg-white">
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge>{selectedImage.category || 'Üldine'}</Badge>
+                </div>
+                <h2 className="text-2xl font-semibold mb-2">{selectedImage.title}</h2>
+                {selectedImage.description && (
+                  <p className="text-gray-600 mb-4">{selectedImage.description}</p>
+                )}
+                {selectedImage.tags && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedImage.tags.split(',').map((tag, index) => (
+                      <span key={index} className="px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full">
+                        {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
