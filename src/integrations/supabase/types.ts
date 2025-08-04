@@ -471,6 +471,27 @@ export type Database = {
         }
         Relationships: []
       }
+      site_settings: {
+        Row: {
+          id: string
+          key: string
+          updated_at: string | null
+          value: string | null
+        }
+        Insert: {
+          id?: string
+          key: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Update: {
+          id?: string
+          key?: string
+          updated_at?: string | null
+          value?: string | null
+        }
+        Relationships: []
+      }
       sitemap_entries: {
         Row: {
           changefreq: string | null
@@ -556,6 +577,17 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_sitemap_status: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          total_entries: number
+          active_entries: number
+          dynamic_entries: number
+          blog_posts: number
+          products: number
+          static_pages: number
+        }[]
+      }
       gtrgm_compress: {
         Args: { "": unknown }
         Returns: unknown
@@ -575,6 +607,29 @@ export type Database = {
       gtrgm_out: {
         Args: { "": unknown }
         Returns: unknown
+      }
+      list_current_blog_posts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          title: string
+          slug: string
+          updated_at: string
+        }[]
+      }
+      list_current_sitemap_entries: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          url: string
+          source_table: string
+          source_id: string
+          is_active: boolean
+          lastmod: string
+        }[]
+      }
+      rebuild_sitemap_entries: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search_products_by_colors: {
         Args: { search_colors: string[] }
@@ -615,6 +670,10 @@ export type Database = {
       show_trgm: {
         Args: { "": string }
         Returns: string[]
+      }
+      sync_blog_posts_to_sitemap: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       sync_dynamic_sitemap_entries: {
         Args: Record<PropertyKey, never>
