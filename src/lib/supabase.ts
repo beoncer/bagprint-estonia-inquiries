@@ -51,6 +51,7 @@ export interface Product {
   updated_at: string;
   colors: ProductColor[];
   sizes: string[];
+  size_multipliers?: Record<string, number>; // NEW: Size multipliers for pricing
   is_eco?: boolean;
   badges: string[];
   category: string;
@@ -94,6 +95,7 @@ export async function getProducts() {
       updated_at: item.updated_at,
       colors: item.colors || [],
       sizes: item.sizes || [],
+      size_multipliers: item.size_multipliers || {},
       is_eco: item.is_eco || false,
       badges: item.badges || [],
       category: item.type,
@@ -130,6 +132,7 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     image: data.color_images && data.main_color ? data.color_images[data.main_color] : (data.image_url || '/placeholder.svg'),
     colors: data.colors || [],
     sizes: data.sizes || [],
+    size_multipliers: data.size_multipliers || {},
     badges: data.badges || [],
     slug: data.slug || `${data.type}-${data.id}`,
     base_price: data.base_price || 0,

@@ -15,6 +15,7 @@ export interface Product {
   updated_at: string;
   colors: ProductColor[];
   sizes: string[];
+  size_multipliers?: Record<string, number>; // NEW: Size multipliers for pricing
   is_eco?: boolean;
   badges: string[];
   category: string;

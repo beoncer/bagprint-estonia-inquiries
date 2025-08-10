@@ -42,6 +42,7 @@ import { cn } from "@/lib/utils";
 import { usePricing } from "@/hooks/usePricing";
 import ColorImageUpload from "@/components/admin/ColorImageUpload";
 import SizeImageUpload from "@/components/admin/SizeImageUpload";
+import { SizeMultipliersManager } from "@/components/admin/SizeMultipliersManager";
 import BulkProductUpload, { exportProductsToCSV } from "@/components/admin/BulkProductUpload";
 import ImageUpload, { MultiImageUpload } from "@/components/admin/ImageUpload";
 
@@ -57,6 +58,7 @@ interface Product {
   updated_at: string;
   colors: ProductColor[];
   sizes: string[];
+  size_multipliers?: Record<string, number>;
   is_eco?: boolean;
   badges: BadgeType[];
   material?: string | null;
@@ -383,6 +385,14 @@ const ProductsPage: React.FC = () => {
       seo_description: product.seo_description || "",
       seo_keywords: product.seo_keywords || "",
     });
+    setSelectedColors(product.colors || []);
+    setSelectedSizes(product.sizes || []);
+    setIsEco(product.is_eco || false);
+    setSelectedBadges(product.badges || []);
+    setColorImages(product.color_images || {});
+    setSizeImages(product.size_images || {});
+    setMainColor(product.main_color || "");
+    setAdditionalImages(product.additional_images || []);
     setIsDialogOpen(true);
   };
 
@@ -833,6 +843,17 @@ const ProductsPage: React.FC = () => {
                     currentSizeImages={sizeImages}
                     availableSizes={selectedSizes}
                     productTitle={formData.name}
+                  />
+                </div>
+              )}
+
+              {/* Size Multipliers section */}
+              {selectedSizes.length > 0 && selectedProduct && (
+                <div className="space-y-4">
+                  <SizeMultipliersManager
+                    productId={selectedProduct.id}
+                    sizes={selectedSizes}
+                    onSizesChange={setSelectedSizes}
                   />
                 </div>
               )}

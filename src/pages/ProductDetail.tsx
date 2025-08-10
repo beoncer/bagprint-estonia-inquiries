@@ -113,7 +113,9 @@ const ProductDetail = () => {
     basePrice: product.base_price,
     quantity: parseInt(quantity),
     colorCount: printType === "with" ? colorCount : 0,
-    withPrint: printType === "with"
+    withPrint: printType === "with",
+    size: selectedSize,
+    product: product
   }) : null;
 
   // Find the lowest multiplier

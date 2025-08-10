@@ -40,4 +40,6 @@ export interface PriceCalculationInput {
   quantity: number;
   colorCount?: number;
   withPrint?: boolean;
+  size?: string; // Selected size for size-based pricing
+  product?: any; // Product object to access size_multipliers
 }

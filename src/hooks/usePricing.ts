@@ -56,16 +56,23 @@ export function usePricing() {
   };
 
   // Calculate final price based on business logic
-  const calculatePrice = ({ basePrice, quantity, colorCount = 0, withPrint = false }: PriceCalculationInput): PriceCalculationResult => {
+  const calculatePrice = ({ basePrice, quantity, colorCount = 0, withPrint = false, size, product }: PriceCalculationInput & { product?: any }): PriceCalculationResult => {
     // Step 1: Apply quantity discount to base price
     const quantityMultiplier = getQuantityMultiplier(quantity);
     const discountedBasePrice = basePrice * quantityMultiplier;
 
-    // Step 2: Add print cost if printing is requested
+    // Step 2: Apply size multiplier if size is specified and product has size multipliers
+    let sizeMultiplier = 1.0;
+    if (size && product?.size_multipliers) {
+      sizeMultiplier = product.size_multipliers[size] || 1.0;
+    }
+    const sizeAdjustedPrice = discountedBasePrice * sizeMultiplier;
+
+    // Step 3: Add print cost if printing is requested
     const printCost = withPrint && colorCount > 0 ? getPrintPrice(quantity, colorCount) : 0;
 
-    // Step 3: Calculate final price per item
-    const pricePerItem = discountedBasePrice + printCost;
+    // Step 4: Calculate final price per item
+    const pricePerItem = sizeAdjustedPrice + printCost;
     const totalPrice = pricePerItem * quantity;
 
     return {
