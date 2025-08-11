@@ -1,11 +1,15 @@
 
-const CACHE_NAME = 'leatex-ee-v3.0.1';
-const STATIC_CACHE = 'static-v3.0.1';
-const DYNAMIC_CACHE = 'dynamic-v3.0.1';
+const CACHE_NAME = 'leatex-ee-v3.0.2';
+const STATIC_CACHE = 'static-v3.0.2';
+const DYNAMIC_CACHE = 'dynamic-v3.0.2';
 
 const STATIC_ASSETS = [
   '/',
-  '/manifest.json',
+  '/manifest.json?v=3',
+  '/favicon-16x16.png?v=3',
+  '/favicon-32x32.png?v=3',
+  '/icon-192x192.png?v=3',
+  '/icon-512x512.png?v=3',
   '/assets/category-cotton-bags.jpg',
   '/assets/category-paper-bags.jpg',
   '/assets/category-drawstring-bags.jpg',
@@ -23,15 +27,37 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean old caches
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((cacheName) => cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE)
-          .map((cacheName) => caches.delete(cacheName))
+  event.waitUntil((async () => {
+    // Clean old caches (keep only current)
+    const cacheNames = await caches.keys();
+    await Promise.all(
+      cacheNames
+        .filter((cacheName) => cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE)
+        .map((cacheName) => caches.delete(cacheName))
+    );
+
+    // Purge any stale favicon entries from current caches
+    const purgeFavicons = async (cacheName) => {
+      const cache = await caches.open(cacheName);
+      const requests = await cache.keys();
+      await Promise.all(
+        requests
+          .filter((req) => {
+            try {
+              const u = new URL(req.url);
+              return u.pathname === '/favicon.ico' || u.pathname.includes('favicon');
+            } catch (_) {
+              return false;
+            }
+          })
+          .map((req) => cache.delete(req))
       );
-    }).then(() => self.clients.claim())
-  );
+    };
+
+    await Promise.all([purgeFavicons(STATIC_CACHE), purgeFavicons(DYNAMIC_CACHE)]);
+
+    await self.clients.claim();
+  })());
 });
 
 // Fetch event - cache strategy
@@ -47,11 +73,11 @@ self.addEventListener('fetch', (event) => {
   // Force consistent favicon: always serve PNG bag icon for /favicon.ico
   if (url.pathname === '/favicon.ico') {
     event.respondWith(
-      caches.match('/favicon-32x32.png?v=2').then((cached) => {
+      caches.match('/favicon-32x32.png?v=3').then((cached) => {
         if (cached) return cached;
-        return fetch('/favicon-32x32.png?v=2', { cache: 'reload' }).then((resp) => {
+        return fetch('/favicon-32x32.png?v=3', { cache: 'reload' }).then((resp) => {
           return caches.open(STATIC_CACHE).then((cache) => {
-            cache.put('/favicon-32x32.png?v=2', resp.clone());
+            cache.put('/favicon-32x32.png?v=3', resp.clone());
             return resp;
           });
         });
