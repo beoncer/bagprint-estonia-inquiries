@@ -1,7 +1,7 @@
 
-const CACHE_NAME = 'leatex-ee-v3.0.0';
-const STATIC_CACHE = 'static-v3.0.0';
-const DYNAMIC_CACHE = 'dynamic-v3.0.0';
+const CACHE_NAME = 'leatex-ee-v3.0.1';
+const STATIC_CACHE = 'static-v3.0.1';
+const DYNAMIC_CACHE = 'dynamic-v3.0.1';
 
 const STATIC_ASSETS = [
   '/',
@@ -41,6 +41,22 @@ self.addEventListener('fetch', (event) => {
 
   // Skip non-GET requests and chrome-extension requests
   if (request.method !== 'GET' || url.protocol !== 'https:') {
+    return;
+  }
+
+  // Force consistent favicon: always serve PNG bag icon for /favicon.ico
+  if (url.pathname === '/favicon.ico') {
+    event.respondWith(
+      caches.match('/favicon-32x32.png?v=2').then((cached) => {
+        if (cached) return cached;
+        return fetch('/favicon-32x32.png?v=2', { cache: 'reload' }).then((resp) => {
+          return caches.open(STATIC_CACHE).then((cache) => {
+            cache.put('/favicon-32x32.png?v=2', resp.clone());
+            return resp;
+          });
+        });
+      })
+    );
     return;
   }
 
