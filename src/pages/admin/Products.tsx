@@ -109,7 +109,7 @@ const ProductsPage: React.FC = () => {
   const [bulkUploadOpen, setBulkUploadOpen] = useState(false);
   const [additionalImages, setAdditionalImages] = useState<string[]>([]);
   
-  const { calculatePrice } = usePricing();
+  const { calculatePrice, calculateMinimumPrice } = usePricing();
 
   useEffect(() => {
     fetchProducts();
@@ -585,8 +585,11 @@ const ProductsPage: React.FC = () => {
       withPrint: false
     });
     
-    if (priceResult) {
-      return `From €${priceResult.pricePerItem.toFixed(2)} (50pcs)`;
+    // Calculate minimum price for highest quantity tier
+    const minimumPrice = calculateMinimumPrice(product.base_price);
+    
+    if (priceResult && minimumPrice) {
+      return `From €${minimumPrice.toFixed(2)} (min) / €${priceResult.pricePerItem.toFixed(2)} (50pcs)`;
     }
     
     return `Base: €${product.base_price.toFixed(2)}`;

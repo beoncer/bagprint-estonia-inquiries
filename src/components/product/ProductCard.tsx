@@ -25,17 +25,13 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
     ? color_images[main_color]
     : image || image_url || '/placeholder.svg';
   
-  const { calculatePrice } = usePricing();
+  const { calculatePrice, calculateMinimumPrice } = usePricing();
   
   // Make sure ID is valid to prevent broken links
   const safeId = id || 'unknown';
   
-  // Calculate starting price using the new pricing system
-  const startingPriceResult = calculatePrice({
-    basePrice: base_price,
-    quantity: 50,
-    withPrint: false
-  });
+  // Calculate minimum possible price (for highest quantity tier)
+  const minimumPrice = calculateMinimumPrice(base_price);
   
   // Process image URL if it's from Supabase
   const [imageUrl, setImageUrl] = useState(mainImage);
@@ -123,9 +119,9 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
               )}
             </div>
           )}
-          {startingPriceResult ? (
+          {minimumPrice ? (
             <p className="text-primary font-medium">
-              Alates €{startingPriceResult.pricePerItem.toFixed(2)}
+              Alates €{minimumPrice.toFixed(2)}
             </p>
           ) : (
             <p className="text-gray-400 font-medium">

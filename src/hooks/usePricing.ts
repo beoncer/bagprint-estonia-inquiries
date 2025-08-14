@@ -55,6 +55,18 @@ export function usePricing() {
     return printPrice ? printPrice.price_per_item : 0;
   };
 
+  // Calculate minimum possible price (for highest quantity tier)
+  const calculateMinimumPrice = (basePrice: number): number => {
+    if (quantityMultipliers.length === 0) return basePrice;
+    
+    // Find the highest quantity tier (lowest multiplier = best discount)
+    const highestTier = quantityMultipliers.reduce((min, current) => 
+      current.multiplier < min.multiplier ? current : min
+    );
+    
+    return basePrice * highestTier.multiplier;
+  };
+
   // Calculate final price based on business logic
   const calculatePrice = ({ basePrice, quantity, colorCount = 0, withPrint = false, size, product }: PriceCalculationInput & { product?: any }): PriceCalculationResult => {
     // Step 1: Apply quantity discount to base price
@@ -148,6 +160,7 @@ export function usePricing() {
     loading,
     error,
     calculatePrice,
+    calculateMinimumPrice,
     getQuantityMultiplier,
     getPrintPrice,
     updateQuantityMultiplier,

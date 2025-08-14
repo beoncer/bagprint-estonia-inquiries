@@ -3,7 +3,7 @@ import { usePricing } from './usePricing';
 import { Product } from '@/lib/supabase';
 
 export function useProductPricing(product: Product) {
-  const { calculatePrice } = usePricing();
+  const { calculatePrice, calculateMinimumPrice } = usePricing();
 
   const getStartingPrice = () => {
     return calculatePrice({
@@ -11,6 +11,10 @@ export function useProductPricing(product: Product) {
       quantity: 50,
       withPrint: false
     });
+  };
+
+  const getMinimumPrice = () => {
+    return calculateMinimumPrice(product.base_price);
   };
 
   const getPriceForQuantity = (quantity: number, withPrint: boolean = false, colorCount: number = 1) => {
@@ -24,6 +28,7 @@ export function useProductPricing(product: Product) {
 
   return {
     getStartingPrice,
+    getMinimumPrice,
     getPriceForQuantity
   };
 }
