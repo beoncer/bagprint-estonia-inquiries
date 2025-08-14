@@ -29,7 +29,7 @@ const ProductDetail = () => {
   const [isImageZoomed, setIsImageZoomed] = useState(false);
   
   // Calculator state
-  const [quantity, setQuantity] = useState<string>("50");
+  const [quantity, setQuantity] = useState<string>("1");
   const [printType, setPrintType] = useState<string>("without");
   const [colorCount, setColorCount] = useState<number>(1);
   
@@ -381,21 +381,14 @@ const ProductDetail = () => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-sm">Kogus</Label>
-                <Select
+                <Input
+                  type="number"
+                  min="1"
                   value={quantity}
-                  onValueChange={(value) => setQuantity(value)}
-                >
-                  <SelectTrigger className="w-full bg-white">
-                    <SelectValue placeholder="Vali kogus" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
-                    <SelectItem value="200">200</SelectItem>
-                    <SelectItem value="500">500</SelectItem>
-                    <SelectItem value="1000">1000</SelectItem>
-                  </SelectContent>
-                </Select>
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Sisestage soovitud kogus"
+                  className="w-full bg-white"
+                />
               </div>
 
               <div className="space-y-2">

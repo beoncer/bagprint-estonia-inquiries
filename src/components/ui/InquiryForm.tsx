@@ -42,7 +42,9 @@ const formSchema = z.object({
     message: "Palun valige toode.",
   }),
   quantity: z.string().min(1, {
-    message: "Palun valige kogus.",
+    message: "Palun sisestage kogus.",
+  }).refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+    message: "Kogus peab olema positiivne number.",
   }),
   printRequired: z.string(),
   message: z.string().optional(),
@@ -73,7 +75,7 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
       email: "",
       phone: "",
       product: productId || "",
-      quantity: "",
+      quantity: "1",
       printRequired: "no",
       message: "",
     },
@@ -195,24 +197,15 @@ const InquiryForm = ({ productId, productName }: InquiryFormProps) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm md:text-base">Kogus *</FormLabel>
-                  <Select 
-                    onValueChange={field.onChange} 
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="h-10 md:h-11 text-sm md:text-base">
-                        <SelectValue placeholder="Valige kogus" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="50">50 tk</SelectItem>
-                      <SelectItem value="100">100 tk</SelectItem>
-                      <SelectItem value="200">200 tk</SelectItem>
-                      <SelectItem value="500">500 tk</SelectItem>
-                      <SelectItem value="1000">1000 tk</SelectItem>
-                      <SelectItem value="custom">Muu kogus</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input 
+                      type="number"
+                      min="1"
+                      placeholder="Sisestage soovitud kogus" 
+                      className="h-10 md:h-11 text-sm md:text-base" 
+                      {...field} 
+                    />
+                  </FormControl>
                   <FormMessage className="text-xs md:text-sm" />
                 </FormItem>
               )}
