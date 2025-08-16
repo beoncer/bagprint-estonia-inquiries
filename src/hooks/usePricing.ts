@@ -116,6 +116,8 @@ export function usePricing() {
 
   // Find print price for a given quantity, color count, and product type
   const getPrintPrice = (quantity: number, colorCount: number, productType?: string): number => {
+    let perItemPrice = 0;
+    
     // First try to find category-specific print price
     if (productType) {
       const categoryPrintPrice = categoryPrintPrices.find(
@@ -125,17 +127,40 @@ export function usePricing() {
              p.colors_count === colorCount
       );
       if (categoryPrintPrice) {
-        return categoryPrintPrice.price_per_item;
+        perItemPrice = categoryPrintPrice.price_per_item;
       }
     }
 
-    // Fall back to global print price
-    const globalPrintPrice = printPrices.find(
-      p => quantity >= p.quantity_range_start &&
-           quantity <= p.quantity_range_end &&
-           p.colors_count === colorCount
-    );
-    return globalPrintPrice ? globalPrintPrice.price_per_item : 0;
+    // Fall back to global print price if no category-specific price found
+    if (perItemPrice === 0) {
+      const globalPrintPrice = printPrices.find(
+        p => quantity >= p.quantity_range_start &&
+             quantity <= p.quantity_range_end &&
+             p.colors_count === colorCount
+      );
+      perItemPrice = globalPrintPrice ? globalPrintPrice.price_per_item : 0;
+    }
+
+    // Add €21 setup cost per color
+    const setupCostPerColor = 21;
+    const totalSetupCost = setupCostPerColor * colorCount;
+    
+    // Calculate total print cost: (per-item price × quantity) + setup cost
+    const totalPrintCost = (perItemPrice * quantity) + totalSetupCost;
+    
+    console.log('🖨️ Print cost calculation:', {
+      productType,
+      quantity,
+      colorCount,
+      perItemPrice,
+      setupCostPerColor,
+      totalSetupCost,
+      perItemTotal: perItemPrice * quantity,
+      totalPrintCost
+    });
+    
+    // Return the total cost (this will be used to calculate price per item)
+    return totalPrintCost;
   };
 
   // Calculate minimum possible price for a product category
@@ -170,7 +195,9 @@ export function usePricing() {
     const printCost = withPrint && colorCount > 0 ? getPrintPrice(quantity, colorCount, productType) : 0;
 
     // Step 4: Calculate final price per item
-    const pricePerItem = sizeAdjustedPrice + printCost;
+    // Note: printCost is now the total cost for all items, so we divide by quantity to get per-item cost
+    const printCostPerItem = withPrint && colorCount > 0 ? printCost / quantity : 0;
+    const pricePerItem = sizeAdjustedPrice + printCostPerItem;
     const totalPrice = pricePerItem * quantity;
 
     // Step 5: Calculate discount based on highest category price (not base price)
