@@ -137,9 +137,14 @@ export function PrintPricesManager() {
         </Table>
       </div>
 
-      <p className="text-sm text-gray-500">
-        * These prices are added per item when printing is requested. Lower quantities generally have higher per-item print costs.
-      </p>
+      <div className="space-y-2 text-sm text-gray-500">
+        <p>
+          * These prices are added per item when printing is requested. Lower quantities generally have higher per-item print costs.
+        </p>
+        <p>
+          * Additional preparation cost of €21 per color is automatically added and distributed across the quantity range.
+        </p>
+      </div>
     </div>
   );
 }

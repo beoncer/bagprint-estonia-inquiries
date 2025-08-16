@@ -52,7 +52,18 @@ export function usePricing() {
           quantity <= p.quantity_range_end && 
           p.colors_count === colorCount
     );
-    return printPrice ? printPrice.price_per_item : 0;
+    
+    if (!printPrice) return 0;
+    
+    // Add preparation cost: €21 per color distributed across the quantity range
+    const preparationCostPerColor = 21;
+    const totalPreparationCost = preparationCostPerColor * colorCount;
+    
+    // Use the maximum quantity in the range for preparation cost calculation
+    const maxQuantityInRange = printPrice.quantity_range_end === 9999 ? quantity : printPrice.quantity_range_end;
+    const preparationCostPerItem = totalPreparationCost / maxQuantityInRange;
+    
+    return printPrice.price_per_item + preparationCostPerItem;
   };
 
   // Calculate minimum possible price (for highest quantity tier)
