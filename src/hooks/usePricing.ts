@@ -173,6 +173,40 @@ export function usePricing() {
     const pricePerItem = sizeAdjustedPrice + printCost;
     const totalPrice = pricePerItem * quantity;
 
+    // Step 5: Calculate discount based on highest category price (not base price)
+    let discount = 0;
+    if (productType) {
+      // Find the highest category multiplier for this product type
+      const categoryMultipliers = categoryQuantityMultipliers.filter(m => m.product_type === productType);
+      if (categoryMultipliers.length > 0) {
+        const highestMultiplier = Math.max(...categoryMultipliers.map(m => m.multiplier));
+        const highestPossiblePrice = basePrice * highestMultiplier;
+        const currentPrice = basePrice * quantityMultiplier;
+        
+        console.log('💰 Discount calculation:', {
+          productType,
+          basePrice,
+          currentMultiplier: quantityMultiplier,
+          highestMultiplier,
+          currentPrice,
+          highestPossiblePrice,
+          discountAmount: highestPossiblePrice - currentPrice
+        });
+        
+        // Only show discount if current price is lower than highest price
+        if (currentPrice < highestPossiblePrice) {
+          discount = highestPossiblePrice - currentPrice;
+          console.log('🎯 Discount applied:', discount);
+        } else {
+          console.log('❌ No discount - current price is not lower than highest price');
+        }
+      }
+    } else {
+      // For global pricing, use the old logic
+      discount = basePrice - discountedBasePrice;
+      console.log('🌍 Global pricing discount:', discount);
+    }
+
     // Determine if category-specific pricing was used
     const categoryUsed = productType && (
       categoryQuantityMultipliers.some(m => m.product_type === productType) ||
@@ -189,7 +223,7 @@ export function usePricing() {
       categoryMultiplier: productType ? quantityMultiplier : undefined,
       breakdown: {
         basePrice,
-        discount: basePrice - discountedBasePrice,
+        discount,
         printCost,
         finalPricePerItem: pricePerItem,
         quantity,
