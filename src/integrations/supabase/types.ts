@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
+  // Allows to automatically instanciate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -333,7 +333,6 @@ export type Database = {
           seo_keywords: string | null
           seo_title: string | null
           size_images: Json | null
-          size_multipliers: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -359,7 +358,6 @@ export type Database = {
           seo_keywords?: string | null
           seo_title?: string | null
           size_images?: Json | null
-          size_multipliers?: Json | null
           sizes?: string[] | null
           slug?: string | null
           type: string
@@ -385,7 +383,6 @@ export type Database = {
           seo_keywords?: string | null
           seo_title?: string | null
           size_images?: Json | null
-          size_multipliers?: Json | null
           sizes?: string[] | null
           slug?: string | null
           type?: string
@@ -583,12 +580,12 @@ export type Database = {
       get_sitemap_status: {
         Args: Record<PropertyKey, never>
         Returns: {
+          total_entries: number
           active_entries: number
-          blog_posts: number
           dynamic_entries: number
+          blog_posts: number
           products: number
           static_pages: number
-          total_entries: number
         }[]
       }
       gtrgm_compress: {
@@ -615,19 +612,19 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           id: string
-          slug: string
           title: string
+          slug: string
           updated_at: string
         }[]
       }
       list_current_sitemap_entries: {
         Args: Record<PropertyKey, never>
         Returns: {
+          url: string
+          source_table: string
+          source_id: string
           is_active: boolean
           lastmod: string
-          source_id: string
-          source_table: string
-          url: string
         }[]
       }
       rebuild_sitemap_entries: {
@@ -656,7 +653,6 @@ export type Database = {
           seo_keywords: string | null
           seo_title: string | null
           size_images: Json | null
-          size_multipliers: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -684,7 +680,7 @@ export type Database = {
         Returns: undefined
       }
       toggle_eco_status: {
-        Args: { new_status: boolean; product_id: string }
+        Args: { product_id: string; new_status: boolean }
         Returns: {
           additional_images: string[] | null
           badges: string[] | null
@@ -705,7 +701,6 @@ export type Database = {
           seo_keywords: string | null
           seo_title: string | null
           size_images: Json | null
-          size_multipliers: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -713,7 +708,7 @@ export type Database = {
         }
       }
       update_product_badges: {
-        Args: { new_badges: string[]; product_id: string }
+        Args: { product_id: string; new_badges: string[] }
         Returns: {
           additional_images: string[] | null
           badges: string[] | null
@@ -734,7 +729,6 @@ export type Database = {
           seo_keywords: string | null
           seo_title: string | null
           size_images: Json | null
-          size_multipliers: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
@@ -742,7 +736,7 @@ export type Database = {
         }
       }
       update_product_colors: {
-        Args: { new_colors: string[]; product_id: string }
+        Args: { product_id: string; new_colors: string[] }
         Returns: {
           additional_images: string[] | null
           badges: string[] | null
@@ -763,7 +757,6 @@ export type Database = {
           seo_keywords: string | null
           seo_title: string | null
           size_images: Json | null
-          size_multipliers: Json | null
           sizes: string[] | null
           slug: string | null
           type: string
