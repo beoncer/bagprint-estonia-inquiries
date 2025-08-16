@@ -585,8 +585,8 @@ const ProductsPage: React.FC = () => {
       withPrint: false
     });
     
-    // Calculate minimum price for highest quantity tier
-    const minimumPrice = calculateMinimumPrice(product.base_price);
+    // Calculate minimum price for highest quantity tier using category-specific pricing
+    const minimumPrice = calculateMinimumPrice(product.base_price, product.type);
     
     if (priceResult && minimumPrice) {
       return `From €${minimumPrice.toFixed(2)} (min) / €${priceResult.pricePerItem.toFixed(2)} (50pcs)`;

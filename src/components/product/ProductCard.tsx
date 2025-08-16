@@ -12,6 +12,7 @@ export interface ProductProps {
   description: string;
   image: string;
   category: string;
+  type: string; // Add this field for category-specific pricing
   base_price: number;
   slug: string;
   color_images?: Record<string, string>;
@@ -19,7 +20,7 @@ export interface ProductProps {
   image_url?: string;
 }
 
-const ProductCard = ({ id, name, description, image, base_price, slug, color_images, main_color, image_url }: ProductProps) => {
+const ProductCard = ({ id, name, description, image, base_price, slug, color_images, main_color, image_url, type }: ProductProps) => {
   // Use main color image if available
   const mainImage = main_color && color_images && color_images[main_color]
     ? color_images[main_color]
@@ -30,8 +31,8 @@ const ProductCard = ({ id, name, description, image, base_price, slug, color_ima
   // Make sure ID is valid to prevent broken links
   const safeId = id || 'unknown';
   
-  // Calculate minimum possible price (for highest quantity tier)
-  const minimumPrice = calculateMinimumPrice(base_price);
+  // Calculate minimum possible price (for highest quantity tier) using category-specific pricing
+  const minimumPrice = calculateMinimumPrice(base_price, type);
   
   // Process image URL if it's from Supabase
   const [imageUrl, setImageUrl] = useState(mainImage);
