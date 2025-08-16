@@ -432,10 +432,6 @@ const ProductDetail = () => {
                 {!pricingLoading && priceResult && (
                   <>
                     <div className="space-y-1 text-sm text-gray-600">
-                      <div className="flex justify-between">
-                        <span>Põhihind:</span>
-                        <span>€{priceResult.basePrice.toFixed(2)}</span>
-                      </div>
                       {priceResult.breakdown.discount > 0 && (
                         <div className="flex justify-between text-green-600">
                           <span>Koguse allahindlus:</span>
