@@ -8,6 +8,10 @@ export interface QuantityMultiplier {
   updated_at: string;
 }
 
+export interface CategoryQuantityMultiplier extends QuantityMultiplier {
+  product_type: string;
+}
+
 export interface PrintPrice {
   id: string;
   quantity_range_start: number;
@@ -18,21 +22,8 @@ export interface PrintPrice {
   updated_at: string;
 }
 
-export interface PriceCalculationResult {
-  pricePerItem: number;
-  totalPrice: number;
-  basePrice: number;
-  discountedBasePrice: number;
-  printCost: number;
-  quantityMultiplier: number;
-  breakdown: {
-    basePrice: number;
-    discount: number;
-    printCost: number;
-    finalPricePerItem: number;
-    quantity: number;
-    totalPrice: number;
-  };
+export interface CategoryPrintPrice extends PrintPrice {
+  product_type: string;
 }
 
 export interface PriceCalculationInput {
@@ -40,6 +31,34 @@ export interface PriceCalculationInput {
   quantity: number;
   colorCount?: number;
   withPrint?: boolean;
-  size?: string; // Selected size for size-based pricing
-  product?: any; // Product object to access size_multipliers
+  size?: string;
+  productType?: string; // NEW: Product category for category-specific pricing
+}
+
+export interface PriceCalculationResult {
+  pricePerItem: number;
+  totalPrice: number;
+  basePrice: number;
+  discountedBasePrice: number;
+  printCost: number;
+  quantityMultiplier: number;
+  categoryMultiplier?: number; // NEW: Category-specific multiplier if used
+  breakdown: {
+    basePrice: number;
+    discount: number;
+    printCost: number;
+    finalPricePerItem: number;
+    quantity: number;
+    totalPrice: number;
+    categoryUsed?: string; // NEW: Which category pricing was used
+  };
+}
+
+// NEW: Category pricing configuration interface
+export interface CategoryPricingConfig {
+  productType: string;
+  quantityMultipliers: CategoryQuantityMultiplier[];
+  printPrices: CategoryPrintPrice[];
+  isActive: boolean;
+  fallbackToGlobal: boolean; // Whether to fall back to global pricing if no category rule exists
 }
