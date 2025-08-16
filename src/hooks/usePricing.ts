@@ -25,6 +25,8 @@ export function usePricing() {
       setLoading(true);
       setError(null);
 
+      console.log('🔄 Fetching pricing data...');
+
       const [multipliersResult, printPricesResult, categoryMultipliersResult, categoryPrintPricesResult] = await Promise.all([
         supabase.from('quantity_multipliers').select('*').order('quantity_range_start'),
         supabase.from('print_prices').select('*').order('quantity_range_start, colors_count'),
@@ -36,6 +38,15 @@ export function usePricing() {
       if (printPricesResult.error) throw printPricesResult.error;
       if (categoryMultipliersResult.error) throw categoryMultipliersResult.error;
       if (categoryPrintPricesResult.error) throw categoryPrintPricesResult.error;
+
+      console.log('📊 Pricing data fetched:', {
+        globalMultipliers: multipliersResult.data?.length || 0,
+        globalPrintPrices: printPricesResult.data?.length || 0,
+        categoryMultipliers: categoryMultipliersResult.data?.length || 0,
+        categoryPrintPrices: categoryPrintPricesResult.data?.length || 0
+      });
+
+      console.log('🎯 Category multipliers found:', categoryMultipliersResult.data);
 
       setQuantityMultipliers(multipliersResult.data || []);
       setPrintPrices(printPricesResult.data || []);
@@ -55,15 +66,35 @@ export function usePricing() {
 
   // Find quantity multiplier for a given quantity and product type
   const getQuantityMultiplier = (quantity: number, productType?: string): number => {
+    console.log(`🔍 getQuantityMultiplier called:`, {
+      quantity,
+      productType,
+      categoryMultipliersCount: categoryQuantityMultipliers.length,
+      globalMultipliersCount: quantityMultipliers.length
+    });
+
     // First try to find category-specific multiplier
     if (productType) {
+      console.log(`🔍 Looking for category rules for ${productType}:`, 
+        categoryQuantityMultipliers.filter(m => m.product_type === productType)
+      );
+
       const categoryMultiplier = categoryQuantityMultipliers.find(
         m => m.product_type === productType && 
              quantity >= m.quantity_range_start && 
              quantity <= m.quantity_range_end
       );
+      
       if (categoryMultiplier) {
+        console.log(`🎯 Category pricing found for ${productType}:`, {
+          quantity,
+          range: `${categoryMultiplier.quantity_range_start}-${categoryMultiplier.quantity_range_end}`,
+          multiplier: categoryMultiplier.multiplier,
+          categoryMultipliers: categoryQuantityMultipliers.filter(m => m.product_type === productType)
+        });
         return categoryMultiplier.multiplier;
+      } else {
+        console.log(`❌ No category rule found for ${productType} at quantity ${quantity}`);
       }
     }
 
@@ -71,6 +102,15 @@ export function usePricing() {
     const globalMultiplier = quantityMultipliers.find(
       m => quantity >= m.quantity_range_start && quantity <= m.quantity_range_end
     );
+    
+    console.log(`🌍 Global pricing used:`, {
+      quantity,
+      productType,
+      globalMultiplier: globalMultiplier?.multiplier || 1,
+      categoryMultipliers: categoryQuantityMultipliers.filter(m => m.product_type === productType),
+      allGlobalMultipliers: quantityMultipliers
+    });
+    
     return globalMultiplier ? globalMultiplier.multiplier : 1;
   };
 

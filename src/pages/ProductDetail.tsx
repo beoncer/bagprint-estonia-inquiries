@@ -115,6 +115,7 @@ const ProductDetail = () => {
     colorCount: printType === "with" ? colorCount : 0,
     withPrint: printType === "with",
     size: selectedSize,
+    productType: product.type, // Add this line to pass product type for category pricing
     product: product
   }) : null;
 

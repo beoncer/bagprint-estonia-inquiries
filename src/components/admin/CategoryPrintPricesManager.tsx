@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -18,11 +18,8 @@ interface CategoryPrintPricesManagerProps {
   onSuccess?: () => void;
 }
 
-const COLOR_COUNTS = [1, 2, 3, 4, 5, 6, 7, 8];
-
 export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryPrintPricesManagerProps) {
   const {
-    quantityMultipliers: globalMultipliers,
     printPrices: globalPrintPrices,
     categoryPrintPrices,
     updateCategoryPrintPrice,
@@ -31,131 +28,121 @@ export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryP
   } = usePricing();
 
   const [editMode, setEditMode] = useState(false);
-  const [editingCell, setEditingCell] = useState<{
-    rangeStart: number;
-    rangeEnd: number;
-    colorCount: number;
-    priceId?: string;
-  } | null>(null);
-  const [editValue, setEditValue] = useState('');
+  const [editingCell, setEditingCell] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
 
   // Get category-specific print prices for this product type
   const categoryPrices = categoryPrintPrices.filter(p => p.product_type === productType);
   
-  // Create a matrix showing both global and category-specific print prices
-  const priceMatrix = globalMultipliers.map(range => ({
-    range,
-    prices: COLOR_COUNTS.map(colorCount => {
-      const globalPrice = globalPrintPrices.find(
-        p => p.quantity_range_start === range.quantity_range_start &&
-             p.quantity_range_end === range.quantity_range_end &&
-             p.colors_count === colorCount
-      );
-      
-      const categoryPrice = categoryPrices.find(
-        p => p.quantity_range_start === range.quantity_range_start &&
-             p.quantity_range_end === range.quantity_range_end &&
-             p.colors_count === colorCount
-      );
-      
-      return {
-        globalPrice: globalPrice?.price_per_item || 0,
-        categoryPrice: categoryPrice?.price_per_item || 0,
-        categoryPriceId: categoryPrice?.id,
-        isCustomized: !!categoryPrice,
-        effectivePrice: categoryPrice ? categoryPrice.price_per_item : (globalPrice?.price_per_item || 0),
-      };
-    }),
-  }));
+  // Get unique quantity ranges from global pricing
+  const quantityRanges = globalPrintPrices.reduce((ranges, price) => {
+    const rangeKey = `${price.quantity_range_start}-${price.quantity_range_end}`;
+    if (!ranges.find(r => r.start === price.quantity_range_start && r.end === price.quantity_range_end)) {
+      ranges.push({
+        start: price.quantity_range_start,
+        end: price.quantity_range_end,
+        key: rangeKey
+      });
+    }
+    return ranges;
+  }, [] as Array<{ start: number; end: number; key: string }>);
 
-  const handlePriceChange = async (
-    rangeStart: number,
-    rangeEnd: number,
-    colorCount: number,
-    value: string,
-    priceId?: string
-  ) => {
-    const numericValue = parseFloat(value);
-    if (isNaN(numericValue) || numericValue < 0) return;
+  // Get unique color counts
+  const colorCounts = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  const startEditing = (quantityRange: string, colorCount: number, currentValue: number) => {
+    const cellKey = `${quantityRange}-${colorCount}`;
+    setEditingCell(cellKey);
+    setEditingValue(currentValue.toString());
+  };
+
+  const cancelEditing = () => {
+    setEditingCell(null);
+    setEditingValue('');
+  };
+
+  const saveEditing = async (quantityRange: string, colorCount: number, existingId?: string) => {
+    const numericValue = parseFloat(editingValue);
+    if (isNaN(numericValue) || numericValue < 0) {
+      toast.error('Please enter a valid price value');
+      return;
+    }
+
+    const [start, end] = quantityRange.split('-').map(Number);
 
     try {
-      if (priceId) {
+      if (existingId) {
         await updateCategoryPrintPrice({
-          id: priceId,
+          id: existingId,
           price_per_item: numericValue,
         });
       } else {
         await createCategoryPrintPrice({
           product_type: productType,
-          quantity_range_start: rangeStart,
-          quantity_range_end: rangeEnd,
+          quantity_range_start: start,
+          quantity_range_end: end,
           colors_count: colorCount,
           price_per_item: numericValue,
         });
       }
       toast.success('Category print price updated successfully');
-      setEditingCell(null);
-      setEditValue('');
       onSuccess?.();
+      setEditingCell(null);
+      setEditingValue('');
     } catch (err) {
       toast.error('Failed to update category print price');
     }
   };
 
-  const handleDeleteCustomPrice = async (priceId: string) => {
+  const handleDeleteCustomRule = async (id: string) => {
     try {
-      await deleteCategoryPrintPrice(priceId);
-      toast.success('Custom price removed, now using global pricing');
+      await deleteCategoryPrintPrice(id);
+      toast.success('Custom rule removed, now using global pricing');
       onSuccess?.();
     } catch (err) {
-      toast.error('Failed to remove custom price');
+      toast.error('Failed to remove custom rule');
     }
   };
 
-  const startEditing = (rangeStart: number, rangeEnd: number, colorCount: number, currentPrice: number, priceId?: string) => {
-    if (!editMode) return;
+  const getPriceDisplay = (quantityRange: string, colorCount: number) => {
+    const [start, end] = quantityRange.split('-').map(Number);
     
-    setEditingCell({ rangeStart, rangeEnd, colorCount, priceId });
-    setEditValue(currentPrice.toString());
-  };
+    // Find global price
+    const globalPrice = globalPrintPrices.find(
+      p => p.quantity_range_start === start && 
+           p.quantity_range_end === end && 
+           p.colors_count === colorCount
+    );
 
-  const cancelEditing = () => {
-    setEditingCell(null);
-    setEditValue('');
-  };
+    // Find category-specific price
+    const categoryPrice = categoryPrices.find(
+      p => p.quantity_range_start === start && 
+           p.quantity_range_end === end && 
+           p.colors_count === colorCount
+    );
 
-  const getPriceDisplay = (priceInfo: any, rangeStart: number, rangeEnd: number, colorCount: number) => {
-    const isEditing = editingCell && 
-      editingCell.rangeStart === rangeStart && 
-      editingCell.rangeEnd === rangeEnd && 
-      editingCell.colorCount === colorCount;
+    const isCustomized = !!categoryPrice;
+    const effectivePrice = categoryPrice ? categoryPrice.price_per_item : globalPrice?.price_per_item || 0;
+    const cellKey = `${quantityRange}-${colorCount}`;
+    const isEditing = editingCell === cellKey;
 
     if (isEditing) {
       return (
         <div className="space-y-2">
-          <Input
-            type="number"
-            value={editValue}
-            onChange={e => setEditValue(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                handlePriceChange(rangeStart, rangeEnd, colorCount, editValue, priceInfo.categoryPriceId);
-              } else if (e.key === 'Escape') {
-                cancelEditing();
-              }
-            }}
-            onBlur={() => handlePriceChange(rangeStart, rangeEnd, colorCount, editValue, priceInfo.categoryPriceId)}
-            step="0.01"
-            min="0"
-            className="w-20 text-center"
-            autoFocus
-          />
-          <div className="flex gap-1">
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              value={editingValue}
+              onChange={e => setEditingValue(e.target.value)}
+              step="0.01"
+              min="0"
+              className="w-20"
+              autoFocus
+            />
             <Button
               size="sm"
-              variant="outline"
-              onClick={() => handlePriceChange(rangeStart, rangeEnd, colorCount, editValue, priceInfo.categoryPriceId)}
-              className="text-xs px-2"
+              onClick={() => saveEditing(quantityRange, colorCount, categoryPrice?.id)}
+              className="h-8 px-2"
             >
               ✓
             </Button>
@@ -163,37 +150,30 @@ export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryP
               size="sm"
               variant="outline"
               onClick={cancelEditing}
-              className="text-xs px-2"
+              className="h-8 px-2"
             >
               ✕
             </Button>
           </div>
+          <Badge variant="secondary" className="text-xs">
+            {isCustomized ? 'Custom' : 'New Custom'}
+          </Badge>
         </div>
       );
     }
 
-    if (priceInfo.isCustomized) {
+    if (isCustomized) {
       return (
         <div className="space-y-2">
           <div 
-            className={`cursor-pointer p-2 rounded hover:bg-gray-100 ${editMode ? 'border border-dashed border-gray-300' : ''}`}
-            onClick={() => startEditing(rangeStart, rangeEnd, colorCount, priceInfo.effectivePrice, priceInfo.categoryPriceId)}
+            className="cursor-pointer hover:bg-gray-100 p-2 rounded border border-transparent hover:border-gray-300"
+            onClick={() => startEditing(quantityRange, colorCount, effectivePrice)}
           >
-            <span className="font-medium">€{priceInfo.effectivePrice.toFixed(2)}</span>
+            <span className="font-medium">€{effectivePrice.toFixed(2)}</span>
           </div>
           <Badge variant="secondary" className="text-xs">
             Custom
           </Badge>
-          {editMode && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => handleDeleteCustomPrice(priceInfo.categoryPriceId!)}
-              className="w-full text-xs"
-            >
-              Remove
-            </Button>
-          )}
         </div>
       );
     }
@@ -201,10 +181,10 @@ export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryP
     return (
       <div className="space-y-2">
         <div 
-          className={`cursor-pointer p-2 rounded hover:bg-gray-100 ${editMode ? 'border border-dashed border-gray-300' : ''}`}
-          onClick={() => startEditing(rangeStart, rangeEnd, colorCount, priceInfo.effectivePrice)}
+          className="cursor-pointer hover:bg-gray-100 p-2 rounded border border-transparent hover:border-gray-300"
+          onClick={() => startEditing(quantityRange, colorCount, effectivePrice)}
         >
-          <span className="text-gray-500">€{priceInfo.effectivePrice.toFixed(2)}</span>
+          <span className="text-gray-500">€{effectivePrice.toFixed(2)}</span>
         </div>
         <Badge variant="outline" className="text-xs">
           Global
@@ -213,17 +193,13 @@ export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryP
     );
   };
 
-  const getProductTypeDisplayName = (type: string) => {
-    return type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-  };
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Print Prices for {getProductTypeDisplayName(productType)}</h3>
+          <h3 className="text-lg font-semibold">Print Prices for {productType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
           <p className="text-sm text-gray-600">
-            Customize print costs for this category. Prices not set will use global pricing.
+            Click on any price to customize it. Custom rules override global pricing for this category.
           </p>
         </div>
         <Button
@@ -238,23 +214,23 @@ export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryP
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[120px]">Quantity Range</TableHead>
-              {COLOR_COUNTS.map(colorCount => (
-                <TableHead key={colorCount} className="text-center min-w-[80px]">
-                  {colorCount} Color{colorCount > 1 ? 's' : ''}
+              <TableHead>Quantity Range</TableHead>
+              {colorCounts.map(colorCount => (
+                <TableHead key={colorCount} className="text-center">
+                  {colorCount} {colorCount === 1 ? 'Color' : 'Colors'}
                 </TableHead>
               ))}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {priceMatrix.map(({ range, prices }) => (
-              <TableRow key={`${range.quantity_range_start}-${range.quantity_range_end}`}>
-                <TableCell className="font-medium min-w-[120px]">
-                  {range.quantity_range_start}-{range.quantity_range_end === 9999 ? '∞' : range.quantity_range_end}
+            {quantityRanges.map((range) => (
+              <TableRow key={range.key}>
+                <TableCell className="font-medium">
+                  {range.start}-{range.end === 9999 ? '∞' : range.end}
                 </TableCell>
-                {prices.map((priceInfo, index) => (
-                  <TableCell key={index} className="text-center min-w-[80px]">
-                    {getPriceDisplay(priceInfo, range.quantity_range_start, range.quantity_range_end, COLOR_COUNTS[index])}
+                {colorCounts.map(colorCount => (
+                  <TableCell key={`${range.key}-${colorCount}`} className="text-center">
+                    {getPriceDisplay(range.key, colorCount)}
                   </TableCell>
                 ))}
               </TableRow>
@@ -264,37 +240,44 @@ export function CategoryPrintPricesManager({ productType, onSuccess }: CategoryP
       </div>
 
       {editMode && (
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <h4 className="font-medium text-blue-900 mb-3">How to Customize Print Prices</h4>
-          <div className="space-y-2 text-sm text-blue-800">
-            <p>• <strong>Click on any price cell</strong> to edit it for this category</p>
-            <p>• Custom prices will override global pricing for this category</p>
-            <p>• Press Enter to save or Escape to cancel</p>
-            <p>• Use the "Remove" button to revert to global pricing</p>
-            <p>• Different materials may have different print costs:</p>
-            <ul className="ml-4 space-y-1">
-              <li>• <strong>Cotton bags:</strong> Higher print costs due to fabric complexity</li>
-              <li>• <strong>Paper bags:</strong> Standard print costs</li>
-              <li>• <strong>Drawstring bags:</strong> Medium print costs</li>
-              <li>• <strong>Shoe bags:</strong> Specialized print requirements</li>
-              <li>• <strong>Packaging boxes:</strong> Varies by material type</li>
-            </ul>
+        <div className="space-y-4">
+          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <h4 className="font-medium text-blue-900 mb-3">Custom Rules</h4>
+            <div className="space-y-2">
+              {categoryPrices.map((price) => (
+                <div key={price.id} className="flex items-center justify-between p-2 bg-white rounded border">
+                  <span>
+                    {price.quantity_range_start}-{price.quantity_range_end === 9999 ? '∞' : price.quantity_range_end} • {price.colors_count} {price.colors_count === 1 ? 'Color' : 'Colors'} • €{price.price_per_item.toFixed(2)}
+                  </span>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDeleteCustomRule(price.id)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+              {categoryPrices.length === 0 && (
+                <p className="text-blue-700 text-sm">No custom rules set. Click on any price above to create one.</p>
+              )}
+            </div>
           </div>
         </div>
       )}
 
       <div className="space-y-2 text-sm text-gray-500">
         <p>
-          * These prices are added per item when printing is requested.
+          * Print prices are per item and depend on quantity and number of colors.
+        </p>
+        <p>
+          * <strong>Click on any price to customize it</strong> - this will create a category-specific rule.
         </p>
         <p>
           * Custom rules override global pricing for this category.
         </p>
         <p>
-          * Prices not set will automatically use global pricing.
-        </p>
-        <p>
-          * Consider material complexity when setting category-specific prices.
+          * Rules not set will automatically use global pricing.
         </p>
       </div>
     </div>

@@ -29,6 +29,8 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
 
   const [editMode, setEditMode] = useState(false);
   const [newRange, setNewRange] = useState({ start: '', end: '', multiplier: '' });
+  const [editingCell, setEditingCell] = useState<string | null>(null);
+  const [editingValue, setEditingValue] = useState<string>('');
 
   // Get category-specific multipliers for this product type
   const categoryMultipliers = categoryQuantityMultipliers.filter(m => m.product_type === productType);
@@ -48,9 +50,23 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
     };
   });
 
-  const handleMultiplierChange = async (rangeStart: number, rangeEnd: number, value: string, existingId?: string) => {
-    const numericValue = parseFloat(value);
-    if (isNaN(numericValue) || numericValue <= 0) return;
+  const startEditing = (rangeStart: number, rangeEnd: number, currentValue: number) => {
+    const cellKey = `${rangeStart}-${rangeEnd}`;
+    setEditingCell(cellKey);
+    setEditingValue(currentValue.toString());
+  };
+
+  const cancelEditing = () => {
+    setEditingCell(null);
+    setEditingValue('');
+  };
+
+  const saveEditing = async (rangeStart: number, rangeEnd: number, existingId?: string) => {
+    const numericValue = parseFloat(editingValue);
+    if (isNaN(numericValue) || numericValue <= 0) {
+      toast.error('Please enter a valid multiplier value');
+      return;
+    }
 
     try {
       if (existingId) {
@@ -68,6 +84,8 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
       }
       toast.success('Category multiplier updated successfully');
       onSuccess?.();
+      setEditingCell(null);
+      setEditingValue('');
     } catch (err) {
       toast.error('Failed to update category multiplier');
     }
@@ -110,9 +128,8 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
         quantity_range_end: end,
         multiplier: multiplier,
       });
-      
-      setNewRange({ start: '', end: '', multiplier: '' });
       toast.success('New pricing range added successfully');
+      setNewRange({ start: '', end: '', multiplier: '' });
       onSuccess?.();
     } catch (err) {
       toast.error('Failed to add new pricing range');
@@ -120,23 +137,63 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
   };
 
   const getMultiplierDisplay = (item: any) => {
+    const cellKey = `${item.globalRange.quantity_range_start}-${item.globalRange.quantity_range_end}`;
+    const isEditing = editingCell === cellKey;
+
+    if (isEditing) {
+      return (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              value={editingValue}
+              onChange={e => setEditingValue(e.target.value)}
+              step="0.01"
+              min="0.1"
+              max="1"
+              className="w-24"
+              autoFocus
+            />
+            <Button
+              size="sm"
+              onClick={() => saveEditing(
+                item.globalRange.quantity_range_start,
+                item.globalRange.quantity_range_end,
+                item.categoryRule?.id
+              )}
+              className="h-8 px-2"
+            >
+              ✓
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={cancelEditing}
+              className="h-8 px-2"
+            >
+              ✕
+            </Button>
+          </div>
+          <Badge variant="secondary" className="text-xs">
+            {item.isCustomized ? 'Custom' : 'New Custom'}
+          </Badge>
+        </div>
+      );
+    }
+
     if (item.isCustomized) {
       return (
         <div className="space-y-2">
-          <Input
-            type="number"
-            value={item.effectiveMultiplier}
-            onChange={e => handleMultiplierChange(
+          <div 
+            className="cursor-pointer hover:bg-gray-100 p-2 rounded border border-transparent hover:border-gray-300"
+            onClick={() => startEditing(
               item.globalRange.quantity_range_start,
               item.globalRange.quantity_range_end,
-              e.target.value,
-              item.categoryRule?.id
+              item.effectiveMultiplier
             )}
-            step="0.01"
-            min="0.1"
-            max="1"
-            className="w-24"
-          />
+          >
+            <span className="font-medium">{item.effectiveMultiplier.toFixed(2)}</span>
+          </div>
           <Badge variant="secondary" className="text-xs">
             Custom
           </Badge>
@@ -146,7 +203,16 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
 
     return (
       <div className="space-y-2">
-        <span className="text-gray-500">{item.effectiveMultiplier.toFixed(2)}</span>
+        <div 
+          className="cursor-pointer hover:bg-gray-100 p-2 rounded border border-transparent hover:border-gray-300"
+          onClick={() => startEditing(
+            item.globalRange.quantity_range_start,
+            item.globalRange.quantity_range_end,
+            item.effectiveMultiplier
+          )}
+        >
+          <span className="text-gray-500">{item.effectiveMultiplier.toFixed(2)}</span>
+        </div>
         <Badge variant="outline" className="text-xs">
           Global
         </Badge>
@@ -165,7 +231,7 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
         <div>
           <h3 className="text-lg font-semibold">Quantity Multipliers for {productType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</h3>
           <p className="text-sm text-gray-600">
-            Customize bulk discount rates for this category. Rules not set will use global pricing.
+            Click on any multiplier to customize it. Custom rules override global pricing for this category.
           </p>
         </div>
         <Button
@@ -283,6 +349,9 @@ export function CategoryQuantityMultipliersManager({ productType, onSuccess }: C
       <div className="space-y-2 text-sm text-gray-500">
         <p>
           * Multipliers are applied to the base price. Lower multiplier = bigger discount.
+        </p>
+        <p>
+          * <strong>Click on any multiplier to customize it</strong> - this will create a category-specific rule.
         </p>
         <p>
           * Custom rules override global pricing for this category.
