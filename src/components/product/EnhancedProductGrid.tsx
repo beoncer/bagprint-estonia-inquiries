@@ -66,6 +66,7 @@ const EnhancedProductGrid: React.FC<EnhancedProductGridProps> = ({
           color_images={product.color_images}
           main_color={product.main_color}
           image_url={product.image_url}
+          type={product.type}
         />
       ))}
     </div>
