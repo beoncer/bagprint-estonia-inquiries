@@ -59,6 +59,69 @@ export type Database = {
         }
         Relationships: []
       }
+      category_print_prices: {
+        Row: {
+          colors_count: number
+          created_at: string
+          id: string
+          price_per_item: number
+          product_type: string
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at: string
+        }
+        Insert: {
+          colors_count: number
+          created_at?: string
+          id?: string
+          price_per_item: number
+          product_type: string
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at?: string
+        }
+        Update: {
+          colors_count?: number
+          created_at?: string
+          id?: string
+          price_per_item?: number
+          product_type?: string
+          quantity_range_end?: number
+          quantity_range_start?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      category_quantity_multipliers: {
+        Row: {
+          created_at: string
+          id: string
+          multiplier: number
+          product_type: string
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          multiplier: number
+          product_type: string
+          quantity_range_end: number
+          quantity_range_start: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          multiplier?: number
+          product_type?: string
+          quantity_range_end?: number
+          quantity_range_start?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       featured_blog_posts: {
         Row: {
           created_at: string | null
