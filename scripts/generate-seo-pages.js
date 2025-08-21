@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 
-const { createClient } = require('@supabase/supabase-js');
-const fs = require('fs').promises;
-const path = require('path');
+import { createClient } from '@supabase/supabase-js';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Supabase configuration
 const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co';
@@ -304,8 +308,8 @@ async function generateBlogPages(distDir) {
 }
 
 // Run the generation
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   generateSEOPages();
 }
 
-module.exports = { generateSEOPages };
+export { generateSEOPages };

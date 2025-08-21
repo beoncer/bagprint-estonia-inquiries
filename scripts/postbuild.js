@@ -8,7 +8,7 @@
  * npm run build && node scripts/postbuild.js
  */
 
-const { generateSEOPages } = require('./generate-seo-pages');
+import { generateSEOPages } from './generate-seo-pages.js';
 
 console.log('🔍 Post-build SEO optimization starting...');
 generateSEOPages()

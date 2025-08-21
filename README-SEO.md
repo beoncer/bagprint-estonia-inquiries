@@ -2,6 +2,32 @@
 
 This project now includes a hybrid SEO system that combines client-side dynamic SEO with build-time static generation to ensure optimal search engine visibility.
 
+## Quick Setup
+
+⚠️ **First, update your package.json manually:**
+
+Add these scripts to your `package.json`:
+```json
+{
+  "scripts": {
+    "build:vite": "vite build",
+    "build:seo": "node scripts/build-with-seo.js",
+    "postbuild": "node scripts/postbuild.js", 
+    "generate-seo": "node scripts/generate-seo-pages.js"
+  }
+}
+```
+
+**Then run SEO generation:**
+
+```bash
+# Generate SEO-optimized static files
+npm run generate-seo
+
+# Or build everything with SEO
+npm run build:seo
+```
+
 ## How It Works
 
 ### 1. Build-Time Static Generation

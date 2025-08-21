@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-const { exec } = require('child_process');
-const { generateSEOPages } = require('./generate-seo-pages');
+import { exec } from 'child_process';
+import { generateSEOPages } from './generate-seo-pages.js';
 
 async function buildWithSEO() {
   try {
@@ -35,8 +35,8 @@ async function buildWithSEO() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   buildWithSEO();
 }
 
-module.exports = { buildWithSEO };
+export { buildWithSEO };
