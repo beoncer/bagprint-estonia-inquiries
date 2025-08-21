@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "scripts/generate-seo-pages.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/sitemap.xml",
@@ -7,6 +12,54 @@
     {
       "source": "/admin/(.*)",
       "destination": "/index.html"
+    },
+    {
+      "source": "/$",
+      "destination": "/seo-index.html"
+    },
+    {
+      "source": "/tooted$",
+      "destination": "/tooted/index.html"
+    },
+    {
+      "source": "/riidest-kotid$",
+      "destination": "/riidest-kotid/index.html"
+    },
+    {
+      "source": "/paberkotid$",
+      "destination": "/paberkotid/index.html"
+    },
+    {
+      "source": "/nooriga-kotid$",
+      "destination": "/nooriga-kotid/index.html"
+    },
+    {
+      "source": "/sussikotid$",
+      "destination": "/sussikotid/index.html"
+    },
+    {
+      "source": "/kontakt$",
+      "destination": "/kontakt/index.html"
+    },
+    {
+      "source": "/meist$",
+      "destination": "/meist/index.html"
+    },
+    {
+      "source": "/portfoolio$",
+      "destination": "/portfoolio/index.html"
+    },
+    {
+      "source": "/blogi$",
+      "destination": "/blogi/index.html"
+    },
+    {
+      "source": "/tooted/([^/]+)$",
+      "destination": "/tooted/$1/index.html"
+    },
+    {
+      "source": "/blogi/([^/]+)$",
+      "destination": "/blogi/$1/index.html"
     },
     {
       "source": "/(.*)",
