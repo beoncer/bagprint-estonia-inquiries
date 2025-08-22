@@ -1,25 +1,46 @@
 {
-  "rewrites": [
+  "functions": {
+    "api/ssr.ts": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
     {
-      "source": "/sitemap.xml",
-      "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
+      "src": "/sitemap.xml",
+      "dest": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
     },
     {
-      "source": "/admin/(.*)",
-      "destination": "/index.html"
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "^/(.*)\\.(js|css|map|png|jpg|jpeg|gif|webp|svg|ico|woff|woff2|ttf|eot)$",
+      "dest": "/$1"
+    },
+    {
+      "src": "^/sw\\.js$",
+      "dest": "/sw.js"
+    },
+    {
+      "src": "^/manifest\\.json$",
+      "dest": "/manifest.json"
+    },
+    {
+      "src": "^/robots\\.txt$",
+      "dest": "/robots.txt"
+    },
+    {
+      "src": "^(?!/api/).*",
+      "dest": "/api/ssr"
     }
   ],
   "headers": [
     {
-      "source": "/admin/(.*)",
+      "source": "/assets/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },

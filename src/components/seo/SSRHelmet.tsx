@@ -1,0 +1,93 @@
+import { Helmet } from 'react-helmet-async';
+import { Product } from '@/lib/supabase';
+
+interface SSRHelmetProps {
+  product?: Product;
+  pageType?: string;
+  url?: string;
+}
+
+const SSRHelmet: React.FC<SSRHelmetProps> = ({ product, pageType, url }) => {
+  if (product) {
+    const title = product.seo_title || `${product.name} - Leatex`;
+    const description = product.seo_description || `${product.name} - kvaliteetne ${product.type} kohandatud trükiga. ${product.description}`;
+    const keywords = product.seo_keywords || `${product.type}, kotid, trükk, pakendid, Leatex`;
+    const canonicalUrl = `https://leatex.ee/tooted/${product.slug}`;
+    
+    // Create structured data for product
+    const productLD = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": product.name,
+      "description": product.description,
+      "brand": {
+        "@type": "Brand",
+        "name": "Leatex"
+      },
+      "category": product.category,
+      "url": canonicalUrl,
+      "image": product.image,
+      "offers": {
+        "@type": "Offer",
+        "availability": "https://schema.org/InStock",
+        "priceCurrency": "EUR",
+        "seller": {
+          "@type": "Organization",
+          "name": "Leatex"
+        }
+      }
+    };
+
+    return (
+      <Helmet>
+        <html lang="et" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <link rel="canonical" href={canonicalUrl} />
+        
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="product" />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:image" content={product.image} />
+        <meta property="og:site_name" content="Leatex" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={product.image} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(productLD)}
+        </script>
+      </Helmet>
+    );
+  }
+
+  // Default home/category page SEO
+  const defaultTitle = "Leatex - Kvaliteetsed kotid ja pakendid";
+  const defaultDescription = "Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga. Küsi pakkumist juba täna!";
+  const canonicalUrl = `https://leatex.ee${url || ''}`;
+
+  return (
+    <Helmet>
+      <html lang="et" />
+      <title>{defaultTitle}</title>
+      <meta name="description" content={defaultDescription} />
+      <link rel="canonical" href={canonicalUrl} />
+      
+      <meta property="og:title" content={defaultTitle} />
+      <meta property="og:description" content={defaultDescription} />
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:site_name" content="Leatex" />
+      
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={defaultTitle} />
+      <meta name="twitter:description" content={defaultDescription} />
+    </Helmet>
+  );
+};
+
+export default SSRHelmet;
