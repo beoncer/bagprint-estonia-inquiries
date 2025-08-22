@@ -41,17 +41,20 @@ import {
 
 interface AppRoutesProps {
   routeData?: any;
+  currentUrl?: string;
 }
 
-const AppRoutes: React.FC<AppRoutesProps> = ({ routeData }) => {
+const AppRoutes: React.FC<AppRoutesProps> = ({ routeData, currentUrl }) => {
   return (
     <Suspense fallback={<div className="min-h-4" />}>
-      {/* Add SSR Helmet for SEO */}
-      <SSRHelmet 
-        product={routeData?.product} 
-        pageType={routeData?.pageType}
-        url={typeof window !== 'undefined' ? window.location.pathname : '/'}
-      />
+      {/* SSR Helmet handles SEO for server-side rendering only */}
+      {typeof window === 'undefined' && (
+        <SSRHelmet 
+          product={routeData?.product} 
+          pageType={routeData?.pageType}
+          url={currentUrl || '/'}
+        />
+      )}
       
       <Routes>
         {/* Public routes - Estonian only */}

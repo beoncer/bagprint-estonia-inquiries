@@ -65,9 +65,9 @@ export async function render(url: string) {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>
-            <StaticRouter location={url}>
-              <AppRoutes routeData={routeData} />
-            </StaticRouter>
+              <StaticRouter location={url}>
+                <AppRoutes routeData={routeData} currentUrl={url} />
+              </StaticRouter>
           </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>
