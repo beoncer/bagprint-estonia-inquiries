@@ -1,12 +1,10 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   try {
     // Debug: Log all request details
     console.log('🚨 SSR DEBUG - Full request details:')
     console.log('📍 req.url:', req.url)
-    console.log('📍 req.path:', (req as any).path)
-    console.log('📍 req.originalUrl:', (req as any).originalUrl)
+    console.log('📍 req.path:', req.path)
+    console.log('📍 req.originalUrl:', req.originalUrl)
     console.log('📍 req.headers.host:', req.headers.host)
     console.log('📍 req.headers.referer:', req.headers.referer)
     
@@ -23,8 +21,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.log('❌ Error parsing req.url, using as-is:', req.url)
         url = req.url
       }
-    } else if ((req as any).originalUrl) {
-      url = (req as any).originalUrl
+    } else if (req.originalUrl) {
+      url = req.originalUrl
       console.log('✅ Using req.originalUrl:', url)
     } else {
       console.log('❌ No URL found, defaulting to /')
@@ -37,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Cache at the edge for 5 minutes; serve stale while revalidating for a day
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400')
     res.status(status).setHeader('Content-Type', 'text/html; charset=utf-8').send(html)
-  } catch (e: any) {
+  } catch (e) {
     console.error('SSR Error:', e)
     res.status(500).send('<!doctype html><html><body><h1>500 - Server Error</h1></body></html>')
   }
