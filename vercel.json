@@ -1,41 +1,24 @@
 {
-  "buildCommand": "node build.js",
-  "outputDirectory": "dist/client",
-  "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/sitemap.xml",
       "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
     },
     {
-      "source": "/admin/:path*",
+      "source": "/admin/(.*)",
       "destination": "/index.html"
     },
     {
-      "source": "/((?!tooted).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
-      "source": "/tooted/**",
+      "source": "/admin/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=86400"
-        },
-        {
-          "key": "X-Robots-Tag", 
-          "value": "index, follow"
-        }
-      ]
-    },
-    {
-      "source": "/admin/**",
-      "headers": [
-        {
-          "key": "Cache-Control", 
           "value": "no-cache, no-store, must-revalidate"
         }
       ]

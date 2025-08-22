@@ -19,13 +19,8 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  ssr: {
-    noExternal: ['react-helmet-async']
-  },
   build: {
-    outDir: 'dist/client',
     rollupOptions: {
-      input: 'index.html',
       output: {
         manualChunks: {
           // Core React - keep minimal
