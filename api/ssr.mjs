@@ -29,6 +29,7 @@ export default async function handler(req, res) {
     }
     
     console.log('🎯 Final URL passed to render():', url)
+    console.log('🔄 Build timestamp:', new Date().toISOString())
     
     const { html, status } = await render(url)
 
