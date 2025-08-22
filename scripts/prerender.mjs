@@ -29,7 +29,7 @@ async function prerender() {
     // Generate HTML for each route
     for (const url of routes) {
       try {
-        const { html, status } = await render(url)
+        const { html, status } = await render(url, 'GET')
         
         if (status === 200) {
           // Create directory structure

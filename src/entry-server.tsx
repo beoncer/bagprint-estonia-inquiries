@@ -9,7 +9,7 @@ import { productLd, breadcrumbLd, categoryLd } from './seo/productLd'
 
 type RenderResult = { html: string; status: number }
 
-export async function render(url: string): Promise<RenderResult> {
+export async function render(url: string, method: string = 'GET'): Promise<RenderResult> {
   const helmetContext: any = {}
   let body: React.ReactElement
   let title = 'Bagprint | Kangakotid ja paberikotid trükiga'
@@ -106,6 +106,28 @@ export async function render(url: string): Promise<RenderResult> {
     )
   } else {
     return { status: 404, html: notFoundHtml('Lehte ei leitud') }
+  }
+
+  // For HEAD requests, skip React rendering but include all metadata
+  if (method === 'HEAD') {
+    const headOnlyHtml = `<!doctype html>
+<html lang="et">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
+    <title>${escapeHtml(title)}</title>
+    <meta name="description" content="${escapeHtml(description)}" />
+    <link rel="canonical" href="${canonical}" />
+    <meta name="robots" content="index,follow" />
+    ${extraHead}
+  </head>
+  <body></body>
+</html>`
+    return { status: 200, html: headOnlyHtml }
   }
 
   const appHtml = renderToString(body)
