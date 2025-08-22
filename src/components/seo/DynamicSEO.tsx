@@ -25,6 +25,11 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
     // Use SSR path if available, otherwise fall back to client-side location
     const path = ssrPath || location.pathname;
     
+    console.log('🔍 DynamicSEO SSR Debug:');
+    console.log('📍 SSR Path:', ssrPath);
+    console.log('📍 Client Path:', location.pathname);
+    console.log('📍 Final Path:', path);
+    
     // Map common routes to slugs
     const routeToSlug: Record<string, string> = {
       '/': 'home',
@@ -40,11 +45,14 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
       '/admin': 'admin',
     };
 
-    return routeToSlug[path] || path.slice(1).replace(/\//g, '-') || 'home';
+    const slug = routeToSlug[path] || path.slice(1).replace(/\//g, '-') || 'home';
+    console.log('🏷️  Final Slug:', slug);
+    return slug;
   };
 
   useEffect(() => {
     const fetchSEOData = async () => {
+      console.log('🔄 DynamicSEO useEffect triggered');
       setLoading(true);
       const pageSlug = getCurrentPageSlug();
       
@@ -55,6 +63,7 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
       console.log('🔄 SSR Path (if any):', ssrPath);
       
       try {
+        console.log('📡 Attempting to fetch SEO data from Supabase...');
         const { data, error } = await supabase
           .from('seo_metadata')
           .select('*')
@@ -62,7 +71,7 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
           .single();
 
         if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
-          console.error('Error fetching SEO data:', error);
+          console.error('❌ Error fetching SEO data:', error);
         } else if (data) {
           console.log('✅ SEO data found:', data);
           setSeoData(data);
@@ -71,7 +80,7 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
           setSeoData(null);
         }
       } catch (error) {
-        console.error('Error fetching SEO data:', error);
+        console.error('💥 Unexpected error fetching SEO data:', error);
         setSeoData(null);
       } finally {
         setLoading(false);
@@ -82,6 +91,8 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
   }, [location.pathname, ssrPath]);
 
   // Render SEO tags using react-helmet-async
+  console.log('🎭 DynamicSEO rendering Helmet with data:', seoData);
+  
   return (
     <Helmet>
       {seoData?.title && <title>{seoData.title}</title>}
