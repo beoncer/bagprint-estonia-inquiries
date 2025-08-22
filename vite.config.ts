@@ -21,7 +21,34 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
-      input: 'index.html',
+      output: {
+        manualChunks: {
+          // Core React - keep minimal
+          'react-core': ['react', 'react-dom'],
+          
+          // Router - separate small chunk
+          'router': ['react-router-dom'],
+          
+          // Essential UI only
+          'ui-core': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
+          
+          // Data layer
+          'data': ['@supabase/supabase-js', '@tanstack/react-query'],
+          
+          // Split pages into very small chunks
+          'page-home': ['./src/pages/Index'],
+          'page-products': ['./src/pages/Products'],
+          'page-product-detail': ['./src/pages/ProductDetail'],
+          'page-contact': ['./src/pages/Contact'],
+          'page-meist': ['./src/pages/Meist'],
+          
+          // Admin chunks - only load when needed
+          'admin-auth': ['./src/pages/admin/Login'],
+          'admin-main': ['./src/pages/admin/Dashboard', './src/pages/admin/Products'],
+          'admin-content': ['./src/pages/admin/Content', './src/pages/admin/Pages'],
+          'admin-settings': ['./src/pages/admin/SEO', './src/pages/admin/Assets']
+        }
+      },
     },
     target: 'es2020',
     minify: 'terser',
@@ -57,9 +84,6 @@ export default defineConfig(({ mode }) => ({
     modulePreload: {
       polyfill: false
     }
-  },
-  ssr: {
-    noExternal: ['react-helmet-async']
   },
   
   optimizeDeps: {

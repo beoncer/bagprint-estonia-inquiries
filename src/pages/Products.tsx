@@ -81,8 +81,6 @@ interface FeaturedBlogPost {
 }
 
 const Products = () => {
-  const location = useLocation();
-  
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
@@ -96,6 +94,7 @@ const Products = () => {
   const [selectedColor, setSelectedColor] = useState<string>("all");
   const [selectedSize, setSelectedSize] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("popular");
+  const location = useLocation();
   const [guarantees, setGuarantees] = useState<any[]>([]);
   const [guaranteesLoading, setGuaranteesLoading] = useState(true);
   const [guaranteesHeading, setGuaranteesHeading] = useState<string>("");

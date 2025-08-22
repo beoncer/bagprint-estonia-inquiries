@@ -1,27 +1,40 @@
 {
-  "functions": {
-    "api/ssr.mjs": {
-      "runtime": "@vercel/node@5.3.13"
-    }
-  },
-  "routes": [
-    { "src": "^/sitemap.xml", "dest": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap" },
-    { "src": "^/admin/(.*)", "dest": "/index.html" },
-    { "src": "^/assets/(.*)", "dest": "/assets/$1" },
-    { "src": "^/(.*)\\.(js|css|map|png|jpg|webp|svg|ico)$", "dest": "/$1" },
-    { "src": "^(?!/api/).*", "dest": "/api/ssr" },
+  "rewrites": [
     {
-      "src": "/admin/(.*)",
-      "headers": {
-        "Cache-Control": "no-cache, no-store, must-revalidate"
-      }
+      "source": "/sitemap.xml",
+      "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
     },
     {
-      "src": "/sitemap.xml",
-      "headers": {
-        "Content-Type": "application/xml",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600"
-      }
+      "source": "/admin/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/admin/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
     }
   ]
 }
