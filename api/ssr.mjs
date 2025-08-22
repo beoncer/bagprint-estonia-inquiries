@@ -39,5 +39,4 @@ export default async function handler(req, res) {
     console.error('SSR Error:', e)
     res.status(500).send('<!doctype html><html><body><h1>500 - Server Error</h1></body></html>')
   }
-}
-231E12A 
+} 
