@@ -12,7 +12,7 @@ export async function render(url: string) {
   const app = (
     <HelmetProvider context={helmetContext}>
       <StaticRouter location={url}>
-        <AppSSR />
+        <AppSSR ssrPath={url} />
       </StaticRouter>
     </HelmetProvider>
   )

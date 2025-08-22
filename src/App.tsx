@@ -66,6 +66,8 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  console.log('🚀 App component rendering');
+  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -75,9 +77,9 @@ const App: React.FC = () => {
             <BrowserRouter>
               <ScrollToTop />
               <AuthProvider>
-                <DynamicSEO />
+                <DynamicSEO ssrPath={undefined} />
                 <WebSiteStructuredData />
-                <Suspense fallback={<div className="min-h-4" />}>
+                <Suspense fallback={<div className="min-h-4">Loading...</div>}>
                   <Routes>
                     {/* Public routes - Estonian only */}
                     <Route path="/" element={<MainLayout />}>

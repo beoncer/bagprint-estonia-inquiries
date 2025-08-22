@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, createContext, useContext } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -13,6 +13,11 @@ import ErrorBoundary from "./components/ui/ErrorBoundary";
 import LoadingSpinner from "./components/ui/LoadingSpinner";
 import ScrollToTop from "./components/ui/ScrollToTop";
 import PageTransition from "./components/ui/PageTransition";
+
+// Context for SSR path
+const SSRPathContext = createContext<string>('/');
+
+export const useSSRPath = () => useContext(SSRPathContext);
 
 // Import lazy components
 import {
@@ -61,17 +66,22 @@ const queryClient = new QueryClient({
   },
 });
 
-const AppSSR: React.FC = () => {
+interface AppSSRProps {
+  ssrPath?: string;
+}
+
+const AppSSR: React.FC<AppSSRProps> = ({ ssrPath = '/' }) => {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <ScrollToTop />
-          <AuthProvider>
-            <DynamicSEO />
-            <WebSiteStructuredData />
-            <Suspense fallback={<div className="min-h-4" />}>
+      <SSRPathContext.Provider value={ssrPath}>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <ScrollToTop />
+            <AuthProvider>
+              <DynamicSEO ssrPath={ssrPath} />
+              <WebSiteStructuredData />
+              <Suspense fallback={<div className="min-h-4" />}>
               <Routes>
                 {/* Public routes - Estonian only */}
                 <Route path="/" element={<MainLayout />}>
@@ -120,6 +130,7 @@ const AppSSR: React.FC = () => {
           </AuthProvider>
         </TooltipProvider>
       </QueryClientProvider>
+        </SSRPathContext.Provider>
     </ErrorBoundary>
   );
 };

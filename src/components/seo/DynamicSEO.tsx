@@ -11,14 +11,19 @@ interface SEOMetadata {
   keywords: string | null;
 }
 
-const DynamicSEO: React.FC = () => {
+interface DynamicSEOProps {
+  ssrPath?: string; // For SSR, we'll pass the current path
+}
+
+const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
   const location = useLocation();
   const [seoData, setSeoData] = useState<SEOMetadata | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Get the current page slug from the URL
   const getCurrentPageSlug = (): string => {
-    const path = location.pathname;
+    // Use SSR path if available, otherwise fall back to client-side location
+    const path = ssrPath || location.pathname;
     
     // Map common routes to slugs
     const routeToSlug: Record<string, string> = {
@@ -47,6 +52,7 @@ const DynamicSEO: React.FC = () => {
       console.log('🔍 DynamicSEO Debug:');
       console.log('📍 Current pathname:', location.pathname);
       console.log('🏷️  Mapped page slug:', pageSlug);
+      console.log('🔄 SSR Path (if any):', ssrPath);
       
       try {
         const { data, error } = await supabase
@@ -73,7 +79,7 @@ const DynamicSEO: React.FC = () => {
     };
 
     fetchSEOData();
-  }, [location.pathname]);
+  }, [location.pathname, ssrPath]);
 
   // Render SEO tags using react-helmet-async
   return (
