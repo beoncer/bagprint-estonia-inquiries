@@ -1,35 +1,19 @@
 export default async function handler(req, res) {
   try {
-    // Debug: Log all request details
-    console.log('🚨 SSR DEBUG - Full request details:')
-    console.log('📍 req.url:', req.url)
-    console.log('📍 req.path:', req.path)
-    console.log('📍 req.originalUrl:', req.originalUrl)
-    console.log('📍 req.headers.host:', req.headers.host)
-    console.log('📍 req.headers.referer:', req.headers.referer)
-    
     // Import compiled SSR bundle
     const { render } = await import('../dist/server/entry-server.js')
     
-    // Try different ways to get the URL
+    // Get the URL from the request
     let url = '/'
     if (req.url) {
       try {
         url = new URL(req.url).pathname
-        console.log('✅ Using req.url pathname:', url)
       } catch (e) {
-        console.log('❌ Error parsing req.url, using as-is:', req.url)
         url = req.url
       }
     } else if (req.originalUrl) {
       url = req.originalUrl
-      console.log('✅ Using req.originalUrl:', url)
-    } else {
-      console.log('❌ No URL found, defaulting to /')
     }
-    
-    console.log('🎯 Final URL passed to render():', url)
-    console.log('🔄 Build timestamp:', new Date().toISOString())
     
     const { html, status } = await render(url)
 

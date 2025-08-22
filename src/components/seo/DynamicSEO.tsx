@@ -12,25 +12,16 @@ interface SEOMetadata {
 }
 
 interface DynamicSEOProps {
-  ssrPath?: string; // For SSR, we'll pass the current path
+  ssrPath?: string;
 }
 
 const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
   const location = useLocation();
   const [seoData, setSeoData] = useState<SEOMetadata | null>(null);
-  const [loading, setLoading] = useState(false);
 
-  // Get the current page slug from the URL
   const getCurrentPageSlug = (): string => {
-    // Use SSR path if available, otherwise fall back to client-side location
     const path = ssrPath || location.pathname;
     
-    console.log('🔍 DynamicSEO SSR Debug:');
-    console.log('📍 SSR Path:', ssrPath);
-    console.log('📍 Client Path:', location.pathname);
-    console.log('📍 Final Path:', path);
-    
-    // Map common routes to slugs
     const routeToSlug: Record<string, string> = {
       '/': 'home',
       '/tooted': 'products',
@@ -45,54 +36,33 @@ const DynamicSEO: React.FC<DynamicSEOProps> = ({ ssrPath }) => {
       '/admin': 'admin',
     };
 
-    const slug = routeToSlug[path] || path.slice(1).replace(/\//g, '-') || 'home';
-    console.log('🏷️  Final Slug:', slug);
-    return slug;
+    return routeToSlug[path] || path.slice(1).replace(/\//g, '-') || 'home';
   };
 
   useEffect(() => {
     const fetchSEOData = async () => {
-      console.log('🔄 DynamicSEO useEffect triggered');
-      setLoading(true);
       const pageSlug = getCurrentPageSlug();
       
-      // Debug logging
-      console.log('🔍 DynamicSEO Debug:');
-      console.log('📍 Current pathname:', location.pathname);
-      console.log('🏷️  Mapped page slug:', pageSlug);
-      console.log('🔄 SSR Path (if any):', ssrPath);
-      
       try {
-        console.log('📡 Attempting to fetch SEO data from Supabase...');
         const { data, error } = await supabase
           .from('seo_metadata')
           .select('*')
           .eq('page', pageSlug)
           .single();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
-          console.error('❌ Error fetching SEO data:', error);
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error fetching SEO data:', error);
         } else if (data) {
-          console.log('✅ SEO data found:', data);
           setSeoData(data);
-        } else {
-          console.log('❌ No SEO data found for slug:', pageSlug);
-          setSeoData(null);
         }
       } catch (error) {
-        console.error('💥 Unexpected error fetching SEO data:', error);
-        setSeoData(null);
-      } finally {
-        setLoading(false);
+        console.error('Error fetching SEO data:', error);
       }
     };
 
     fetchSEOData();
   }, [location.pathname, ssrPath]);
 
-  // Render SEO tags using react-helmet-async
-  console.log('🎭 DynamicSEO rendering Helmet with data:', seoData);
-  
   return (
     <Helmet>
       {seoData?.title && <title>{seoData.title}</title>}

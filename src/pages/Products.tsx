@@ -82,8 +82,6 @@ interface FeaturedBlogPost {
 
 const Products = () => {
   const location = useLocation();
-  console.log('🏪 Products component rendering');
-  console.log('📍 Current location:', location.pathname);
   
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");

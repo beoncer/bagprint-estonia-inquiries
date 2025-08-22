@@ -5,8 +5,6 @@ import { Helmet, HelmetProvider } from 'react-helmet-async'
 import AppSSR from './App-ssr'
 
 export async function render(url: string) {
-  console.log('🎯 entry-server.render() called with URL:', url)
-  
   const helmetContext: any = {}
   
   const app = (
