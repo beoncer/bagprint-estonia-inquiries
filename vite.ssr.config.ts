@@ -9,7 +9,17 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    target: 'esnext',
+    rollupOptions: {
+      output: {
+        format: 'es'
+      }
+    }
+  },
   ssr: {
-    noExternal: ['react-helmet-async']
+    noExternal: ['react-helmet-async'],
+    target: 'node',
+    format: 'esm'
   }
 });
