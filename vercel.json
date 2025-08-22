@@ -1,45 +1,23 @@
 {
   "buildCommand": "node build.js",
   "outputDirectory": "dist/client",
-  "functions": {
-    "src/api/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/sitemap.xml",
       "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/tooted$",
-      "dest": "/tooted/index.html"
     },
     {
-      "src": "/tooted/([^/]+)$",
-      "dest": "/tooted/$1/index.html"
+      "source": "/admin/:path*",
+      "destination": "/index.html"
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!tooted).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
-    {
-      "source": "/admin/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
     {
       "source": "/tooted/**",
       "headers": [
@@ -48,8 +26,17 @@
           "value": "public, max-age=3600, s-maxage=86400"
         },
         {
-          "key": "X-Robots-Tag",
+          "key": "X-Robots-Tag", 
           "value": "index, follow"
+        }
+      ]
+    },
+    {
+      "source": "/admin/**",
+      "headers": [
+        {
+          "key": "Cache-Control", 
+          "value": "no-cache, no-store, must-revalidate"
         }
       ]
     },

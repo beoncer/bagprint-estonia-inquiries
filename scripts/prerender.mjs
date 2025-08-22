@@ -33,14 +33,20 @@ async function prerender() {
         
         if (status === 200) {
           // Create directory structure
-          const routePath = url === '/tooted' ? '/tooted' : url
-          const filePath = path.join(outDir, routePath, 'index.html')
-          const dir = path.dirname(filePath)
+          let filePath
+          if (url === '/tooted') {
+            filePath = path.join(outDir, 'tooted', 'index.html')
+          } else {
+            // For product pages like /tooted/slug
+            const slug = url.replace('/tooted/', '')
+            filePath = path.join(outDir, 'tooted', slug, 'index.html')
+          }
           
+          const dir = path.dirname(filePath)
           fs.mkdirSync(dir, { recursive: true })
           fs.writeFileSync(filePath, html, 'utf-8')
           
-          console.log(`✓ Generated: ${url}`)
+          console.log(`✓ Generated: ${url} -> ${path.relative(outDir, filePath)}`)
           successCount++
         } else if (status === 404) {
           console.warn(`⚠ Skipped 404: ${url}`)
