@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/ssr.ts": {
+    "api/ssr.mjs": {
       "runtime": "@vercel/node@5.3.13"
     }
   },
