@@ -1,17 +1,15 @@
 {
-  "rewrites": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
-    },
-    {
-      "source": "/admin/(.*)",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+  "functions": {
+    "api/ssr.ts": {
+      "runtime": "nodejs20.x"
     }
+  },
+  "routes": [
+    { "src": "^/sitemap.xml", "dest": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap" },
+    { "src": "^/admin/(.*)", "dest": "/index.html" },
+    { "src": "^/assets/(.*)", "dest": "/assets/$1" },
+    { "src": "^/(.*)\\.(js|css|map|png|jpg|webp|svg|ico)$", "dest": "/$1" },
+    { "src": "^(?!/api/).*", "dest": "/api/ssr" }
   ],
   "headers": [
     {

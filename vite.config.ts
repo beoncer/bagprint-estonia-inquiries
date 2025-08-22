@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
+      input: 'index.html',
       output: {
         manualChunks: {
           // Core React - keep minimal
@@ -84,6 +85,9 @@ export default defineConfig(({ mode }) => ({
     modulePreload: {
       polyfill: false
     }
+  },
+  ssr: {
+    noExternal: ['react-helmet-async']
   },
   
   optimizeDeps: {

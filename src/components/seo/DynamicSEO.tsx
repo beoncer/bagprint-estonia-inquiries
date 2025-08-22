@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { supabase } from '@/lib/supabase';
 
 interface SEOMetadata {
@@ -42,6 +43,11 @@ const DynamicSEO: React.FC = () => {
       setLoading(true);
       const pageSlug = getCurrentPageSlug();
       
+      // Debug logging
+      console.log('🔍 DynamicSEO Debug:');
+      console.log('📍 Current pathname:', location.pathname);
+      console.log('🏷️  Mapped page slug:', pageSlug);
+      
       try {
         const { data, error } = await supabase
           .from('seo_metadata')
@@ -52,8 +58,10 @@ const DynamicSEO: React.FC = () => {
         if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
           console.error('Error fetching SEO data:', error);
         } else if (data) {
+          console.log('✅ SEO data found:', data);
           setSeoData(data);
         } else {
+          console.log('❌ No SEO data found for slug:', pageSlug);
           setSeoData(null);
         }
       } catch (error) {
@@ -67,66 +75,28 @@ const DynamicSEO: React.FC = () => {
     fetchSEOData();
   }, [location.pathname]);
 
-  useEffect(() => {
-    if (seoData) {
-      // Update document title
-      if (seoData.title) {
-        document.title = seoData.title;
-      }
-
-      // Update meta description
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription && seoData.description) {
-        metaDescription.setAttribute('content', seoData.description);
-      }
-
-      // Update meta keywords
-      const metaKeywords = document.querySelector('meta[name="keywords"]');
-      if (seoData.keywords) {
-        if (metaKeywords) {
-          metaKeywords.setAttribute('content', seoData.keywords);
-        } else {
-          // Create keywords meta tag if it doesn't exist
-          const newMetaKeywords = document.createElement('meta');
-          newMetaKeywords.setAttribute('name', 'keywords');
-          newMetaKeywords.setAttribute('content', seoData.keywords);
-          document.head.appendChild(newMetaKeywords);
-        }
-      }
-
-      // Update Open Graph tags
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle && seoData.title) {
-        ogTitle.setAttribute('content', seoData.title);
-      }
-
-      const ogDescription = document.querySelector('meta[property="og:description"]');
-      if (ogDescription && seoData.description) {
-        ogDescription.setAttribute('content', seoData.description);
-      }
-
-      // Update Twitter Card tags
-      const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-      if (twitterTitle && seoData.title) {
-        twitterTitle.setAttribute('content', seoData.title);
-      }
-
-      const twitterDescription = document.querySelector('meta[name="twitter:description"]');
-      if (twitterDescription && seoData.description) {
-        twitterDescription.setAttribute('content', seoData.description);
-      }
-
-      // Update canonical URL
-      const canonical = document.querySelector('link[rel="canonical"]');
-      if (canonical) {
-        const currentUrl = `https://leatex.ee${location.pathname}`;
-        canonical.setAttribute('href', currentUrl);
-      }
-    }
-  }, [seoData, location.pathname]);
-
-  // This component doesn't render anything visible
-  return null;
+  // Render SEO tags using react-helmet-async
+  return (
+    <Helmet>
+      {seoData?.title && <title>{seoData.title}</title>}
+      {seoData?.description && <meta name="description" content={seoData.description} />}
+      {seoData?.keywords && <meta name="keywords" content={seoData.keywords} />}
+      
+      {/* Open Graph */}
+      {seoData?.title && <meta property="og:title" content={seoData.title} />}
+      {seoData?.description && <meta property="og:description" content={seoData.description} />}
+      <meta property="og:type" content="website" />
+      <meta property="og:url" content={`https://leatex.ee${location.pathname}`} />
+      
+      {/* Twitter Card */}
+      {seoData?.title && <meta name="twitter:title" content={seoData.title} />}
+      {seoData?.description && <meta name="twitter:description" content={seoData.description} />}
+      <meta name="twitter:card" content="summary_large_image" />
+      
+      {/* Canonical URL */}
+      <link rel="canonical" href={`https://leatex.ee${location.pathname}`} />
+    </Helmet>
+  );
 };
 
 export default DynamicSEO;
