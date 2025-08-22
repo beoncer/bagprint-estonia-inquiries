@@ -5,7 +5,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/hooks/use-auth';
-import { getProductBySlug, getSiteContent } from '@/lib/supabase';
+import { getProductBySlug, getSiteContent, supabase } from '@/lib/supabase';
 import AppRoutes from './AppRoutes';
 
 // Create a fresh QueryClient for each SSR request
@@ -24,25 +24,66 @@ const createQueryClient = () => new QueryClient({
 
 // Route matcher for data fetching
 const getRouteData = async (url: string) => {
+  // Get SEO data for current page
+  const getSEOData = async (pageSlug: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('seo_metadata')
+        .select('*')
+        .eq('page', pageSlug)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error fetching SEO data:', error);
+        return null;
+      }
+      return data;
+    } catch (error) {
+      console.error('Error fetching SEO data:', error);
+      return null;
+    }
+  };
+
+  // Map URLs to page slugs
+  const getPageSlug = (url: string): string => {
+    const routeToSlug: Record<string, string> = {
+      '/': 'home',
+      '/tooted': 'products',
+      '/riidest-kotid': 'cotton-bags',
+      '/paberkotid': 'paper-bags',
+      '/nooriga-kotid': 'drawstring-bags',
+      '/sussikotid': 'shoebags',
+      '/kontakt': 'contact',
+      '/meist': 'about',
+      '/portfoolio': 'portfolio',
+      '/blogi': 'blog',
+    };
+
+    return routeToSlug[url] || url.slice(1).replace(/\//g, '-') || 'home';
+  };
+
+  const pageSlug = getPageSlug(url);
+  const seoData = await getSEOData(pageSlug);
+
   // Product detail pages
   const productMatch = url.match(/^\/tooted\/([^\/]+)\/?$/);
   if (productMatch) {
     try {
       const product = await getProductBySlug(productMatch[1]);
-      return { product, pageType: 'product' };
+      return { product, pageType: 'product', seoData };
     } catch (error) {
       console.error('Product not found:', error);
-      return { product: null, pageType: 'product' };
+      return { product: null, pageType: 'product', seoData };
     }
   }
 
   // Category pages
   if (url.match(/^\/(riidest-kotid|paberkotid|nooriga-kotid|sussikotid)\/?$/)) {
-    return { pageType: 'category' };
+    return { pageType: 'category', seoData };
   }
 
   // Home and other pages
-  return { pageType: 'default' };
+  return { pageType: 'default', seoData };
 };
 
 export async function render(url: string) {

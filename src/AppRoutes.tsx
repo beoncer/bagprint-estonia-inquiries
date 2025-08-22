@@ -53,6 +53,7 @@ const AppRoutes: React.FC<AppRoutesProps> = ({ routeData, currentUrl }) => {
           product={routeData?.product} 
           pageType={routeData?.pageType}
           url={currentUrl || '/'}
+          seoData={routeData?.seoData}
         />
       )}
       
