@@ -3,35 +3,27 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const url = req.url || '/';
   
+  console.log('SSR Request for URL:', url);
+  
   try {
-    // For now, serve a simple HTML with correct SEO until full SSR is deployed
     const seoData = await getSEOData(url);
+    console.log('SEO Data retrieved:', seoData);
     
     const html = generateHTML(url, seoData);
     
-    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+    // Set headers to prevent caching during debugging
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.status(200).send(html);
     
   } catch (error: any) {
     console.error('SSR Error:', error);
     
-    // Fallback to client-side rendering
-    const fallbackHtml = `<!DOCTYPE html>
-<html lang="et">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leatex – Paberkotid, puuvillakotid ja rohelised lahendused</title>
-  <meta name="description" content="Kvaliteetsed ja keskkonnasõbralikud kotid ning pakendid. Puuvillakotid, paberkotid, kinkekotid ja palju muud. Küsi pakkumist!" />
-  <link rel="canonical" href="https://leatex.ee${url}" />
-</head>
-<body>
-  <div id="root"></div>
-  <script type="module" crossorigin src="/assets/index.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index.css">
-</body>
-</html>`;
+    // Fallback with correct default SEO
+    const fallbackHtml = generateHTML(url, {
+      title: "Paberkotid ja riidest kotid logoga | Leatex",
+      description: "Leatex pakub kvaliteetseid paberkotte ja puuvillakotte logoga. Keskkonnasõbralikud ja bränditavad lahendused ettevõtetele ja üritustele."
+    });
     
     res.status(200).setHeader('Content-Type', 'text/html; charset=utf-8').send(fallbackHtml);
   }
@@ -78,9 +70,9 @@ async function getSEOData(url: string) {
 }
 
 function generateHTML(url: string, seoData: any) {
-  const title = seoData?.title || "Leatex – Paberkotid, puuvillakotid ja rohelised lahendused";
-  const description = seoData?.description || "Kvaliteetsed ja keskkonnasõbralikud kotid ning pakendid. Puuvillakotid, paberkotid, kinkekotid ja palju muud. Küsi pakkumist!";
-  const canonicalUrl = `https://leatex.ee${url}`;
+  const title = seoData?.title || "Paberkotid ja riidest kotid logoga | Leatex";
+  const description = seoData?.description || "Leatex pakub kvaliteetseid paberkotte ja puuvillakotte logoga. Keskkonnasõbralikud ja bränditavad lahendused ettevõtetele ja üritustele.";
+  const canonicalUrl = `https://leatex.ee${url === '/' ? '' : url}`;
 
   return `<!DOCTYPE html>
 <html lang="et">
@@ -99,6 +91,7 @@ function generateHTML(url: string, seoData: any) {
   <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <!-- SSR Debug: Generated at ${new Date().toISOString()} -->
 </head>
 <body>
   <div id="root"></div>
