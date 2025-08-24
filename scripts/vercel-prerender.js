@@ -11,65 +11,18 @@ const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co';
 const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3RweGxpYWVya3pqem55aXBpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzgxNDU3NSwiZXhwIjoyMDYzMzkwNTc1fQ.2fW1J9z8RQAd3WopZHjQ-rSwaf5exwneU1MfQ_DgJME';
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-// Static SEO data for main pages
-const staticSeoData = {
-  '/': {
-    title: 'Leatex - Kvaliteetsed kotid ja pakendid',
-    description: 'Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga. Küsi pakkumist juba täna!'
-  },
-  '/kontakt': {
-    title: 'Kontakt - Leatex Kotid ja Pakendid',
-    description: 'Võta meiega ühendust ja küsi pakkumist kvaliteetsetele kottidele ja pakenditele. Kiire vastus ja professionaalne teenus.'
-  },
-  '/meist': {
-    title: 'Meist - Leatex Kotid ja Pakendid',
-    description: 'Tutvu meie ettevõttega ja kvaliteetsete kottide tootmisega. Leatex on sinu usaldusväärne partner kottide ja pakendite valdkonnas.'
-  },
-  '/portfoolio': {
-    title: 'Portfoolio - Leatex Kotid ja Pakendid',
-    description: 'Vaata meie portfooliot ja näe kvaliteetsete kottide ja pakendite näiteid. Meie tööd räägivad ise enda eest.'
-  },
-  '/blogi': {
-    title: 'Blogi - Leatex Kotid ja Pakendid',
-    description: 'Loe meie blogist kasulikke artikleid kottide ja pakendite kohta. Nõuanded, trendid ja uudised.'
-  },
-  '/privaatsus': {
-    title: 'Privaatsuspoliitika - Leatex',
-    description: 'Leatex privaatsuspoliitika ja andmete kaitse. Loe, kuidas kaitstakse sinu isiklikke andmeid.'
-  },
-  '/ostutingimused': {
-    title: 'Ostutingimused - Leatex',
-    description: 'Leatex ostutingimused ja teenuse kasutamise reeglid. Tutvu meie teenuse tingimustega.'
-  },
-  '/tooted': {
-    title: 'Tooted - Leatex Kotid ja Pakendid',
-    description: 'Vaata meie kvaliteetsete kottide ja pakendite valikut. Puuvillakotid, paberkotid, paelaga kotid ja palju muud.'
-  },
-  '/riidest-kotid': {
-    title: 'Riidest kotid - Leatex Kotid ja Pakendid',
-    description: 'Kvaliteetsed riidest kotid erinevates värvides ja suurustes. Kohandatud trükk ja kiire tootmine.'
-  },
-  '/paberkotid': {
-    title: 'Paberkotid - Leatex Kotid ja Pakendid',
-    description: 'Keskkonnasõbralikud paberkotid kohandatud trükiga. Ideaalne turustamiseks ja reklaamiks.'
-  },
-  '/nooriga-kotid': {
-    title: 'Nooriga kotid - Leatex Kotid ja Pakendid',
-    description: 'Praktilised nooriga kotid erinevates stiilides. Kohandatud trükk ja kõrge kvaliteet.'
-  },
-  '/sussikotid': {
-    title: 'Sussikotid - Leatex Kotid ja Pakendid',
-    description: 'Elegantsed sussikotid kohandatud trükiga. Ideaalne kingade ja jalatiste pakendamiseks.'
-  },
-  '/e-poe-pakendid': {
-    title: 'E-poe pakendid - Leatex Kotid ja Pakendid',
-    description: 'Professionaalsed e-poe pakendid kohandatud trükiga. Turustamiseks ja brändimiseks.'
-  }
-};
-
-async function fetchDynamicSeoData() {
+async function fetchAllSeoData() {
   try {
-    console.log('📊 Fetching dynamic SEO data from Supabase...');
+    console.log('📊 Fetching ALL SEO data from Supabase...');
+    
+    // Fetch main page SEO data from seo_metadata table
+    const { data: seoMetadata, error: seoError } = await supabase
+      .from('seo_metadata')
+      .select('*');
+    
+    if (seoError) {
+      console.error('❌ Error fetching SEO metadata:', seoError);
+    }
     
     // Fetch product SEO data
     const { data: products, error: productsError } = await supabase
@@ -91,15 +44,43 @@ async function fetchDynamicSeoData() {
       console.error('❌ Error fetching blog posts:', blogError);
     }
     
-    // Create dynamic SEO data
-    const dynamicSeoData = {};
+    // Create unified SEO data structure
+    const allSeoData = {};
+    
+    // Map main pages to their SEO data
+    if (seoMetadata) {
+      seoMetadata.forEach(seo => {
+        // Map page identifiers to actual routes
+        const routeMapping = {
+          'home': '/',
+          'products': '/tooted',
+          'cotton-bags': '/riidest-kotid',
+          'paper-bags': '/paberkotid',
+          'drawstring-bags': '/nooriga-kotid',
+          'shoebags': '/sussikotid',
+          'contact': '/kontakt',
+          'about': '/meist',
+          'portfolio': '/portfoolio',
+          'blog': '/blogi',
+          'admin': '/admin'
+        };
+        
+        const route = routeMapping[seo.page];
+        if (route && seo.title && seo.description) {
+          allSeoData[route] = {
+            title: seo.title,
+            description: seo.description
+          };
+        }
+      });
+    }
     
     // Add product routes
     if (products) {
       products.forEach(product => {
         if (product.slug) {
           const route = `/tooted/${product.slug}`;
-          dynamicSeoData[route] = {
+          allSeoData[route] = {
             title: `${product.name} - Leatex`,
             description: product.description || `Kvaliteetne ${product.name} kohandatud trükiga. Leatex kvaliteet ja usaldusväärsus.`
           };
@@ -112,7 +93,7 @@ async function fetchDynamicSeoData() {
       blogPosts.forEach(post => {
         if (post.slug) {
           const route = `/blogi/${post.slug}`;
-          dynamicSeoData[route] = {
+          allSeoData[route] = {
             title: `${post.title} - Leatex Blogi`,
             description: post.excerpt || `Loe meie blogist artiklit "${post.title}". Kasulikud nõuanded ja teadmised.`
           };
@@ -120,11 +101,66 @@ async function fetchDynamicSeoData() {
       });
     }
     
-    console.log(`✅ Fetched ${Object.keys(dynamicSeoData).length} dynamic routes`);
-    return dynamicSeoData;
+    // Add category pages with SEO from seo_metadata
+    const categoryPages = [
+      '/riidest-kotid',
+      '/paberkotid', 
+      '/nooriga-kotid',
+      '/sussikotid',
+      '/e-poe-pakendid'
+    ];
+    
+    categoryPages.forEach(category => {
+      if (!allSeoData[category]) {
+        // Fallback SEO for category pages if not in seo_metadata
+        const categoryNames = {
+          '/riidest-kotid': 'Riidest kotid',
+          '/paberkotid': 'Paberkotid',
+          '/nooriga-kotid': 'Nooriga kotid',
+          '/sussikotid': 'Sussikotid',
+          '/e-poe-pakendid': 'E-poe pakendid'
+        };
+        
+        allSeoData[category] = {
+          title: `${categoryNames[category]} - Leatex Kotid ja Pakendid`,
+          description: `Kvaliteetsed ${categoryNames[category].toLowerCase()} kohandatud trükiga. Leatex kvaliteet ja usaldusväärsus.`
+        };
+      }
+    });
+    
+    // Add other main pages with fallback SEO if not in seo_metadata
+    const mainPages = [
+      '/kontakt',
+      '/meist',
+      '/portfoolio',
+      '/blogi',
+      '/privaatsus',
+      '/ostutingimused'
+    ];
+    
+    mainPages.forEach(page => {
+      if (!allSeoData[page]) {
+        const pageNames = {
+          '/kontakt': 'Kontakt',
+          '/meist': 'Meist',
+          '/portfoolio': 'Portfoolio',
+          '/blogi': 'Blogi',
+          '/privaatsus': 'Privaatsuspoliitika',
+          '/ostutingimused': 'Ostutingimused'
+        };
+        
+        allSeoData[page] = {
+          title: `${pageNames[page]} - Leatex Kotid ja Pakendid`,
+          description: `Leatex ${pageNames[page].toLowerCase()} leht. Kvaliteetsed kotid ja pakendid kohandatud trükiga.`
+        };
+      }
+    });
+    
+    console.log(`✅ Fetched SEO data for ${Object.keys(allSeoData).length} routes from Supabase`);
+    return allSeoData;
     
   } catch (error) {
-    console.error('❌ Error fetching dynamic SEO data:', error);
+    console.error('❌ Error fetching SEO data:', error);
     return {};
   }
 }
@@ -154,12 +190,9 @@ async function vercelPrerender() {
       ];
     }
 
-    // Fetch dynamic SEO data
-    const dynamicSeoData = await fetchDynamicSeoData();
+    // Fetch ALL SEO data from Supabase
+    const allSeoData = await fetchAllSeoData();
     
-    // Merge static and dynamic SEO data
-    const allSeoData = { ...staticSeoData, ...dynamicSeoData };
-
     // Create output directory
     const outputDir = path.join(__dirname, '../dist-prerendered');
     if (!fs.existsSync(outputDir)) {
@@ -204,13 +237,17 @@ async function vercelPrerender() {
 </html>`;
         }
 
-        // Inject SEO data based on route
+        // Inject SEO data from Supabase
         let modifiedHtml = baseHtml;
         if (allSeoData[route]) {
           const { title, description } = allSeoData[route];
           modifiedHtml = baseHtml
             .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
             .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${description}">`);
+          
+          console.log(`  📝 SEO: "${title}"`);
+        } else {
+          console.log(`  ⚠️  No SEO data found for ${route}`);
         }
 
         // Create route directory structure
@@ -232,6 +269,7 @@ async function vercelPrerender() {
 
     console.log('🎉 Vercel pre-rendering completed successfully!');
     console.log(`📁 Output directory: ${outputDir}`);
+    console.log('💡 All pages now use SEO data from Supabase database');
 
   } catch (error) {
     console.error('❌ Vercel pre-rendering failed:', error);
