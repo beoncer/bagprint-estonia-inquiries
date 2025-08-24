@@ -7,6 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:prerender": "node scripts/build-with-prerender.js",
+    "build:static": "node scripts/build-with-prerender.js",
+    "build:vercel": "node scripts/build-with-prerender.js",
+    "generate-routes": "node scripts/generate-routes.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -68,6 +72,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "@prerenderer/prerenderer": "^1.2.5",
+    "@prerenderer/renderer-puppeteer": "^1.2.4",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
@@ -80,6 +86,8 @@
     "globals": "^15.9.0",
     "lovable-tagger": "^1.1.7",
     "postcss": "^8.4.47",
+    "puppeteer": "^24.17.0",
+    "serve-static": "^2.2.0",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",

@@ -1,0 +1,1 @@
+import{e}from"./react-core-CGKACH0y.js";const o=Object.freeze(Object.defineProperty({__proto__:null,default:e(function(){throw Error("ws does not work in the browser. Browser clients must use the native WebSocket object")})},Symbol.toStringTag,{value:"Module"}));export{o as b};

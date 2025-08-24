@@ -1,12 +1,44 @@
 {
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "dist-prerendered",
+  "installCommand": "npm install",
+  "framework": "vite",
   "rewrites": [
     {
-      "source": "/sitemap.xml",
-      "destination": "https://ixotpxliaerkzjznyipi.supabase.co/functions/v1/sitemap"
+      "source": "/kontakt",
+      "destination": "/kontakt/index.html"
     },
     {
-      "source": "/admin/(.*)",
-      "destination": "/index.html"
+      "source": "/meist",
+      "destination": "/meist/index.html"
+    },
+    {
+      "source": "/portfoolio",
+      "destination": "/portfoolio/index.html"
+    },
+    {
+      "source": "/blogi",
+      "destination": "/blogi/index.html"
+    },
+    {
+      "source": "/privaatsus",
+      "destination": "/privaatsus/index.html"
+    },
+    {
+      "source": "/ostutingimused",
+      "destination": "/ostutingimused/index.html"
+    },
+    {
+      "source": "/tooted",
+      "destination": "/tooted/index.html"
+    },
+    {
+      "source": "/tooted/:slug",
+      "destination": "/tooted/:slug/index.html"
+    },
+    {
+      "source": "/blogi/:slug",
+      "destination": "/blogi/:slug/index.html"
     },
     {
       "source": "/(.*)",
@@ -15,24 +47,19 @@
   ],
   "headers": [
     {
-      "source": "/admin/(.*)",
+      "source": "/(.*)",
       "headers": [
         {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/sitemap.xml",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/xml"
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
         },
         {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600, s-maxage=3600"
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
         }
       ]
     }
