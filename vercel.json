@@ -61,10 +61,6 @@
     {
       "source": "/blogi/:slug",
       "destination": "/blogi/:slug/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ],
   "headers": [
