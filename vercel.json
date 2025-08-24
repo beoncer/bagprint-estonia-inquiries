@@ -5,6 +5,68 @@
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
+  "routes": [
+    {
+      "src": "/kontakt",
+      "dest": "/kontakt.html"
+    },
+    {
+      "src": "/meist",
+      "dest": "/meist.html"
+    },
+    {
+      "src": "/portfoolio",
+      "dest": "/portfoolio.html"
+    },
+    {
+      "src": "/blogi",
+      "dest": "/blogi.html"
+    },
+    {
+      "src": "/privaatsus",
+      "dest": "/privaatsus.html"
+    },
+    {
+      "src": "/ostutingimused",
+      "dest": "/ostutingimused.html"
+    },
+    {
+      "src": "/tooted",
+      "dest": "/tooted.html"
+    },
+    {
+      "src": "/riidest-kotid",
+      "dest": "/riidest-kotid.html"
+    },
+    {
+      "src": "/paberkotid",
+      "dest": "/paberkotid.html"
+    },
+    {
+      "src": "/nooriga-kotid",
+      "dest": "/nooriga-kotid.html"
+    },
+    {
+      "src": "/sussikotid",
+      "dest": "/sussikotid.html"
+    },
+    {
+      "src": "/e-poe-pakendid",
+      "dest": "/e-poe-pakendid.html"
+    },
+    {
+      "src": "/tooted/(.*)",
+      "dest": "/tooted/$1.html"
+    },
+    {
+      "src": "/blogi/(.*)",
+      "dest": "/blogi/$1.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
   "redirects": [
     {
       "source": "/kontakt/",
