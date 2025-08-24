@@ -282,13 +282,20 @@ async function vercelPrerender() {
           console.log(`  ⚠️  No SEO data found for ${route}`);
         }
 
-        // Write the HTML file directly (flat structure for Vercel)
-        const htmlPath = route === '/' 
-          ? path.join(outputDir, 'index.html')
-          : path.join(outputDir, `${route}.html`);
-        fs.writeFileSync(htmlPath, modifiedHtml);
-
-        console.log(`✅ Generated: ${route === '/' ? 'index.html' : route + '.html'}`);
+        // Create route directory structure and write index.html
+        if (route === '/') {
+          const htmlPath = path.join(outputDir, 'index.html');
+          fs.writeFileSync(htmlPath, modifiedHtml);
+          console.log(`✅ Generated: index.html`);
+        } else {
+          const routeDir = path.join(outputDir, route);
+          if (!fs.existsSync(routeDir)) {
+            fs.mkdirSync(routeDir, { recursive: true });
+          }
+          const htmlPath = path.join(routeDir, 'index.html');
+          fs.writeFileSync(htmlPath, modifiedHtml);
+          console.log(`✅ Generated: ${route}/index.html`);
+        }
 
       } catch (error) {
         console.error(`❌ Failed to process ${route}:`, error.message);
