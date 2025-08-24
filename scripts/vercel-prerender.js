@@ -241,11 +241,42 @@ async function vercelPrerender() {
         let modifiedHtml = baseHtml;
         if (allSeoData[route]) {
           const { title, description } = allSeoData[route];
-          modifiedHtml = baseHtml
-            .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
-            .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${description}">`);
+          
+          // Replace title tag
+          modifiedHtml = modifiedHtml.replace(/<title>.*?<\/title>/, `<title>${title}</title>`);
+          
+          // Replace meta description
+          modifiedHtml = modifiedHtml.replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${description}" />`);
+          
+          // Replace Open Graph tags - more precise regex
+          modifiedHtml = modifiedHtml.replace(
+            /<meta property="og:title"[^>]*content="[^"]*"[^>]*>/,
+            `<meta property="og:title" content="${title}" />`
+          );
+          modifiedHtml = modifiedHtml.replace(
+            /<meta property="og:description"[^>]*content="[^"]*"[^>]*>/,
+            `<meta property="og:description" content="${description}" />`
+          );
+          
+          // Replace Twitter tags - more precise regex
+          modifiedHtml = modifiedHtml.replace(
+            /<meta name="twitter:title"[^>]*content="[^"]*"[^>]*>/,
+            `<meta name="twitter:title" content="${title}" />`
+          );
+          modifiedHtml = modifiedHtml.replace(
+            /<meta name="twitter:description"[^>]*content="[^"]*"[^>]*>/,
+            `<meta name="twitter:description" content="${description}" />`
+          );
+          
+          // Update canonical URL for each route
+          const canonicalUrl = `https://leatex.ee${route}`;
+          modifiedHtml = modifiedHtml.replace(
+            /<link rel="canonical"[^>]*href="[^"]*"[^>]*>/,
+            `<link rel="canonical" href="${canonicalUrl}" />`
+          );
           
           console.log(`  📝 SEO: "${title}"`);
+          console.log(`  📝 Description: "${description}"`);
         } else {
           console.log(`  ⚠️  No SEO data found for ${route}`);
         }
