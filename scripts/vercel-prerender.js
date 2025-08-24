@@ -50,7 +50,7 @@ async function fetchAllSeoData() {
     // Map main pages to their SEO data
     if (seoMetadata) {
       seoMetadata.forEach(seo => {
-        // Map page identifiers to actual routes
+        // Use EXACTLY the same mapping as DynamicSEO component
         const routeMapping = {
           'home': '/',
           'products': '/tooted',
@@ -71,6 +71,7 @@ async function fetchAllSeoData() {
             title: seo.title,
             description: seo.description
           };
+          console.log(`  📝 Mapped ${seo.page} -> ${route}: "${seo.title}"`);
         }
       });
     }

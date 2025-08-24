@@ -83,6 +83,25 @@ const DynamicSEO: React.FC = () => {
 
   useEffect(() => {
     if (seoData) {
+      // Debug: Log what we're about to update vs what's already there
+      const currentTitle = document.title;
+      const currentDescription = document.querySelector('meta[name="description"]')?.getAttribute('content');
+      
+      console.log('🔍 SEO Update Debug:');
+      console.log('  Current DOM title:', currentTitle);
+      console.log('  Current DOM description:', currentDescription);
+      console.log('  Supabase title:', seoData.title);
+      console.log('  Supabase description:', seoData.description);
+      
+      // Check if the current meta tags already contain the correct pre-rendered data
+      // If the current title and description already match what we want, don't update anything
+      if (currentTitle === seoData.title && currentDescription === seoData.description) {
+        console.log('✅ SEO already matches pre-rendered data, skipping update');
+        return;
+      }
+      
+      console.log('🔄 Updating SEO tags...');
+      
       // Only update title if it's different from pre-rendered data
       if (seoData.title && shouldUpdateTitle(seoData.title)) {
         document.title = seoData.title;
@@ -96,7 +115,7 @@ const DynamicSEO: React.FC = () => {
         }
       }
 
-      // Only update meta keywords if it's different from pre-rendered data
+      // Only update meta keywords if they're different from pre-rendered data
       if (seoData.keywords && shouldUpdateMetaTag('keywords', seoData.keywords)) {
         const metaKeywords = document.querySelector('meta[name="keywords"]');
         if (metaKeywords) {
