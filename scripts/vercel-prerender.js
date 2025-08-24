@@ -282,6 +282,30 @@ async function vercelPrerender() {
           console.log(`  ⚠️  No SEO data found for ${route}`);
         }
 
+        // Update asset paths to match current build
+        // This prevents 404 errors from stale asset references
+        const assetsDir = path.join(outputDir, 'assets');
+        if (fs.existsSync(assetsDir)) {
+          const assetFiles = fs.readdirSync(assetsDir);
+          
+          // Update JavaScript asset paths
+          assetFiles.forEach(assetFile => {
+            if (assetFile.endsWith('.js') || assetFile.endsWith('.css')) {
+              // Extract the base name without hash (e.g., 'page-meist' from 'page-meist-BkGTQKic.js')
+              const baseName = assetFile.split('-').slice(0, -1).join('-');
+              const extension = assetFile.split('.').pop();
+              
+              // Find and replace old asset references with new ones
+              const oldAssetPattern = new RegExp(`/${baseName}-[a-zA-Z0-9]+\\.${extension}`, 'g');
+              const newAssetPath = `/${assetFile}`;
+              
+              modifiedHtml = modifiedHtml.replace(oldAssetPattern, newAssetPath);
+            }
+          });
+          
+          console.log(`  🔧 Updated asset paths for current build`);
+        }
+
         // Create route directory structure and write index.html
         if (route === '/') {
           const htmlPath = path.join(outputDir, 'index.html');
