@@ -5,66 +5,66 @@
   "framework": "vite",
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/kontakt",
-      "dest": "/kontakt.html"
+      "source": "/kontakt",
+      "destination": "/kontakt.html"
     },
     {
-      "src": "/meist",
-      "dest": "/meist.html"
+      "source": "/meist",
+      "destination": "/meist.html"
     },
     {
-      "src": "/portfoolio",
-      "dest": "/portfoolio.html"
+      "source": "/portfoolio",
+      "destination": "/portfoolio.html"
     },
     {
-      "src": "/blogi",
-      "dest": "/blogi.html"
+      "source": "/blogi",
+      "destination": "/blogi.html"
     },
     {
-      "src": "/privaatsus",
-      "dest": "/privaatsus.html"
+      "source": "/privaatsus",
+      "destination": "/privaatsus.html"
     },
     {
-      "src": "/ostutingimused",
-      "dest": "/ostutingimused.html"
+      "source": "/ostutingimused",
+      "destination": "/ostutingimused.html"
     },
     {
-      "src": "/tooted",
-      "dest": "/tooted.html"
+      "source": "/tooted",
+      "destination": "/tooted.html"
     },
     {
-      "src": "/riidest-kotid",
-      "dest": "/riidest-kotid.html"
+      "source": "/riidest-kotid",
+      "destination": "/riidest-kotid.html"
     },
     {
-      "src": "/paberkotid",
-      "dest": "/paberkotid.html"
+      "source": "/paberkotid",
+      "destination": "/paberkotid.html"
     },
     {
-      "src": "/nooriga-kotid",
-      "dest": "/nooriga-kotid.html"
+      "source": "/nooriga-kotid",
+      "destination": "/nooriga-kotid.html"
     },
     {
-      "src": "/sussikotid",
-      "dest": "/sussikotid.html"
+      "source": "/sussikotid",
+      "destination": "/sussikotid.html"
     },
     {
-      "src": "/e-poe-pakendid",
-      "dest": "/e-poe-pakendid.html"
+      "source": "/e-poe-pakendid",
+      "destination": "/e-poe-pakendid.html"
     },
     {
-      "src": "/tooted/(.*)",
-      "dest": "/tooted/$1.html"
+      "source": "/tooted/:slug",
+      "destination": "/tooted/:slug.html"
     },
     {
-      "src": "/blogi/(.*)",
-      "dest": "/blogi/$1.html"
+      "source": "/blogi/:slug",
+      "destination": "/blogi/:slug.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "redirects": [
