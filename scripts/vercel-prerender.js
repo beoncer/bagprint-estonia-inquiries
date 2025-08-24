@@ -282,17 +282,13 @@ async function vercelPrerender() {
           console.log(`  ⚠️  No SEO data found for ${route}`);
         }
 
-        // Create route directory structure
-        const routeDir = path.join(outputDir, route === '/' ? '' : route);
-        if (!fs.existsSync(routeDir)) {
-          fs.mkdirSync(routeDir, { recursive: true });
-        }
-
-        // Write the HTML file
-        const htmlPath = path.join(routeDir, 'index.html');
+        // Write the HTML file directly (flat structure for Vercel)
+        const htmlPath = route === '/' 
+          ? path.join(outputDir, 'index.html')
+          : path.join(outputDir, `${route}.html`);
         fs.writeFileSync(htmlPath, modifiedHtml);
 
-        console.log(`✅ Generated: ${route}/index.html`);
+        console.log(`✅ Generated: ${route === '/' ? 'index.html' : route + '.html'}`);
 
       } catch (error) {
         console.error(`❌ Failed to process ${route}:`, error.message);

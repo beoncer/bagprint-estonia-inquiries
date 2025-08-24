@@ -3,64 +3,62 @@
   "outputDirectory": "dist-prerendered",
   "installCommand": "npm install",
   "framework": "vite",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/kontakt",
-      "destination": "/kontakt/index.html"
+      "src": "/kontakt",
+      "dest": "/kontakt.html"
     },
     {
-      "source": "/meist",
-      "destination": "/meist/index.html"
+      "src": "/meist",
+      "dest": "/meist.html"
     },
     {
-      "source": "/portfoolio",
-      "destination": "/portfoolio/index.html"
+      "src": "/portfoolio",
+      "dest": "/portfoolio.html"
     },
     {
-      "source": "/blogi",
-      "destination": "/blogi/index.html"
+      "src": "/blogi",
+      "dest": "/blogi.html"
     },
     {
-      "source": "/privaatsus",
-      "destination": "/privaatsus/index.html"
+      "src": "/privaatsus",
+      "dest": "/privaatsus.html"
     },
     {
-      "source": "/ostutingimused",
-      "destination": "/ostutingimused/index.html"
+      "src": "/ostutingimused",
+      "dest": "/ostutingimused.html"
     },
     {
-      "source": "/tooted",
-      "destination": "/tooted/index.html"
+      "src": "/tooted",
+      "dest": "/tooted.html"
     },
     {
-      "source": "/riidest-kotid",
-      "destination": "/riidest-kotid/index.html"
+      "src": "/riidest-kotid",
+      "dest": "/riidest-kotid.html"
     },
     {
-      "source": "/paberkotid",
-      "destination": "/paberkotid/index.html"
+      "src": "/paberkotid",
+      "dest": "/paberkotid.html"
     },
     {
-      "source": "/nooriga-kotid",
-      "destination": "/nooriga-kotid/index.html"
+      "src": "/nooriga-kotid",
+      "dest": "/nooriga-kotid.html"
     },
     {
-      "source": "/sussikotid",
-      "destination": "/sussikotid/index.html"
+      "src": "/sussikotid",
+      "dest": "/sussikotid.html"
     },
     {
-      "source": "/e-poe-pakendid",
-      "destination": "/e-poe-pakendid/index.html"
+      "src": "/e-poe-pakendid",
+      "dest": "/e-poe-pakendid.html"
     },
     {
-      "source": "/tooted/:slug",
-      "destination": "/tooted/:slug/index.html"
+      "src": "/tooted/(.*)",
+      "dest": "/tooted/$1.html"
     },
     {
-      "source": "/blogi/:slug",
-      "destination": "/blogi/:slug/index.html"
+      "src": "/blogi/(.*)",
+      "dest": "/blogi/$1.html"
     }
   ],
   "headers": [
