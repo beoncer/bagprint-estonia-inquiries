@@ -8,106 +8,73 @@
   "rewrites": [
     {
       "source": "/kontakt",
-      "destination": "/kontakt.html"
+      "destination": "/kontakt/index.html"
     },
     {
       "source": "/meist",
-      "destination": "/meist.html"
+      "destination": "/meist/index.html"
     },
     {
       "source": "/portfoolio",
-      "destination": "/portfoolio.html"
+      "destination": "/portfoolio/index.html"
     },
     {
       "source": "/blogi",
-      "destination": "/blogi.html"
+      "destination": "/blogi/index.html"
     },
     {
       "source": "/privaatsus",
-      "destination": "/privaatsus.html"
+      "destination": "/privaatsus/index.html"
     },
     {
       "source": "/ostutingimused",
-      "destination": "/ostutingimused.html"
+      "destination": "/ostutingimused/index.html"
     },
     {
       "source": "/tooted",
-      "destination": "/tooted.html"
+      "destination": "/tooted/index.html"
     },
     {
       "source": "/riidest-kotid",
-      "destination": "/riidest-kotid.html"
+      "destination": "/riidest-kotid/index.html"
     },
     {
       "source": "/paberkotid",
-      "destination": "/paberkotid.html"
+      "destination": "/paberkotid/index.html"
     },
     {
       "source": "/nooriga-kotid",
-      "destination": "/nooriga-kotid.html"
+      "destination": "/nooriga-kotid/index.html"
     },
     {
       "source": "/sussikotid",
-      "destination": "/sussikotid.html"
+      "destination": "/sussikotid/index.html"
     },
     {
       "source": "/e-poe-pakendid",
-      "destination": "/e-poe-pakendid.html"
+      "destination": "/e-poe-pakendid/index.html"
     },
     {
       "source": "/tooted/:slug",
-      "destination": "/tooted/:slug.html"
+      "destination": "/tooted/:slug/index.html"
     },
     {
       "source": "/blogi/:slug",
-      "destination": "/blogi/:slug.html"
+      "destination": "/blogi/:slug/index.html"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
-  "redirects": [
-    {
-      "source": "/kontakt/",
-      "destination": "/kontakt",
-      "permanent": true
-    },
-    {
-      "source": "/meist/",
-      "destination": "/meist",
-      "permanent": true
-    },
-    {
-      "source": "/portfoolio/",
-      "destination": "/portfoolio",
-      "permanent": true
-    },
-    {
-      "source": "/blogi/",
-      "destination": "/blogi",
-      "permanent": true
-    },
-    {
-      "source": "/privaatsus/",
-      "destination": "/privaatsus",
-      "permanent": true
-    },
-    {
-      "source": "/ostutingimused/",
-      "destination": "/ostutingimused",
-      "permanent": true
-    },
-    {
-      "source": "/tooted/",
-      "destination": "/tooted",
-      "permanent": true
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
@@ -119,6 +86,10 @@
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer-when-downgrade"
         }
       ]
     }

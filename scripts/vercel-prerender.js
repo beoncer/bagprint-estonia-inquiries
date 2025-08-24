@@ -1,12 +1,18 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// SEO data mapping for different routes
-const seoData = {
+// Initialize Supabase client
+const supabaseUrl = 'https://ixotpxliaerkzjznyipi.supabase.co';
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4b3RweGxpYWVya3pqem55aXBpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NzgxNDU3NSwiZXhwIjoyMDYzMzkwNTc1fQ.2fW1J9z8RQAd3WopZHjQ-rSwaf5exwneU1MfQ_DgJME';
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// Static SEO data for main pages
+const staticSeoData = {
   '/': {
     title: 'Leatex - Kvaliteetsed kotid ja pakendid',
     description: 'Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga. Küsi pakkumist juba täna!'
@@ -38,17 +44,99 @@ const seoData = {
   '/tooted': {
     title: 'Tooted - Leatex Kotid ja Pakendid',
     description: 'Vaata meie kvaliteetsete kottide ja pakendite valikut. Puuvillakotid, paberkotid, paelaga kotid ja palju muud.'
+  },
+  '/riidest-kotid': {
+    title: 'Riidest kotid - Leatex Kotid ja Pakendid',
+    description: 'Kvaliteetsed riidest kotid erinevates värvides ja suurustes. Kohandatud trükk ja kiire tootmine.'
+  },
+  '/paberkotid': {
+    title: 'Paberkotid - Leatex Kotid ja Pakendid',
+    description: 'Keskkonnasõbralikud paberkotid kohandatud trükiga. Ideaalne turustamiseks ja reklaamiks.'
+  },
+  '/nooriga-kotid': {
+    title: 'Nooriga kotid - Leatex Kotid ja Pakendid',
+    description: 'Praktilised nooriga kotid erinevates stiilides. Kohandatud trükk ja kõrge kvaliteet.'
+  },
+  '/sussikotid': {
+    title: 'Sussikotid - Leatex Kotid ja Pakendid',
+    description: 'Elegantsed sussikotid kohandatud trükiga. Ideaalne kingade ja jalatiste pakendamiseks.'
+  },
+  '/e-poe-pakendid': {
+    title: 'E-poe pakendid - Leatex Kotid ja Pakendid',
+    description: 'Professionaalsed e-poe pakendid kohandatud trükiga. Turustamiseks ja brändimiseks.'
   }
 };
+
+async function fetchDynamicSeoData() {
+  try {
+    console.log('📊 Fetching dynamic SEO data from Supabase...');
+    
+    // Fetch product SEO data
+    const { data: products, error: productsError } = await supabase
+      .from('products')
+      .select('slug, name, description')
+      .not('slug', 'is', null);
+    
+    if (productsError) {
+      console.error('❌ Error fetching products:', productsError);
+    }
+    
+    // Fetch blog post SEO data
+    const { data: blogPosts, error: blogError } = await supabase
+      .from('blog_posts')
+      .select('slug, title, excerpt')
+      .not('slug', 'is', null);
+    
+    if (blogError) {
+      console.error('❌ Error fetching blog posts:', blogError);
+    }
+    
+    // Create dynamic SEO data
+    const dynamicSeoData = {};
+    
+    // Add product routes
+    if (products) {
+      products.forEach(product => {
+        if (product.slug) {
+          const route = `/tooted/${product.slug}`;
+          dynamicSeoData[route] = {
+            title: `${product.name} - Leatex`,
+            description: product.description || `Kvaliteetne ${product.name} kohandatud trükiga. Leatex kvaliteet ja usaldusväärsus.`
+          };
+        }
+      });
+    }
+    
+    // Add blog post routes
+    if (blogPosts) {
+      blogPosts.forEach(post => {
+        if (post.slug) {
+          const route = `/blogi/${post.slug}`;
+          dynamicSeoData[route] = {
+            title: `${post.title} - Leatex Blogi`,
+            description: post.excerpt || `Loe meie blogist artiklit "${post.title}". Kasulikud nõuanded ja teadmised.`
+          };
+        }
+      });
+    }
+    
+    console.log(`✅ Fetched ${Object.keys(dynamicSeoData).length} dynamic routes`);
+    return dynamicSeoData;
+    
+  } catch (error) {
+    console.error('❌ Error fetching dynamic SEO data:', error);
+    return {};
+  }
+}
 
 async function vercelPrerender() {
   try {
     console.log('🎭 Starting Vercel-compatible pre-rendering...');
-    
+
     // Load routes from the generated file
     const routesFile = path.join(__dirname, '../src/routes.json');
     let routes = [];
-    
+
     if (fs.existsSync(routesFile)) {
       routes = JSON.parse(fs.readFileSync(routesFile, 'utf8'));
       console.log(`📋 Loaded ${routes.length} routes for pre-rendering`);
@@ -65,31 +153,37 @@ async function vercelPrerender() {
         '/tooted'
       ];
     }
+
+    // Fetch dynamic SEO data
+    const dynamicSeoData = await fetchDynamicSeoData();
     
+    // Merge static and dynamic SEO data
+    const allSeoData = { ...staticSeoData, ...dynamicSeoData };
+
     // Create output directory
     const outputDir = path.join(__dirname, '../dist-prerendered');
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     // Copy the built Vite app first
     const distDir = path.join(__dirname, '../dist');
     if (fs.existsSync(distDir)) {
       console.log('📁 Copying built Vite app...');
       copyDirectory(distDir, outputDir);
     }
-    
+
     // Generate HTML files for each route
     console.log('🔄 Generating HTML files for each route...');
-    
+
     for (const route of routes) {
       try {
         console.log(`📝 Processing route: ${route}`);
-        
+
         // Get the base HTML template
         const baseHtmlPath = path.join(outputDir, 'index.html');
         let baseHtml = '';
-        
+
         if (fs.existsSync(baseHtmlPath)) {
           baseHtml = fs.readFileSync(baseHtmlPath, 'utf8');
         } else {
@@ -109,38 +203,36 @@ async function vercelPrerender() {
 </body>
 </html>`;
         }
-        
+
         // Inject SEO data based on route
         let modifiedHtml = baseHtml;
-        if (seoData[route]) {
-          const { title, description } = seoData[route];
+        if (allSeoData[route]) {
+          const { title, description } = allSeoData[route];
           modifiedHtml = baseHtml
             .replace(/<title>.*?<\/title>/, `<title>${title}</title>`)
             .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${description}">`);
         }
-        
-        // For Vercel, create files with the exact route name
-        let fileName = 'index.html';
-        if (route !== '/') {
-          // Remove leading slash and create filename
-          fileName = route.substring(1) + '.html';
+
+        // Create route directory structure
+        const routeDir = path.join(outputDir, route === '/' ? '' : route);
+        if (!fs.existsSync(routeDir)) {
+          fs.mkdirSync(routeDir, { recursive: true });
         }
-        
-        // Write the HTML file directly in the output directory
-        const htmlPath = path.join(outputDir, fileName);
+
+        // Write the HTML file
+        const htmlPath = path.join(routeDir, 'index.html');
         fs.writeFileSync(htmlPath, modifiedHtml);
-        
-        console.log(`✅ Generated: ${fileName}`);
-        
+
+        console.log(`✅ Generated: ${route}/index.html`);
+
       } catch (error) {
         console.error(`❌ Failed to process ${route}:`, error.message);
       }
     }
-    
+
     console.log('🎉 Vercel pre-rendering completed successfully!');
     console.log(`📁 Output directory: ${outputDir}`);
-    console.log('💡 Note: Files are now created as route.html (e.g., kontakt.html) for Vercel compatibility');
-    
+
   } catch (error) {
     console.error('❌ Vercel pre-rendering failed:', error);
     process.exit(1);
@@ -151,13 +243,13 @@ function copyDirectory(src, dest) {
   if (!fs.existsSync(dest)) {
     fs.mkdirSync(dest, { recursive: true });
   }
-  
+
   const entries = fs.readdirSync(src, { withFileTypes: true });
-  
+
   for (const entry of entries) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
-    
+
     if (entry.isDirectory()) {
       copyDirectory(srcPath, destPath);
     } else {

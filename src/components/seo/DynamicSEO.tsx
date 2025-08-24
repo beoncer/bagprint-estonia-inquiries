@@ -37,6 +37,20 @@ const DynamicSEO: React.FC = () => {
     return routeToSlug[path] || path.slice(1).replace(/\//g, '-') || 'home';
   };
 
+  // Check if current meta tags match the pre-rendered data
+  const shouldUpdateMetaTag = (tagName: string, newValue: string): boolean => {
+    const existingTag = document.querySelector(`meta[name="${tagName}"]`);
+    if (!existingTag) return true;
+    
+    const existingValue = existingTag.getAttribute('content');
+    return existingValue !== newValue;
+  };
+
+  // Check if current title matches the pre-rendered data
+  const shouldUpdateTitle = (newTitle: string): boolean => {
+    return document.title !== newTitle;
+  };
+
   useEffect(() => {
     const fetchSEOData = async () => {
       setLoading(true);
@@ -69,20 +83,22 @@ const DynamicSEO: React.FC = () => {
 
   useEffect(() => {
     if (seoData) {
-      // Update document title
-      if (seoData.title) {
+      // Only update title if it's different from pre-rendered data
+      if (seoData.title && shouldUpdateTitle(seoData.title)) {
         document.title = seoData.title;
       }
 
-      // Update meta description
-      const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription && seoData.description) {
-        metaDescription.setAttribute('content', seoData.description);
+      // Only update meta description if it's different from pre-rendered data
+      if (seoData.description && shouldUpdateMetaTag('description', seoData.description)) {
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+          metaDescription.setAttribute('content', seoData.description);
+        }
       }
 
-      // Update meta keywords
-      const metaKeywords = document.querySelector('meta[name="keywords"]');
-      if (seoData.keywords) {
+      // Only update meta keywords if it's different from pre-rendered data
+      if (seoData.keywords && shouldUpdateMetaTag('keywords', seoData.keywords)) {
+        const metaKeywords = document.querySelector('meta[name="keywords"]');
         if (metaKeywords) {
           metaKeywords.setAttribute('content', seoData.keywords);
         } else {
@@ -94,29 +110,37 @@ const DynamicSEO: React.FC = () => {
         }
       }
 
-      // Update Open Graph tags
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle && seoData.title) {
-        ogTitle.setAttribute('content', seoData.title);
+      // Only update Open Graph tags if they're different from pre-rendered data
+      if (seoData.title && shouldUpdateMetaTag('og:title', seoData.title)) {
+        const ogTitle = document.querySelector('meta[property="og:title"]');
+        if (ogTitle) {
+          ogTitle.setAttribute('content', seoData.title);
+        }
       }
 
-      const ogDescription = document.querySelector('meta[property="og:description"]');
-      if (ogDescription && seoData.description) {
-        ogDescription.setAttribute('content', seoData.description);
+      if (seoData.description && shouldUpdateMetaTag('og:description', seoData.description)) {
+        const ogDescription = document.querySelector('meta[property="og:description"]');
+        if (ogDescription) {
+          ogDescription.setAttribute('content', seoData.description);
+        }
       }
 
-      // Update Twitter Card tags
-      const twitterTitle = document.querySelector('meta[name="twitter:title"]');
-      if (twitterTitle && seoData.title) {
-        twitterTitle.setAttribute('content', seoData.title);
+      // Only update Twitter Card tags if they're different from pre-rendered data
+      if (seoData.title && shouldUpdateMetaTag('twitter:title', seoData.title)) {
+        const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+        if (twitterTitle) {
+          twitterTitle.setAttribute('content', seoData.title);
+        }
       }
 
-      const twitterDescription = document.querySelector('meta[name="twitter:description"]');
-      if (twitterDescription && seoData.description) {
-        twitterDescription.setAttribute('content', seoData.description);
+      if (seoData.description && shouldUpdateMetaTag('twitter:description', seoData.description)) {
+        const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+        if (twitterDescription) {
+          twitterDescription.setAttribute('content', seoData.description);
+        }
       }
 
-      // Update canonical URL
+      // Always update canonical URL to current path
       const canonical = document.querySelector('link[rel="canonical"]');
       if (canonical) {
         const currentUrl = `https://leatex.ee${location.pathname}`;
