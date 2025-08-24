@@ -119,17 +119,18 @@ async function vercelPrerender() {
             .replace(/<meta name="description"[^>]*>/, `<meta name="description" content="${description}">`);
         }
         
-        // Create route directory structure
-        const routeDir = path.join(outputDir, route === '/' ? '' : route);
-        if (!fs.existsSync(routeDir)) {
-          fs.mkdirSync(routeDir, { recursive: true });
+        // For Vercel, create files with the exact route name
+        let fileName = 'index.html';
+        if (route !== '/') {
+          // Remove leading slash and create filename
+          fileName = route.substring(1) + '.html';
         }
         
-        // Write the HTML file
-        const htmlPath = path.join(routeDir, 'index.html');
+        // Write the HTML file directly in the output directory
+        const htmlPath = path.join(outputDir, fileName);
         fs.writeFileSync(htmlPath, modifiedHtml);
         
-        console.log(`✅ Generated: ${route}/index.html`);
+        console.log(`✅ Generated: ${fileName}`);
         
       } catch (error) {
         console.error(`❌ Failed to process ${route}:`, error.message);
@@ -138,6 +139,7 @@ async function vercelPrerender() {
     
     console.log('🎉 Vercel pre-rendering completed successfully!');
     console.log(`📁 Output directory: ${outputDir}`);
+    console.log('💡 Note: Files are now created as route.html (e.g., kontakt.html) for Vercel compatibility');
     
   } catch (error) {
     console.error('❌ Vercel pre-rendering failed:', error);

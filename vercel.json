@@ -3,62 +3,44 @@
   "outputDirectory": "dist-prerendered",
   "installCommand": "npm install",
   "framework": "vite",
-  "rewrites": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {},
+  "redirects": [
     {
-      "source": "/kontakt",
-      "destination": "/kontakt/index.html"
+      "source": "/kontakt/",
+      "destination": "/kontakt",
+      "permanent": true
     },
     {
-      "source": "/meist",
-      "destination": "/meist/index.html"
+      "source": "/meist/",
+      "destination": "/meist",
+      "permanent": true
     },
     {
-      "source": "/portfoolio",
-      "destination": "/portfoolio/index.html"
+      "source": "/portfoolio/",
+      "destination": "/portfoolio",
+      "permanent": true
     },
     {
-      "source": "/blogi",
-      "destination": "/blogi/index.html"
+      "source": "/blogi/",
+      "destination": "/blogi",
+      "permanent": true
     },
     {
-      "source": "/privaatsus",
-      "destination": "/privaatsus/index.html"
+      "source": "/privaatsus/",
+      "destination": "/privaatsus",
+      "permanent": true
     },
     {
-      "source": "/ostutingimused",
-      "destination": "/ostutingimused/index.html"
+      "source": "/ostutingimused/",
+      "destination": "/ostutingimused",
+      "permanent": true
     },
     {
-      "source": "/tooted",
-      "destination": "/tooted/index.html"
-    },
-    {
-      "source": "/riidest-kotid",
-      "destination": "/riidest-kotid/index.html"
-    },
-    {
-      "source": "/paberkotid",
-      "destination": "/paberkotid/index.html"
-    },
-    {
-      "source": "/nooriga-kotid",
-      "destination": "/nooriga-kotid/index.html"
-    },
-    {
-      "source": "/sussikotid",
-      "destination": "/sussikotid/index.html"
-    },
-    {
-      "source": "/e-poe-pakendid",
-      "destination": "/e-poe-pakendid/index.html"
-    },
-    {
-      "source": "/tooted/:slug",
-      "destination": "/tooted/:slug/index.html"
-    },
-    {
-      "source": "/blogi/:slug",
-      "destination": "/blogi/:slug/index.html"
+      "source": "/tooted/",
+      "destination": "/tooted",
+      "permanent": true
     }
   ],
   "headers": [
