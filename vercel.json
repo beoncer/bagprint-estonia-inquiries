@@ -6,86 +6,168 @@
   "routes": [
     {
       "src": "/kontakt",
-      "dest": "/kontakt.html"
+      "dest": "/kontakt.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/meist",
-      "dest": "/meist.html"
+      "dest": "/meist.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/portfoolio",
-      "dest": "/portfoolio.html"
+      "dest": "/portfoolio.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/blogi",
-      "dest": "/blogi.html"
+      "dest": "/blogi.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/privaatsus",
-      "dest": "/privaatsus.html"
+      "dest": "/privaatsus.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/ostutingimused",
-      "dest": "/ostutingimused.html"
+      "dest": "/ostutingimused.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/tooted",
-      "dest": "/tooted.html"
+      "dest": "/tooted.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/riidest-kotid",
-      "dest": "/riidest-kotid.html"
+      "dest": "/riidest-kotid.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/paberkotid",
-      "dest": "/paberkotid.html"
+      "dest": "/paberkotid.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/nooriga-kotid",
-      "dest": "/nooriga-kotid.html"
+      "dest": "/nooriga-kotid.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/sussikotid",
-      "dest": "/sussikotid.html"
+      "dest": "/sussikotid.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/e-poe-pakendid",
-      "dest": "/e-poe-pakendid.html"
+      "dest": "/e-poe-pakendid.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/tooted/(.*)",
-      "dest": "/tooted/$1.html"
+      "dest": "/tooted/$1.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     },
     {
       "src": "/blogi/(.*)",
-      "dest": "/blogi/$1.html"
-    }
-  ],
-  "headers": [
+      "dest": "/blogi/$1.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
+    },
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=63072000; includeSubDomains; preload"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer-when-downgrade"
-        }
-      ]
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "headers": {
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "DENY",
+        "X-XSS-Protection": "1; mode=block",
+        "Referrer-Policy": "no-referrer-when-downgrade"
+      }
     }
   ]
 }
