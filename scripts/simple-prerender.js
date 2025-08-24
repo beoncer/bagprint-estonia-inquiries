@@ -18,53 +18,62 @@ const seoData = {
   },
   '/meist': {
     title: 'Meist - Leatex Kotid ja Pakendid',
-    description: 'Tutvu meie ettevõttega ja meie missiooniga pakkuda kvaliteetseid kotte ja pakendeid. Aastatepikkune kogemus.'
+    description: 'Tutvu meie ettevõttega ja saada teada, miks valida Leatex kvaliteetsete kottide ja pakendite jaoks.'
   },
   '/portfoolio': {
     title: 'Portfoolio - Leatex Tööde Näited',
-    description: 'Vaata meie portfooliot ja näe, milliseid kvaliteetseid kotte ja pakendeid oleme valmistanud meie klientidele.'
+    description: 'Vaata meie portfooliot ja näe, milliseid kvaliteetseid kotte ja pakendeid oleme valmistanud.'
   },
   '/blogi': {
     title: 'Blogi - Leatex Kotid ja Pakendid',
-    description: 'Loe meie blogist kasulikke artikleid kottide ja pakendite kohta, trendidest ja uutest toodetest.'
+    description: 'Loe meie blogist kasulikke artikleid kottide ja pakendite kohta, keskkonnasõbralikest lahendustest ja palju muust.'
   },
   '/privaatsus': {
     title: 'Privaatsus - Leatex Kotid ja Pakendid',
-    description: 'Meie privaatsuspoliitika ja andmete kaitse tingimused.'
+    description: 'Leatex privaatsuspoliitika ja andmete kaitse tingimused.'
   },
   '/ostutingimused': {
     title: 'Ostutingimused - Leatex Kotid ja Pakendid',
-    description: 'Ostutingimused ja kohustused kvaliteetsete kottide ja pakendite ostmisel.'
+    description: 'Leatex ostutingimused ja teenuse kasutamise reeglid.'
   },
   '/tooted': {
     title: 'Tooted - Leatex Kotid ja Pakendid',
-    description: 'Vaata meie kvaliteetsete kottide ja pakendite valikut. Puuvillakotid, paberkotid, nööriga kotid ja sussikotid.'
+    description: 'Vaata meie laia valikut kvaliteetseid kotte ja pakendeid erinevatele vajadustele.'
   },
   '/riidest-kotid': {
     title: 'Riidest Kotid - Kvaliteetsed Puuvillakotid',
-    description: 'Kvaliteetsed riidest kotid ja puuvillakotid erinevates suurustes ja värvides. Kohandatud trükk ja personaliseerimine.'
+    description: 'Kvaliteetsed puuvillakotid erinevates suurustes ja värvides. Ideaalne kauplustele ja ettevõtetele.'
   },
   '/paberkotid': {
     title: 'Paberkotid - Keskkonnasõbralikud Pakendid',
-    description: 'Keskkonnasõbralikud paberkotid teie brändile. Taaskasutatud materjal, vastupidav ja ökoloogiline.'
+    description: 'Keskkonnasõbralikud paberkotid erinevates suurustes ja disainides. Taaskasutatavad ja biolagunevad.'
   },
   '/nooriga-kotid': {
     title: 'Nööriga Kotid - Mugavad Seljakotid',
-    description: 'Mugavad nööriga kotid spordivahenditele ja väikestele esemetele. Reguleeritavad nöörid ja erinevad materjalid.'
+    description: 'Mugavad nööriga kotid erinevates suurustes ja materjalides. Ideaalne kauplustele ja kliendidele.'
   },
   '/sussikotid': {
     title: 'Sussikotid - Jalanõude Hoiustamine',
-    description: 'Hingavad sussikotid jalanõude hoiustamiseks ja transportimiseks. Erinevad suurused ja hingavad materjalid.'
+    description: 'Kvaliteetsed sussikotid jalanõude hoiustamiseks. Erinevates suurustes ja materjalides.'
   },
   '/e-poe-pakendid': {
     title: 'E-poe Pakendid - Leatex Kotid ja Pakendid',
-    description: 'Spetsiaalsed pakendid e-kaubanduse jaoks. Turvalised ja professionaalsed lahendused.'
+    description: 'Spetsiaalsed pakendid e-poodide jaoks. Turvalised ja esteetilised lahendused.'
   }
 };
 
 async function simplePrerender() {
   try {
     console.log('🎭 Starting simple pre-rendering process...');
+    
+    // Check if we're running on Vercel
+    const isVercel = process.env.VERCEL === '1' || process.env.VERCEL_ENV;
+    
+    if (isVercel) {
+      console.log('🚀 Detected Vercel environment - using fallback pre-rendering...');
+      await fallbackPrerender();
+      return;
+    }
     
     // Load routes from the generated file
     const routesFile = path.join(__dirname, '../src/routes.json');
@@ -91,220 +100,313 @@ async function simplePrerender() {
         '/e-poe-pakendid'
       ];
     }
+
+    // Set up paths
+    const staticDir = path.join(__dirname, '../dist');
+    const outputDir = path.join(__dirname, '../dist-prerendered');
     
-    // Use absolute paths
-    const staticDir = path.resolve(__dirname, '../dist');
-    const outputDir = path.resolve(__dirname, '../dist-prerendered');
+    console.log(`📁 Static directory: ${staticDir}`);
+    console.log(`📁 Output directory: ${outputDir}`);
     
-    console.log('📁 Static directory:', staticDir);
-    console.log('📁 Output directory:', outputDir);
+    // Create output directory if it doesn't exist
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    // Try to launch browser with different options
+    let browser;
+    try {
+      browser = await puppeteer.launch({ 
+        headless: true, 
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] 
+      });
+    } catch (error) {
+      console.log('⚠️  Failed to launch browser, trying alternative approach...');
+      try {
+        browser = await puppeteer.launch({ 
+          headless: true, 
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+          executablePath: process.env.CHROME_BIN || undefined
+        });
+      } catch (secondError) {
+        console.log('❌ Browser launch failed completely, using fallback...');
+        await fallbackPrerender();
+        return;
+      }
+    }
+
+    const page = await browser.newPage();
     
-    // Start a local server to serve the built files
+    // Set viewport
+    await page.setViewport({ width: 1280, height: 720 });
+    
+    // Start a simple HTTP server to serve the static files
     const http = await import('http');
     const serveStatic = await import('serve-static');
     
     const serve = serveStatic.default(staticDir);
     const server = http.createServer((req, res) => {
-      // Handle React Router - serve index.html for all routes
-      if (req.url && !req.url.includes('.') && req.url !== '/') {
-        // For routes like /kontakt, /meist, etc., serve index.html
-        const indexPath = path.join(staticDir, 'index.html');
-        if (fs.existsSync(indexPath)) {
-          const html = fs.readFileSync(indexPath, 'utf8');
-          res.writeHead(200, { 'Content-Type': 'text/html' });
-          res.end(html);
-          return;
-        }
-      }
-      
-      // Serve static files normally
       serve(req, res, () => {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Not found');
       });
     });
     
-    // Start server on a random port
-    const port = 0;
+    const port = Math.floor(Math.random() * 10000) + 50000;
     server.listen(port, '127.0.0.1');
     
     server.on('listening', async () => {
       const actualPort = server.address().port;
       console.log(`🌐 Server started on port ${actualPort}`);
       
-      // Launch browser
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-      });
-      
-      const page = await browser.newPage();
-      
-      // Set viewport
-      await page.setViewport({ width: 1200, height: 800 });
-      
-      // Process each route
-      for (const route of routes) {
-        try {
-          console.log(`🔄 Rendering: ${route}`);
-          
-          const url = `http://127.0.0.1:${actualPort}${route}`;
-          
-          // Navigate to the page
-          await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
-          
-          // Wait for React to hydrate and render
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          
-          // Wait for the root element to be populated with content
-          await page.waitForFunction(() => {
-            const root = document.querySelector('#root');
-            if (!root) return false;
-            
-            // Check if there's actual content (not just loading)
-            const hasContent = root.innerHTML.length > 100;
-            const hasText = root.textContent && root.textContent.trim().length > 50;
-            
-            return hasContent && hasText;
-          }, { timeout: 15000 });
-          
-          // Additional wait to ensure all dynamic content is loaded
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-          // Get the rendered HTML
-          let html = await page.content();
-          
-          // Inject correct SEO data for static routes
-          if (seoData[route]) {
-            const seo = seoData[route];
-            console.log(`🔧 Injecting SEO for ${route}: ${seo.title}`);
-            
-            // Replace title
-            html = html.replace(
-              /<title>.*?<\/title>/,
-              `<title>${seo.title}</title>`
-            );
-            
-            // Replace meta description
-            html = html.replace(
-              /<meta name="description" content=".*?"/g,
-              `<meta name="description" content="${seo.description}"`
-            );
-            
-            // Replace Open Graph title
-            html = html.replace(
-              /<meta property="og:title" content=".*?"/g,
-              `<meta property="og:title" content="${seo.title}"`
-            );
-            
-            // Replace Open Graph description
-            html = html.replace(
-              /<meta property="og:description" content=".*?"/g,
-              `<meta property="og:description" content="${seo.description}"`
-            );
-            
-            // Replace Twitter title
-            html = html.replace(
-              /<meta name="twitter:title" content=".*?"/g,
-              `<meta name="twitter:title" content="${seo.title}"`
-            );
-            
-            // Replace Twitter description
-            html = html.replace(
-              /<meta name="twitter:description" content=".*?"/g,
-              `<meta name="twitter:description" content="${seo.description}"`
-            );
-          }
-          
-          // Create output path
-          const routePath = route === '/' ? '/index' : route;
-          const outputPath = path.join(outputDir, routePath, 'index.html');
-          
-          // Ensure directory exists
-          const dir = path.dirname(outputPath);
-          if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-          }
-          
-          // Write the HTML file
-          fs.writeFileSync(outputPath, html);
-          console.log(`✅ Wrote: ${routePath}/index.html`);
-          
-        } catch (error) {
-          console.error(`❌ Failed to render ${route}:`, error.message);
-          
-          // Try to get the HTML anyway, even if it failed
+      try {
+        for (const route of routes) {
           try {
-            let html = await page.content();
+            console.log(`🔄 Rendering: ${route}`);
             
-            // Inject SEO data even for failed routes
+            const url = `http://127.0.0.1:${actualPort}${route}`;
+            await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+            
+            // Wait for React to hydrate
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            // Wait for the root element to be populated with content
+            await page.waitForFunction(() => {
+              const root = document.querySelector('#root');
+              if (!root) return false;
+              
+              // Check if there's actual content (not just loading)
+              const hasContent = root.innerHTML.length > 100;
+              const hasText = root.textContent && root.textContent.trim().length > 50;
+              
+              return hasContent && hasText;
+            }, { timeout: 15000 });
+            
+            // Additional wait to ensure all dynamic content is loaded
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Inject SEO data if available
             if (seoData[route]) {
-              const seo = seoData[route];
-              html = html.replace(
-                /<title>.*?<\/title>/,
-                `<title>${seo.title}</title>`
-              );
-              html = html.replace(
-                /<meta name="description" content=".*?"/g,
-                `<meta name="description" content="${seo.description}"`
-              );
+              console.log(`🔧 Injecting SEO for ${route}: ${seoData[route].title}`);
+              await page.evaluate((seo) => {
+                if (document.title !== seo.title) {
+                  document.title = seo.title;
+                }
+                let metaDesc = document.querySelector('meta[name="description"]');
+                if (!metaDesc) {
+                  metaDesc = document.createElement('meta');
+                  metaDesc.name = 'description';
+                  document.head.appendChild(metaDesc);
+                }
+                metaDesc.content = seo.description;
+              }, seoData[route]);
             }
             
-            const routePath = route === '/' ? '/index' : route;
-            const outputPath = path.join(outputDir, routePath, 'index.html');
+            // Get the HTML content
+            const html = await page.content();
             
-            const dir = path.dirname(outputPath);
-            if (!fs.existsSync(dir)) {
-              fs.mkdirSync(dir, { recursive: true });
+            // Create the output path
+            let outputPath;
+            if (route === '/') {
+              outputPath = path.join(outputDir, 'index', 'index.html');
+            } else {
+              outputPath = path.join(outputDir, route.slice(1), 'index.html');
             }
             
+            // Ensure the directory exists
+            const outputDirPath = path.dirname(outputPath);
+            if (!fs.existsSync(outputDirPath)) {
+              fs.mkdirSync(outputDirPath, { recursive: true });
+            }
+            
+            // Write the HTML file
             fs.writeFileSync(outputPath, html);
-            console.log(`⚠️  Wrote fallback HTML for: ${routePath}/index.html`);
-          } catch (fallbackError) {
-            console.error(`❌ Failed to write fallback HTML for ${route}:`, fallbackError.message);
+            console.log(`✅ Wrote: ${route}/index.html`);
+            
+          } catch (error) {
+            console.error(`❌ Failed to render ${route}:`, error.message);
+            
+            // Write fallback HTML even if rendering fails
+            try {
+              let outputPath;
+              if (route === '/') {
+                outputPath = path.join(outputDir, 'index', 'index.html');
+              } else {
+                outputPath = path.join(outputDir, route.slice(1), 'index.html');
+              }
+              
+              const outputDirPath = path.dirname(outputPath);
+              if (!fs.existsSync(outputDirPath)) {
+                fs.mkdirSync(outputDirPath, { recursive: true });
+              }
+              
+              // Create a basic fallback HTML
+              const fallbackHtml = `<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${seoData[route]?.title || 'Leatex - Kvaliteetsed kotid ja pakendid'}</title>
+    <meta name="description" content="${seoData[route]?.description || 'Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga.'}">
+    <script>window.location.href = '/';</script>
+</head>
+<body>
+    <p>Redirecting...</p>
+</body>
+</html>`;
+              
+              fs.writeFileSync(outputPath, fallbackHtml);
+              console.log(`⚠️  Wrote fallback HTML for ${route}`);
+            } catch (fallbackError) {
+              console.error(`❌ Failed to write fallback HTML for ${route}:`, fallbackError.message);
+            }
           }
-        }
-      }
-      
-      // Copy assets from dist to dist-prerendered
-      console.log('📁 Copying assets...');
-      
-      function copyDir(src, dest) {
-        if (!fs.existsSync(dest)) {
-          fs.mkdirSync(dest, { recursive: true });
         }
         
-        const items = fs.readdirSync(src);
-        for (const item of items) {
-          const srcPath = path.join(src, item);
-          const destPath = path.join(dest, item);
-          
-          if (fs.statSync(srcPath).isDirectory()) {
-            copyDir(srcPath, destPath);
-          } else if (!item.endsWith('.html')) {
-            fs.copyFileSync(srcPath, destPath);
+        // Copy assets
+        console.log('📁 Copying assets...');
+        const assetsDir = path.join(staticDir, 'assets');
+        const outputAssetsDir = path.join(outputDir, 'assets');
+        
+        if (fs.existsSync(assetsDir)) {
+          if (!fs.existsSync(outputAssetsDir)) {
+            fs.mkdirSync(outputAssetsDir, { recursive: true });
           }
+          
+          // Copy all files from assets directory
+          const copyRecursive = (src, dest) => {
+            if (fs.statSync(src).isDirectory()) {
+              if (!fs.existsSync(dest)) {
+                fs.mkdirSync(dest, { recursive: true });
+              }
+              const files = fs.readdirSync(src);
+              files.forEach(file => {
+                copyRecursive(path.join(src, file), path.join(dest, file));
+              });
+            } else {
+              fs.copyFileSync(src, dest);
+            }
+          };
+          
+          copyRecursive(assetsDir, outputAssetsDir);
+          
+          // Copy other static files
+          const staticFiles = ['favicon.ico', 'manifest.json', 'robots.txt', 'sitemap.xsl', 'sw.js'];
+          staticFiles.forEach(file => {
+            const srcPath = path.join(staticDir, file);
+            const destPath = path.join(outputDir, file);
+            if (fs.existsSync(srcPath)) {
+              fs.copyFileSync(srcPath, destPath);
+            }
+          });
+          
+          // Copy favicon and icon files
+          const iconFiles = ['favicon-16x16.png', 'favicon-32x32.png', 'favicon-base.png', 'icon-192x192.png', 'icon-512x512.png'];
+          iconFiles.forEach(file => {
+            const srcPath = path.join(staticDir, file);
+            const destPath = path.join(outputDir, file);
+            if (fs.existsSync(srcPath)) {
+              fs.copyFileSync(srcPath, destPath);
+            }
+          });
+          
+          // Copy lovable-uploads directory if it exists
+          const lovableDir = path.join(staticDir, 'lovable-uploads');
+          if (fs.existsSync(lovableDir)) {
+            const destLovableDir = path.join(outputDir, 'lovable-uploads');
+            copyRecursive(lovableDir, destLovableDir);
+          }
+          
+          console.log('✅ Assets copied successfully');
         }
+        
+        console.log('🎉 Pre-rendering completed successfully!');
+        console.log(`📁 Output directory: ${outputDir}`);
+        console.log('🚀 You can now deploy the dist-prerendered folder');
+        
+      } catch (error) {
+        console.error('❌ Error during pre-rendering:', error.message);
+      } finally {
+        await browser.close();
+        server.close();
       }
-      
-      copyDir(staticDir, outputDir);
-      console.log('✅ Assets copied successfully');
-      
-      // Cleanup
-      await browser.close();
-      server.close();
-      
-      console.log('🎉 Pre-rendering completed successfully!');
-      console.log(`📁 Output directory: ${outputDir}`);
-      console.log('🚀 You can now deploy the dist-prerendered folder');
-      
     });
     
   } catch (error) {
-    console.error('❌ Pre-rendering failed:', error);
-    process.exit(1);
+    console.error('❌ Fatal error:', error.message);
+    // Try fallback as last resort
+    await fallbackPrerender();
   }
 }
 
-// Run the prerenderer
+async function fallbackPrerender() {
+  console.log('🔄 Using fallback pre-rendering method...');
+  
+  try {
+    // Load routes
+    const routesFile = path.join(__dirname, '../src/routes.json');
+    let routes = [];
+    
+    if (fs.existsSync(routesFile)) {
+      routes = JSON.parse(fs.readFileSync(routesFile, 'utf8'));
+    } else {
+      routes = ['/', '/kontakt', '/meist', '/portfoolio', '/blogi', '/privaatsus', '/ostutingimused', '/tooted'];
+    }
+    
+    const outputDir = path.join(__dirname, '../dist-prerendered');
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+    
+    // Create basic HTML files with SEO data
+    for (const route of routes) {
+      const seo = seoData[route] || {
+        title: 'Leatex - Kvaliteetsed kotid ja pakendid',
+        description: 'Kvaliteetsed puuvillakotid, paberkotid, paelaga kotid ja pakendid kohandatud trükiga.'
+      };
+      
+      let outputPath;
+      if (route === '/') {
+        outputPath = path.join(outputDir, 'index', 'index.html');
+      } else {
+        outputPath = path.join(outputDir, route.slice(1), 'index.html');
+      }
+      
+      const outputDirPath = path.dirname(outputPath);
+      if (!fs.existsSync(outputDirPath)) {
+        fs.mkdirSync(outputDirPath, { recursive: true });
+      }
+      
+      const html = `<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${seo.title}</title>
+    <meta name="description" content="${seo.description}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://leatex.ee${route}">
+    <script>window.location.href = '${route}';</script>
+</head>
+<body>
+    <div id="root">
+        <h1>${seo.title}</h1>
+        <p>${seo.description}</p>
+        <p>Redirecting to main site...</p>
+    </div>
+</body>
+</html>`;
+      
+      fs.writeFileSync(outputPath, html);
+      console.log(`✅ Created fallback HTML for ${route}`);
+    }
+    
+    console.log('🎉 Fallback pre-rendering completed!');
+    
+  } catch (error) {
+    console.error('❌ Fallback pre-rendering failed:', error.message);
+    throw error;
+  }
+}
+
 simplePrerender();
