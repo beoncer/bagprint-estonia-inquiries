@@ -295,6 +295,13 @@ async function vercelPrerender() {
           const htmlPath = path.join(routeDir, 'index.html');
           fs.writeFileSync(htmlPath, modifiedHtml);
           console.log(`✅ Generated: ${route}/index.html`);
+          
+          // Remove any flat .html file if it exists (cleanup)
+          const flatHtmlPath = path.join(outputDir, `${route}.html`);
+          if (fs.existsSync(flatHtmlPath)) {
+            fs.unlinkSync(flatHtmlPath);
+            console.log(`  🧹 Cleaned up flat file: ${route}.html`);
+          }
         }
 
       } catch (error) {
