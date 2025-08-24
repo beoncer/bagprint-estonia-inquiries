@@ -33,16 +33,82 @@
       "destination": "/tooted/index.html"
     },
     {
-      "source": "/tooted/:slug",
-      "destination": "/tooted/:slug/index.html"
+      "source": "/riidest-kotid",
+      "destination": "/riidest-kotid/index.html"
     },
     {
-      "source": "/blogi/:slug",
-      "destination": "/blogi/:slug/index.html"
+      "source": "/paberkotid",
+      "destination": "/paberkotid/index.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/nooriga-kotid",
+      "destination": "/nooriga-kotid/index.html"
+    },
+    {
+      "source": "/sussikotid",
+      "destination": "/sussikotid/index.html"
+    },
+    {
+      "source": "/e-poe-pakendid",
+      "destination": "/e-poe-pakendid/index.html"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/kontakt",
+      "dest": "/kontakt/index.html"
+    },
+    {
+      "src": "/meist",
+      "dest": "/meist/index.html"
+    },
+    {
+      "src": "/portfoolio",
+      "dest": "/portfoolio/index.html"
+    },
+    {
+      "src": "/blogi",
+      "dest": "/blogi/index.html"
+    },
+    {
+      "src": "/privaatsus",
+      "dest": "/privaatsus/index.html"
+    },
+    {
+      "src": "/ostutingimused",
+      "dest": "/ostutingimused/index.html"
+    },
+    {
+      "src": "/tooted",
+      "dest": "/tooted/index.html"
+    },
+    {
+      "src": "/riidest-kotid",
+      "dest": "/riidest-kotid/index.html"
+    },
+    {
+      "src": "/paberkotid",
+      "dest": "/paberkotid/index.html"
+    },
+    {
+      "src": "/nooriga-kotid",
+      "dest": "/nooriga-kotid/index.html"
+    },
+    {
+      "src": "/sussikotid",
+      "dest": "/sussikotid/index.html"
+    },
+    {
+      "src": "/e-poe-pakendid",
+      "dest": "/e-poe-pakendid/index.html"
+    },
+    {
+      "src": "/tooted/(.*)",
+      "dest": "/tooted/$1/index.html"
+    },
+    {
+      "src": "/blogi/(.*)",
+      "dest": "/blogi/$1/index.html"
     }
   ],
   "headers": [
