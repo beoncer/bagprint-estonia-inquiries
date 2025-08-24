@@ -3,54 +3,6 @@
   "outputDirectory": "dist-prerendered",
   "installCommand": "npm install",
   "framework": "vite",
-  "rewrites": [
-    {
-      "source": "/kontakt",
-      "destination": "/kontakt/index.html"
-    },
-    {
-      "source": "/meist",
-      "destination": "/meist/index.html"
-    },
-    {
-      "source": "/portfoolio",
-      "destination": "/portfoolio/index.html"
-    },
-    {
-      "source": "/blogi",
-      "destination": "/blogi/index.html"
-    },
-    {
-      "source": "/privaatsus",
-      "destination": "/privaatsus/index.html"
-    },
-    {
-      "source": "/ostutingimused",
-      "destination": "/ostutingimused/index.html"
-    },
-    {
-      "source": "/tooted",
-      "destination": "/tooted/index.html"
-    },
-    {
-      "source": "/riidest-kotid",
-      "destination": "/riidest-kotid/index.html"
-    },
-    {
-      "source": "/paberkotid",
-      "destination": "/paberkotid/index.html"
-    },
-    {
-      "source": "/nooriga-kotid",
-      "destination": "/nooriga-kotid/index.html"
-    },
-    {
-      "source": "/sussikotid",
-      "destination": "/sussikotid/index.html"
-    },
-    {
-      "source": "/e-poe-pakendid",
-      "destination": "/e-poe-pakendid/index.html"
-    }
-  ]
+  "cleanUrls": true,
+  "trailingSlash": false
 }
